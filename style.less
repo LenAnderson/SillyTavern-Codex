@@ -1,0 +1,117 @@
+#chat {
+	--stcdx--color: rgb(0, 255, 255);
+	--stcdx--icon: "🧾";
+}
+.stcdx--link {
+	cursor: help;
+	color: var(--stcdx--color);
+	transition: 400ms;
+	&:hover {
+		text-decoration: underline dotted;
+		&:after {
+			opacity: 1;
+		}
+	}
+	&:after {
+		content: var(--stcdx--icon);
+		opacity: 0.5;
+	}
+}
+
+
+.stcdx--root {
+	--scale-speaker: 100;
+	--top: calc(100 - 100 / var(--scale-speaker) * 100);
+	--offset: 25;
+	--transition: 400;
+	--scale-dropoff: 3;
+	--position: 100;
+	--width: calc((100vw - var(--sheldWidth)) / 2);
+}
+.stcdx--root {
+	background-color: var(--SmartThemeBotMesBlurTintColor);
+	position: absolute;
+	top: calc(var(--top) * 1%);
+	bottom: 0;
+	left: calc(var(--position) * (100vw - var(--width)) / 100);
+	left: clamp(0vw, calc(var(--position) * (100vw - var(--width)) / 100 - var(--settings-panel-width, 0px)), calc(100vw - var(--width)));
+	width: var(--width);
+	perspective: 500px;
+	transform-style: preserve-3d;
+	transition: calc(var(--transition) * 1ms);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+
+	> .stcdx--header {
+		flex: 0 0 auto;
+		height: 2em;
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		> .stcdx--controls {
+			right: 0;
+			top: 0;
+			> .stcdx--close {
+				height: 15px;
+				aspect-ratio: 1 / 1;
+				font-size: 20px;
+				opacity: 0.5;
+				transition: all 250ms;
+			}
+		}
+	}
+
+	> .stcdx--content {
+		height: 100%;
+		width: 100%;
+		overflow: auto;
+		padding: 1em;
+		text-align: justify;
+		h1, h2, h3 {
+			text-align: center;
+		}
+		img {
+			max-height: 50vh;
+			width: 100%;
+			object-fit: contain;
+			object-position: center;
+		}
+	}
+}
+
+
+
+
+.stcdx--tooltip.mes_text {
+	background-color: var(--SmartThemeBotMesBlurTintColor);
+	backdrop-filter: blur(var(--SmartThemeBlurStrength));
+	filter: drop-shadow(1px 1px 2px var(--black50a));
+	border: 1px solid var(--SmartThemeBorderColor);
+	border-radius: 10px;
+	max-width: 30vw;
+	max-height: 60vh;
+	// min-width: 100px;
+	// min-height: 100px;
+	overflow: auto;
+	position: fixed;
+	z-index: 99999;
+	padding: 1em;
+	text-align: justify;
+	> br {
+		display: none;
+	}
+	h1, h2, h3 {
+		text-align: center;
+	}
+	img {
+		max-height: calc(60vh * 0.5);
+		width: 100%;
+		object-fit: contain;
+		object-position: center;
+	}
+	> p:last-child {
+		margin-bottom: 0;
+	}
+}

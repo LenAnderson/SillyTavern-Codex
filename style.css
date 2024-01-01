@@ -1,0 +1,111 @@
+#chat {
+  --stcdx--color: #00ffff;
+  --stcdx--icon: "🧾";
+}
+.stcdx--link {
+  cursor: help;
+  color: var(--stcdx--color);
+  transition: 400ms;
+}
+.stcdx--link:hover {
+  text-decoration: underline dotted;
+}
+.stcdx--link:hover:after {
+  opacity: 1;
+}
+.stcdx--link:after {
+  content: var(--stcdx--icon);
+  opacity: 0.5;
+}
+.stcdx--root {
+  --scale-speaker: 100;
+  --top: calc(100 - 100 / var(--scale-speaker) * 100);
+  --offset: 25;
+  --transition: 400;
+  --scale-dropoff: 3;
+  --position: 100;
+  --width: calc((100vw - var(--sheldWidth)) / 2);
+}
+.stcdx--root {
+  background-color: var(--SmartThemeBotMesBlurTintColor);
+  position: absolute;
+  top: calc(var(--top) * 1%);
+  bottom: 0;
+  left: calc(var(--position) * (100vw - var(--width)) / 100);
+  left: clamp(0vw, calc(var(--position) * (100vw - var(--width)) / 100 - var(--settings-panel-width, 0px)), calc(100vw - var(--width)));
+  width: var(--width);
+  perspective: 500px;
+  transform-style: preserve-3d;
+  transition: calc(var(--transition) * 1ms);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.stcdx--root > .stcdx--header {
+  flex: 0 0 auto;
+  height: 2em;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.stcdx--root > .stcdx--header > .stcdx--controls {
+  right: 0;
+  top: 0;
+}
+.stcdx--root > .stcdx--header > .stcdx--controls > .stcdx--close {
+  height: 15px;
+  aspect-ratio: 1 / 1;
+  font-size: 20px;
+  opacity: 0.5;
+  transition: all 250ms;
+}
+.stcdx--root > .stcdx--content {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  padding: 1em;
+  text-align: justify;
+}
+.stcdx--root > .stcdx--content h1,
+.stcdx--root > .stcdx--content h2,
+.stcdx--root > .stcdx--content h3 {
+  text-align: center;
+}
+.stcdx--root > .stcdx--content img {
+  max-height: 50vh;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+.stcdx--tooltip.mes_text {
+  background-color: var(--SmartThemeBotMesBlurTintColor);
+  backdrop-filter: blur(var(--SmartThemeBlurStrength));
+  filter: drop-shadow(1px 1px 2px var(--black50a));
+  border: 1px solid var(--SmartThemeBorderColor);
+  border-radius: 10px;
+  max-width: 30vw;
+  max-height: 60vh;
+  overflow: auto;
+  position: fixed;
+  z-index: 99999;
+  padding: 1em;
+  text-align: justify;
+}
+.stcdx--tooltip.mes_text > br {
+  display: none;
+}
+.stcdx--tooltip.mes_text h1,
+.stcdx--tooltip.mes_text h2,
+.stcdx--tooltip.mes_text h3 {
+  text-align: center;
+}
+.stcdx--tooltip.mes_text img {
+  max-height: calc(60vh * 0.5);
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+.stcdx--tooltip.mes_text > p:last-child {
+  margin-bottom: 0;
+}
