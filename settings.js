@@ -8,6 +8,7 @@ export const initSettings = ()=>{
         isEnabled: true,
         color: 'rgba(0, 255, 255, 1)',
         icon: '🧾',
+        onlyFirst: false,
     }, extension_settings.codex ?? {});
     extension_settings.codex = settings;
 
@@ -26,6 +27,12 @@ export const initSettings = ()=>{
                         </label>
                     </div>
                     <div class="flex-container">
+                        <label class="checkbox_label">
+                            <input type="checkbox" id="stcdx--onlyFirst" ${settings.onlyFirst ? 'checked' : ''}>
+                            Only create link on first occurrence in a message
+                        </label>
+                    </div>
+                    <div class="flex-container">
                         <toolcool-color-picker id="stcdx--color" color="${settings.color}"></toolcool-color-picker>
                         <span>Codex link color</span>
                     </div>
@@ -40,8 +47,14 @@ export const initSettings = ()=>{
         </div>
     `;
     $('#extensions_settings').append(html);
+
     document.querySelector('#stcdx--isEnabled').addEventListener('click', ()=>{
         settings.isEnabled = document.querySelector('#stcdx--isEnabled').checked;
+        saveSettingsDebounced();
+        restartDebounced();
+    });
+    document.querySelector('#stcdx--onlyFirst').addEventListener('click', ()=>{
+        settings.onlyFirst = document.querySelector('#stcdx--onlyFirst').checked;
         saveSettingsDebounced();
         restartDebounced();
     });

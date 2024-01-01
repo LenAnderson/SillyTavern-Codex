@@ -133,11 +133,11 @@ const updateMessageIdx = async(idx)=>{
     await updateMessage(document.querySelector(`#chat > .mes[mesid="${idx}"]`));
 };
 const restoreMessage = (/**@type {HTMLElement}*/msg) => {
-    const oldId = msg.getAttribute('data-codex');
+    const oldId = msg.querySelector('.mes_text').getAttribute('data-codex');
     if (oldId && originals[oldId]) {
         msg.querySelector('.mes_text').replaceWith(originals[oldId]);
         originals[oldId] = undefined;
-        msg.removeAttribute('data-codex');
+        msg.querySelector('.mes_text').removeAttribute('data-codex');
     }
 };
 const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
@@ -145,6 +145,7 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
     restoreMessage(msg);
     const nodes = document.evaluate('.//text()', msg.querySelector('.mes_text'), null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
     let modified = false;
+    const found = [];
     for (let i = 0; i < nodes.snapshotLength; i++) {
         const node = nodes.snapshotItem(i);
         const parent = node.parentElement;
@@ -154,6 +155,7 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
                 const entry = book.entries[entryIdx];
                 const keys = entry.key.filter(it=>it.startsWith('codex:'));
                 for (const key of keys) {
+                    if (settings.onlyFirst && found.includes(entry.uid)) break;
                     let searchKey = key.substring(6);
                     let re;
                     let plain;
@@ -166,7 +168,9 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
                     } else {
                         plain = searchKey;
                     }
-                    if (node.textContent.search(re ?? plain) != -1) {
+                    let offset = 0;
+                    while (node.textContent.substring(offset).search(re ?? plain) != -1) {
+                        if (settings.onlyFirst && found.includes(entry.uid)) break;
                         // secondary keys
                         const ksList = entry.keysecondary;
                         if (ksList.length > 0) {
@@ -215,15 +219,15 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
                         let start;
                         let end;
                         if (re) {
-                            const match = node.textContent.match(re);
-                            let idx = match.index;
+                            const match = node.textContent.substring(offset).match(re);
+                            let idx = offset + match.index;
                             if (match[1]) {
                                 idx += match[0].search(match[1]);
                             }
                             start = idx;
                             end = start + (match[1] ?? match[0]).length;
                         } else {
-                            start = node.textContent.search(re ?? plain);
+                            start = offset + node.textContent.substring(offset).search(re ?? plain);
                             end = start + key.length - 6;
                         }
                         matches.push({
@@ -234,6 +238,8 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
                             book: book.name,
                             entry: entry.uid,
                         });
+                        offset += end;
+                        found.push(entry.uid);
                     }
                 }
             }
@@ -242,7 +248,7 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
             log('FOUND', { msg, text:node.textContent, matches });
             if (!modified) {
                 const id = uuidv4();
-                msg.setAttribute('data-codex', id);
+                msg.querySelector('.mes_text').setAttribute('data-codex', id);
                 originals[id] = msg.querySelector('.mes_text').cloneNode(true);
             }
             modified = true;
