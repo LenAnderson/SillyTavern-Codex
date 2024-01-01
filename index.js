@@ -71,7 +71,10 @@ const init = async()=>{
     eventSource.on(event_types.WORLDINFO_SETTINGS_UPDATED, ()=>restartDebounced());
     eventSource.on(event_types.WORLDINFO_UPDATED, ()=>restartDebounced());
 
-    eventSource.on(event_types.MESSAGE_EDITED, (idx)=>queueMessage(idx));
+    eventSource.on(event_types.MESSAGE_EDITED, (idx)=>{
+        document.querySelector(`#chat .mes[mesid="${idx}"] .mes_text`).removeAttribute('data-codex');
+        queueMessage(idx);
+    });
     eventSource.on(event_types.USER_MESSAGE_RENDERED, (idx)=>queueMessage(idx));
     eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (idx)=>queueMessage(idx));
 };
