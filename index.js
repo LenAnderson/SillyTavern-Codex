@@ -92,8 +92,6 @@ const getBook = async(name)=>{
     }
     return null;
 };
-registerSlashCommand('codex-refresh', ()=>restartDebounced(), [], 'Reload World Info', true, true);
-registerSlashCommand('codex-off', ()=>end(), [], 'Reload World Info', true, true);
 
 
 let currentCodex;
