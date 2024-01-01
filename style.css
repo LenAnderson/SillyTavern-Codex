@@ -77,6 +77,10 @@
   width: 100%;
   object-fit: contain;
   object-position: center;
+  cursor: zoom-in;
+}
+.stcdx--root > .stcdx--content img:hover {
+  filter: drop-shadow(2px 4px 6px black);
 }
 .stcdx--tooltip.mes_text {
   background-color: var(--SmartThemeBotMesBlurTintColor);
@@ -108,4 +112,21 @@
 }
 .stcdx--tooltip.mes_text > p:last-child {
   margin-bottom: 0;
+}
+.stcdx--blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  backdrop-filter: blur(0px);
+  cursor: zoom-out;
+  transition: 400ms;
+}
+.stcdx--blocker.stcdx--active {
+  backdrop-filter: blur(10px);
+}
+.stcdx--blocker > .stcdx--clone {
+  position: absolute;
+  object-fit: contain;
+  object-position: center;
+  transition: 400ms;
 }

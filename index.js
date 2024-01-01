@@ -99,7 +99,7 @@ const unrenderCodex = ()=>{
     root = null;
     codexContent = null;
     currentCodex = null;
-}
+};
 const renderCodex = (match)=>{
     if (currentCodex && currentCodex.book == match.book && currentCodex.entry == match.entry) {
         unrenderCodex();
@@ -107,6 +107,41 @@ const renderCodex = (match)=>{
     else {
         if (!root) makeRoot();
         codexContent.innerHTML = makeCodexDom(match);
+        Array.from(codexContent.querySelectorAll('img')).forEach(img=>{
+            img.addEventListener('click', async()=>{
+                const rect = img.getBoundingClientRect();
+                let clone;
+                const blocker = document.createElement('div'); {
+                    blocker.classList.add('stcdx--blocker');
+                    blocker.addEventListener('click', async()=>{
+                        const rect = img.getBoundingClientRect();
+                        blocker.classList.remove('stcdx--active');
+                        clone.style.top = `${rect.top}px`;
+                        clone.style.left = `${rect.left}px`;
+                        clone.style.width = `${rect.width}px`;
+                        clone.style.height = `${rect.height}px`;
+                        await delay(550);
+                        blocker.remove();
+                    });
+                    clone = document.createElement('img'); {
+                        clone.classList.add('stcdx--clone');
+                        clone.src = img.src;
+                        clone.style.top = `${rect.top}px`;
+                        clone.style.left = `${rect.left}px`;
+                        clone.style.width = `${rect.width}px`;
+                        clone.style.height = `${rect.height}px`;
+                        blocker.append(clone);
+                    }
+                    document.body.append(blocker);
+                }
+                await delay(50);
+                blocker.classList.add('stcdx--active');
+                clone.style.top = '0';
+                clone.style.left = '0';
+                clone.style.width = '100vw';
+                clone.style.height = '100vh';
+            });
+        });
         currentCodex = match;
     }
 };
