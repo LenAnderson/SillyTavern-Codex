@@ -92,7 +92,7 @@ eventSource.on(event_types.APP_READY, ()=>init());
 
 
 const getBook = async(name)=>{
-    const result = await fetch('/getworldinfo', {
+    const result = await fetch('/api/worldinfo/get', {
         method: 'POST',
         headers: getRequestHeaders(),
         body: JSON.stringify({ name }),
