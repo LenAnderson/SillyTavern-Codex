@@ -1,6 +1,6 @@
-import { saveSettingsDebounced } from "../../../../script.js";
-import { extension_settings } from "../../../extensions.js";
-import { restartDebounced } from "./index.js";
+import { saveSettingsDebounced } from '../../../../script.js';
+import { extension_settings } from '../../../extensions.js';
+import { restartDebounced } from './index.js';
 
 export let settings;
 export const initSettings = ()=>{
@@ -9,6 +9,7 @@ export const initSettings = ()=>{
         color: 'rgba(0, 255, 255, 1)',
         icon: '🧾',
         onlyFirst: false,
+        requirePrefix: true,
     }, extension_settings.codex ?? {});
     extension_settings.codex = settings;
 
@@ -24,6 +25,12 @@ export const initSettings = ()=>{
                         <label class="checkbox_label">
                             <input type="checkbox" id="stcdx--isEnabled" ${settings.isEnabled ? 'checked' : ''}>
                             Enable codex
+                        </label>
+                    </div>
+                    <div class="flex-container">
+                        <label class="checkbox_label">
+                            <input type="checkbox" id="stcdx--requirePrefix" ${settings.requirePrefix ? 'checked' : ''}>
+                            Only match keys with <code>codex:</code> prefix
                         </label>
                     </div>
                     <div class="flex-container">
@@ -50,6 +57,11 @@ export const initSettings = ()=>{
 
     document.querySelector('#stcdx--isEnabled').addEventListener('click', ()=>{
         settings.isEnabled = document.querySelector('#stcdx--isEnabled').checked;
+        saveSettingsDebounced();
+        restartDebounced();
+    });
+    document.querySelector('#stcdx--requirePrefix').addEventListener('click', ()=>{
+        settings.requirePrefix = document.querySelector('#stcdx--requirePrefix').checked;
         saveSettingsDebounced();
         restartDebounced();
     });

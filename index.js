@@ -194,10 +194,10 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
         for (const book of books) {
             for (const entryIdx of Object.keys(book.entries)) {
                 const entry = book.entries[entryIdx];
-                const keys = entry.key.filter(it=>it.startsWith('codex:'));
+                const keys = entry.key.filter(it=>!settings.requirePrefix || it.startsWith('codex:'));
                 for (const key of keys) {
                     if (settings.onlyFirst && found.includes(entry.uid)) break;
-                    let searchKey = key.substring(6);
+                    let searchKey = key.substring(settings.requirePrefix || key.startsWith('codex:') ? 6 : 0);
                     let re;
                     let plain;
                     if (searchKey.match(/^\/.+\/[a-z]*$/)) {
@@ -269,12 +269,12 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
                             end = start + (match[1] ?? match[0]).length;
                         } else {
                             start = offset + node.textContent.substring(offset).search(re ?? plain);
-                            end = start + key.length - 6;
+                            end = start + key.length - (key.startsWith('codex:') ? 6 : 0);
                         }
                         matches.push({
                             start,
                             end,
-                            key: key.substring(6),
+                            key: key.substring(settings.requirePrefix || key.startsWith('codex:') ? 6 : 0),
                             content: entry.content,
                             book: book.name,
                             entry: entry.uid,
