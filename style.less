@@ -50,6 +50,81 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		padding-right: 2em;
+		gap: 1em;
+		> .stcdx--menuTrigger {
+			cursor: pointer;
+			font-size: 2em;
+			padding: 0.2em;
+			> .stcdx--books {
+				cursor: default;
+				background-color: var(--SmartThemeBotMesBlurTintColor);
+				border: 1px solid var(--SmartThemeBorderColor);
+				backdrop-filter: blur(var(--SmartThemeBlurStrength));
+				border-radius: 10px;
+				font-size: 0.5em;
+				position: absolute;
+				top: 100%;
+				left: 0;
+				overflow: auto;
+				margin: 0;
+				padding: 0.5em;
+				max-height: 90vh;
+				list-style: none;
+				z-index: 99999;
+				max-width: 100%;
+				> .stcdx--book {
+					> .stcdx--name {
+						font-weight: bold;
+					}
+					> .stcdx--entries {
+						list-style: none;
+						padding: 0 0.5em 0.5em 0.5em;
+						margin: 0;
+						> .stcdx--entry {
+							cursor: pointer;
+							white-space: nowrap;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							opacity: 0.8;
+							transition: 200ms;
+							&:hover {
+								opacity: 1;
+							}
+						}
+					}
+				}
+			}
+		}
+		> .stcdx--search {
+			position: relative;
+			flex: 1 1 auto;
+			> .stcdx--results {
+				background-color: var(--SmartThemeBotMesBlurTintColor);
+				border: 1px solid var(--SmartThemeBorderColor);
+				backdrop-filter: blur(var(--SmartThemeBlurStrength));
+				border-radius: 10px;
+				position: absolute;
+				top: 100%;
+				left: 0;
+				overflow: auto;
+				margin: 0;
+				padding: 0.5em;
+				max-height: 90vh;
+				list-style: none;
+				z-index: 99999;
+				width: 100%;
+				> .stcdx--result {
+					opacity: 0.8;
+					transition: 200ms;
+					cursor: pointer;
+					padding: 0.25em;
+					&:hover {
+						opacity: 1;
+					}
+				}
+			}
+		}
 		> .stcdx--controls {
 			right: 0;
 			top: 0;

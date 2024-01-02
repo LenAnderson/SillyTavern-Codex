@@ -1,4 +1,3 @@
-import { log } from '../../SillyTavern-Landing/index.js';
 import { debounceAsync, makeCodexDom } from '../index.js';
 
 export class Tooltip {
