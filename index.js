@@ -1,5 +1,4 @@
 import { eventSource, event_types, getRequestHeaders, messageFormatting, substituteParams } from '../../../../script.js';
-import { registerSlashCommand } from '../../../slash-commands.js';
 import { delay, uuidv4 } from '../../../utils.js';
 import { world_info } from '../../../world-info.js';
 import { initSettings, settings } from './settings.js';
@@ -8,7 +7,7 @@ import { Tooltip } from './src/Tooltip.js';
 const log = (...msg)=>console.log('[STCDX]', ...msg);
 const warn = (...msg)=>console.warn('[STCDX]', ...msg);
 
-function debounceAsync(func, timeout = 300) {
+export function debounceAsync(func, timeout = 300) {
     let timer;
     /**@type {Promise}*/
     let debouncePromise;

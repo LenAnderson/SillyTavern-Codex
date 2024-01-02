@@ -1,11 +1,12 @@
 import { log } from '../../SillyTavern-Landing/index.js';
-import { makeCodexDom } from '../index.js';
+import { debounceAsync, makeCodexDom } from '../index.js';
 
 export class Tooltip {
     /**@type {HTMLElement}*/ trigger;
     /**@type {HTMLElement}*/ root;
     /**@type {Function}*/ boundMove;
     /**@type {Function}*/ boundScroll;
+    /**@type {Function}*/ updatePositionDebounced;
     /**@type {Object}*/ match;
 
 
@@ -21,6 +22,7 @@ export class Tooltip {
         }
         this.boundMove = this.move.bind(this);
         this.boundScroll = this.scroll.bind(this);
+        this.updatePositionDebounced = debounceAsync(async(x, y)=>await this.updatePosition(x, y));
         trigger.addEventListener('pointerenter', evt=>this.show(evt));
         trigger.addEventListener('pointerleave', ()=>this.hide());
     }
@@ -54,7 +56,7 @@ export class Tooltip {
         window.removeEventListener('pointermove', this.boundScroll);
     }
     move(/**@type {PointerEvent}*/evt) {
-        this.updatePosition(evt.clientX, evt.clientY);
+        this.updatePositionDebounced(evt.clientX, evt.clientY);
     }
     scroll(/**@type {WheelEvent}*/evt) {
         evt.preventDefault();
