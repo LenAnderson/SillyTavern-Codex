@@ -43,6 +43,7 @@ let codexContent;
 const queue = [];
 
 const queueMessage = async(...idxList)=>{
+    if (!isReady) return;
     log('queueMessage', idxList);
     queue.push(...idxList);
     await processQueueDebounced();
@@ -72,6 +73,10 @@ const init = async()=>{
     eventSource.on(event_types.WORLDINFO_UPDATED, ()=>restartDebounced());
 
     eventSource.on(event_types.MESSAGE_EDITED, (idx)=>{
+        document.querySelector(`#chat .mes[mesid="${idx}"] .mes_text`).removeAttribute('data-codex');
+        queueMessage(idx);
+    });
+    eventSource.on(event_types.MESSAGE_SWIPED, (idx)=>{
         document.querySelector(`#chat .mes[mesid="${idx}"] .mes_text`).removeAttribute('data-codex');
         queueMessage(idx);
     });
@@ -170,7 +175,7 @@ const updateMessageIdx = async(idx)=>{
 };
 const restoreMessage = (/**@type {HTMLElement}*/msg) => {
     const oldId = msg.querySelector('.mes_text').getAttribute('data-codex');
-    if (oldId && originals[oldId]) {
+    if (oldId && originals[oldId] && originals[oldId].textContent == msg.querySelector('.mes_text').textContent) {
         msg.querySelector('.mes_text').replaceWith(originals[oldId]);
         originals[oldId] = undefined;
         msg.querySelector('.mes_text').removeAttribute('data-codex');
@@ -390,6 +395,7 @@ const loadBooks = async()=>{
 
 
 let restarting = false;
+let isReady = false;
 const restart = async()=>{
     if (restarting) return;
     restarting = true;
@@ -404,9 +410,11 @@ const start = async()=>{
     document.querySelector('#chat').style.setProperty('--stcdx--color', `${settings.color}`);
     document.querySelector('#chat').style.setProperty('--stcdx--icon', `"${settings.icon}"`);
     await loadBooks();
+    isReady = true;
     await updateChat();
 };
 const end = async()=>{
+    isReady = false;
     root?.remove();
     root = null;
     codexContent = null;
