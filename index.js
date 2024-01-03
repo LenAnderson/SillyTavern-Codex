@@ -1,4 +1,6 @@
-import { eventSource, event_types, getRequestHeaders, messageFormatting, substituteParams } from '../../../../script.js';
+import { characters, chat_metadata, eventSource, event_types, getRequestHeaders, messageFormatting, substituteParams } from '../../../../script.js';
+import { getContext } from '../../../extensions.js';
+import { groups } from '../../../group-chats.js';
 import { registerSlashCommand } from '../../../slash-commands.js';
 import { delay, uuidv4 } from '../../../utils.js';
 import { world_info } from '../../../world-info.js';
@@ -75,6 +77,9 @@ const init = async()=>{
     });
     eventSource.on(event_types.WORLDINFO_UPDATED, ()=>restartDebounced());
 
+    eventSource.on(event_types.CHARACTER_EDITED, ()=>restartIfBooksChanged());
+    eventSource.on(event_types.SETTINGS_UPDATED, ()=>restartIfBooksChanged());
+
     eventSource.on(event_types.MESSAGE_EDITED, (idx)=>{
         document.querySelector(`#chat .mes[mesid="${idx}"] .mes_text`).removeAttribute('data-codex');
         queueMessage(idx);
@@ -112,6 +117,7 @@ const unrenderCodex = ()=>{
     currentCodex = null;
 };
 const renderCodex = (match)=>{
+    if (!isReady) return;
     if (currentCodex && currentCodex.book == match?.book && currentCodex.entry == match?.entry) {
         unrenderCodex();
     }
@@ -330,7 +336,7 @@ const findMatches = (text, alreadyFound = [])=>{
                         end = start + (match[1] ?? match[0]).length;
                     } else {
                         start = offset + text.substring(offset).search(re ?? plain);
-                        end = start + key.length - (key.startsWith('codex:') ? 6 : 1);
+                        end = start + key.length - (key.startsWith('codex:') ? 6 : 0);
                     }
                     matches.push({
                         start,
@@ -484,10 +490,23 @@ const makeRoot = ()=>{
     }
 };
 
+const getBookNames = ()=>{
+    const context = getContext();
+    let names = [
+        ...(world_info.globalSelect ?? []),
+        ...(world_info.charLore?.map(it=>it.extraBooks)?.flat() ?? []),
+        chat_metadata.world_info,
+        characters[context.characterId]?.data?.character_book?.name,
+        ...(groups.find(it=>it.id == context.groupId)?.members?.map(m=>characters.find(it=>it.avatar == m)?.data?.character_book?.name) ?? []),
+    ].filter(it=>it);
+    names = names.filter((it,idx)=>names.indexOf(it) == idx);
+    return names;
+};
 const loadBooks = async()=>{
     log('loadBooks');
+    toastr.info('Codex: load books');
     while (books.length) books.pop();
-    const names = [...(world_info.globalSelect ?? []), ...(world_info.charLore ?? [])];
+    let names = getBookNames();
     for (const name of names) {
         const book = await getBook(name);
         if (book) {
@@ -511,9 +530,23 @@ const restart = async()=>{
     await start();
     restarting = false;
 };
+const restartIfBooksChanged = async ()=>{
+    if (!isReady) return;
+    const names = getBookNames();
+    for (const name of names) {
+        if (!books.find(it=>it.name == name)) {
+            return await restartDebounced();
+        }
+    }
+    for (const name of books.map(it=>it.name)) {
+        if (!names.includes(name)) {
+            return await restartDebounced();
+        }
+    }
+};
 export const restartDebounced = debounceAsync(async()=>await restart());
 const start = async()=>{
-    if (!settings.isEnabled) return;
+    if (!settings.isEnabled || !getContext().chatId) return;
     document.querySelector('#chat').style.setProperty('--stcdx--color', `${settings.color}`);
     document.querySelector('#chat').style.setProperty('--stcdx--icon', `"${settings.icon}"`);
     await loadBooks();
