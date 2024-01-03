@@ -164,7 +164,16 @@ const renderCodex = (match)=>{
     }
 };
 export const makeCodexDom = (match)=>{
-    let messageText = substituteParams(books.find(b=>b.name == match.book)?.entries?.[match.entry]?.content ?? '');
+    let text = books.find(b=>b.name == match.book)?.entries?.[match.entry]?.content ?? '';
+    text = text.replace(/\{\{wi::(?:((?:(?!(?:::)).)+)::)?((?:(?!(?:::)).)+)\}\}/g, (all, book, key)=>{
+        log('ARGS', { book, key });
+        const b = books.find(it=>it.name == (book ?? match.book));
+        if (b) {
+            return Object.keys(b.entries).map(k=>b.entries[k]).find(it=>it.key.includes(key))?.content ?? all;
+        }
+        return all;
+    });
+    let messageText = substituteParams(text);
     messageText = messageFormatting(
         messageText,
         'Codex',
