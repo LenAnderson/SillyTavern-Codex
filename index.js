@@ -418,7 +418,9 @@ const makeRoot = ()=>{
                                             link.textContent = entry.comment.length > 50 ? entry.key?.join(' / ') : (entry.comment || entry.key?.join(' / ')) ?? '???';
                                             link.addEventListener('click', (evt)=>{
                                                 evt.stopPropagation();
-                                                renderCodex({ book:book.name, entry:entry.uid });
+                                                renderCodex({ book:book.name, entry:entry.uid }, true);
+                                                bookList.remove();
+                                                bookList = null;
                                             });
                                             entryList.append(link);
                                         }
