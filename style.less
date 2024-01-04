@@ -39,9 +39,9 @@
 	perspective: 500px;
 	transform-style: preserve-3d;
 	transition: calc(var(--transition) * 1ms);
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
+	display: grid;
+	grid-template-columns: 100%;
+    grid-template-rows: 0fr 1fr;
 
 	> .stcdx--header {
 		flex: 0 0 auto;
@@ -139,11 +139,14 @@
 	}
 
 	> .stcdx--content {
+		grid-row: 2;
+		grid-column: 1;
 		height: 100%;
 		width: 100%;
 		overflow: auto;
 		padding: 1em;
 		text-align: justify;
+		transition: 400ms;
 		h1, h2, h3 {
 			text-align: center;
 		}

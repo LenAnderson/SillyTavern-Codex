@@ -116,15 +116,38 @@ const unrenderCodex = ()=>{
     codexContent = null;
     currentCodex = null;
 };
-const renderCodex = (match)=>{
+const renderCodex = async(match, force=false)=>{
     if (!isReady) return;
     if (currentCodex && currentCodex.book == match?.book && currentCodex.entry == match?.entry) {
-        unrenderCodex();
+        if (!force) {
+            unrenderCodex();
+        }
     }
     else {
         if (!root) makeRoot();
         if (!match) return;
-        codexContent.innerHTML = makeCodexDom(match);
+        const nc = document.createElement('div'); {
+            nc.classList.add('stcdx--content');
+            nc.classList.add('mes_text');
+            nc.style.opacity = '0';
+            nc.innerHTML = makeCodexDom(match);
+            root.append(nc);
+        }
+        // codexContent.innerHTML = makeCodexDom(match);
+        await delay(10);
+        await Promise.all(
+            Array.from(nc.querySelectorAll('img'))
+                .map(img=>new Promise(resolve=>{
+                    if (img.complete) resolve();
+                    img.addEventListener('load', resolve);
+                    img.addEventListener('error', resolve);
+                })),
+        );
+        codexContent.style.opacity = '0';
+        nc.style.opacity = '1';
+        await delay(500);
+        codexContent.remove();
+        codexContent = nc;
         Array.from(codexContent.querySelectorAll('img')).forEach(img=>{
             img.addEventListener('click', async()=>{
                 const rect = img.getBoundingClientRect();
