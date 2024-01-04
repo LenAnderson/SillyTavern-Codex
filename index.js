@@ -124,7 +124,7 @@ const unrenderCodex = ()=>{
     codexContent = null;
     currentCodex = null;
 };
-const renderCodex = async(match, force=false, noHist=false)=>{
+const renderCodex = async(match, force = false, noHist = false)=>{
     if (!isReady) return;
     if (currentCodex && currentCodex.book == match?.book && currentCodex.entry == match?.entry) {
         if (!force) {
@@ -133,13 +133,13 @@ const renderCodex = async(match, force=false, noHist=false)=>{
     }
     else {
         if (!noHist && hist.slice(-1)[0] != match) {
-            hist.splice(histIdx+1, hist.length, match);
+            hist.splice(histIdx + 1, hist.length, match);
             log('HIST', hist);
             histIdx = hist.length - 1;
         }
         if (!root) makeRoot();
-        histBack.classList[histIdx-1 >= 0 ? 'remove' : 'add']('stcdx--end');
-        histForward.classList[histIdx+1 < hist.length ? 'remove' : 'add']('stcdx--end');
+        histBack.classList[histIdx - 1 >= 0 ? 'remove' : 'add']('stcdx--end');
+        histForward.classList[histIdx + 1 < hist.length ? 'remove' : 'add']('stcdx--end');
         if (!match) return;
         const nc = document.createElement('div'); {
             nc.classList.add('stcdx--content');
@@ -277,7 +277,7 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
         await updateNodes(resultNodes);
     }
 };
-const checkNodes = async(nodes, skipMatch=null)=>{
+const checkNodes = async(nodes, skipMatch = null)=>{
     const resultNodes = [];
     const found = [];
     for (let i = 0; i < nodes.snapshotLength; i++) {
@@ -334,7 +334,7 @@ const updateNodes = async(nodes)=>{
     }
 };
 
-const findMatches = (text, alreadyFound = [], skipMatch=null)=>{
+const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
     const found = [...alreadyFound];
     const matches = [];
     for (const book of books) {
@@ -454,8 +454,13 @@ const makeRoot = ()=>{
                     }
                     bookList = document.createElement('ul'); {
                         bookList.classList.add('stcdx--books');
-                        books.forEach(book=>{
-                            const entries = Object.keys(book.entries).map(key=>book.entries[key]).filter(e=>e.key.find(k=>!settings.requirePrefix || k.startsWith('codex:')));
+                        books.toSorted((a,b)=>a.name.localeCompare(b.name)).forEach(book=>{
+                            const entries = Object.keys(book.entries)
+                                .map(key=>book.entries[key])
+                                .filter(e=>e.key.find(k=>!settings.requirePrefix || k.startsWith('codex:')))
+                                .map(entry=>({ ...entry, title:entry.comment.length > 50 ? entry.key?.join(' / ') : (entry.comment || entry.key?.join(' / ')) ?? '???' }))
+                                .toSorted((a,b)=>a.title.localeCompare(b.title))
+                            ;
                             if (entries.length == 0) return;
                             const li = document.createElement('li'); {
                                 li.classList.add('stcdx--book');
@@ -469,7 +474,7 @@ const makeRoot = ()=>{
                                     entries.forEach(entry=>{
                                         const link = document.createElement('li'); {
                                             link.classList.add('stcdx--entry');
-                                            link.textContent = entry.comment.length > 50 ? entry.key?.join(' / ') : (entry.comment || entry.key?.join(' / ')) ?? '???';
+                                            link.textContent = entry.title;
                                             link.addEventListener('click', (evt)=>{
                                                 evt.stopPropagation();
                                                 renderCodex({ book:book.name, entry:entry.uid }, true);
@@ -540,7 +545,10 @@ const makeRoot = ()=>{
                                     .filter(e=>e.key.find(k=>k.toLowerCase().includes(text)))
                                     .map(e=>({ book:e.book, entry:e.uid }))
                                 ,
-                            ];
+                            ]
+                                .map(match=>({ ...match, title: `${match.book}: ${books.find(it=>it.name == match.book).entries[match.entry].key.filter(it=>!it.startsWith('codex-tpl:')).map(it=>it.substring(it.startsWith('codex:') ? 6 : 0)).join(' / ')}` }))
+                                .toSorted((a,b)=>a.title.localeCompare(b.title))
+                            ;
                             if (matches.length > 0) {
                                 results = results ?? document.createElement('div'); {
                                     results.innerHTML = '';
@@ -548,7 +556,7 @@ const makeRoot = ()=>{
                                     matches.forEach(match=>{
                                         const item = document.createElement('div'); {
                                             item.classList.add('stcdx--result');
-                                            item.textContent = `${match.book}: ${books.find(it=>it.name == match.book).entries[match.entry].key.join(' / ')}`;
+                                            item.textContent = match.title;
                                             item.addEventListener('mousedown', ()=>renderCodex(match));
                                             results.append(item);
                                         }
