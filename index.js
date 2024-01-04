@@ -163,8 +163,16 @@ const renderCodex = (match)=>{
         currentCodex = match;
     }
 };
+export const rerenderCodex = ()=>{
+    if (currentCodex) {
+        const match = currentCodex;
+        currentCodex = null;
+        renderCodex(match);
+    }
+};
 export const makeCodexDom = (match)=>{
-    let text = books.find(b=>b.name == match.book)?.entries?.[match.entry]?.content ?? '';
+    const entry = books.find(b=>b.name == match.book)?.entries?.[match.entry];
+    let text = entry?.content ?? '';
     text = text.replace(/\{\{wi::(?:((?:(?!(?:::)).)+)::)?((?:(?!(?:::)).)+)\}\}/g, (all, book, key)=>{
         log('ARGS', { book, key });
         const b = books.find(it=>it.name == (book ?? match.book));
@@ -174,6 +182,15 @@ export const makeCodexDom = (match)=>{
         return all;
     });
     let messageText = substituteParams(text);
+    let template = settings.templateList?.find(tpl=>tpl.name == entry?.key?.find(it=>it.startsWith('codex-tpl:'))?.substring(10))?.template ?? settings.template;
+    messageText = template
+        .replace(/\{\{comment\}\}/g, entry?.comment)
+        .replace(/\{\{comment::url\}\}/g, encodeURIComponent(entry?.comment))
+        .replace(/\{\{content\}\}/g, text)
+        .replace(/\{\{content::url\}\}/g, encodeURIComponent(text))
+        .replace(/\{\{key\[(\d+)\]\}\}/g, (_,idx)=>entry?.key?.[idx]?.replace(/^codex:/, ''))
+        .replace(/\{\{key\[(\d+)\]::url\}\}/g, (_,idx)=>encodeURIComponent(entry?.key?.[idx]?.replace(/^codex:/, '')))
+    ;
     messageText = messageFormatting(
         messageText,
         'Codex',

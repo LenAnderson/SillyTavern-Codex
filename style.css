@@ -204,3 +204,12 @@
   object-position: center;
   transition: 400ms;
 }
+.stcdx--settings .stcdx--template {
+  border-top: 1px solid var(--SmartThemeBorderColor);
+  padding-top: 1em;
+  margin-top: 1em;
+}
+.stcdx--settings .stcdx--template > .stcdx--content > .stcdx--row {
+  display: flex;
+  gap: 0.5em;
+}
