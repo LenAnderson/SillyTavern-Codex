@@ -672,6 +672,7 @@ const end = async()=>{
     root?.remove();
     root = null;
     codexContent = null;
+    currentCodex = null;
     const msgList = Array.from(document.querySelectorAll('#chat > .mes'));
     for (const msg of msgList) {
         restoreMessage(msg);
