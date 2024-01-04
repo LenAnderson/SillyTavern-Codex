@@ -133,7 +133,11 @@ const renderCodex = async(match, force=false)=>{
             nc.innerHTML = makeCodexDom(match);
             root.append(nc);
         }
-        // codexContent.innerHTML = makeCodexDom(match);
+        const nodes = document.evaluate('.//text()', nc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
+        const resultNodes = await checkNodes(nodes, match);
+        if (resultNodes.length > 0) {
+            await updateNodes(resultNodes);
+        }
         await delay(10);
         await Promise.all(
             Array.from(nc.querySelectorAll('img'))
@@ -144,6 +148,7 @@ const renderCodex = async(match, force=false)=>{
                 })),
         );
         codexContent.style.opacity = '0';
+        codexContent.style.pointerEvents = 'none';
         nc.style.opacity = '1';
         await delay(500);
         codexContent.remove();
@@ -249,67 +254,78 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
     log('updateMessage', msg);
     restoreMessage(msg);
     const nodes = document.evaluate('.//text()', msg.querySelector('.mes_text'), null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
-    let modified = false;
+    const resultNodes = await checkNodes(nodes);
+    if (resultNodes.length > 0) {
+        const id = uuidv4();
+        originals[id] = msg.querySelector('.mes_text').cloneNode(true);
+        msg.querySelector('.mes_text').setAttribute('data-codex', id);
+        await updateNodes(resultNodes);
+    }
+};
+const checkNodes = async(nodes, skipMatch=null)=>{
+    const resultNodes = [];
     const found = [];
     for (let i = 0; i < nodes.snapshotLength; i++) {
         const node = nodes.snapshotItem(i);
-        const parent = node.parentElement;
-        const matches = findMatches(node.textContent, found);
+        const matches = findMatches(node.textContent, found, skipMatch);
         found.push(...matches.map(it=>`${it.book}---${it.entry}`));
         if (matches.length) {
-            log('FOUND', { msg, text:node.textContent, matches });
-            if (!modified) {
-                const id = uuidv4();
-                originals[id] = msg.querySelector('.mes_text').cloneNode(true);
-                msg.querySelector('.mes_text').setAttribute('data-codex', id);
-                modified = true;
-            }
-            modified = true;
-            matches.sort((a,b)=>a.start - b.start);
-            const els = [];
-            let idx = 0;
-            for (const match of matches) {
-                if (match.start > idx) {
-                    const el = document.createElement('span'); {
-                        el.textContent = node.textContent.substring(idx, match.start);
-                        els.push(el);
-                    }
-                }
-                if (match.start >= idx) {
-                    const el = document.createElement('span'); {
-                        el.classList.add('stcdx--link');
-                        el.textContent = node.textContent.substring(match.start, match.end);
-                        el.addEventListener('click', ()=>renderCodex(match));
-                        const tt = new Tooltip(el, match);
-                        els.push(el);
-                    }
-                    idx = match.end;
-                }
-            }
-            if (idx + 1 < node.textContent.length) {
+            resultNodes.push({ node, matches });
+        }
+    }
+    return resultNodes;
+};
+const updateNodes = async(nodes)=>{
+    for (const { node, matches } of nodes) {
+        const parent = node.parentElement;
+        matches.sort((a,b)=>a.start - b.start);
+        const els = [];
+        let idx = 0;
+        for (const match of matches) {
+            if (match.start > idx) {
                 const el = document.createElement('span'); {
-                    el.textContent = node.textContent.substring(idx);
+                    el.textContent = node.textContent.substring(idx, match.start);
                     els.push(el);
                 }
             }
-            const anchor = document.createElement('span');
-            let prev = anchor;
-            parent.replaceChild(anchor, node);
-            for (const el of els) {
-                prev.insertAdjacentElement('afterend', el);
-                prev = el;
+            if (match.start >= idx) {
+                const el = document.createElement('span'); {
+                    el.classList.add('stcdx--link');
+                    el.textContent = node.textContent.substring(match.start, match.end);
+                    el.addEventListener('click', ()=>{
+                        tt.hide();
+                        renderCodex(match);
+                    });
+                    const tt = new Tooltip(el, match);
+                    els.push(el);
+                }
+                idx = match.end;
             }
-            anchor.remove();
         }
+        if (idx + 1 < node.textContent.length) {
+            const el = document.createElement('span'); {
+                el.textContent = node.textContent.substring(idx);
+                els.push(el);
+            }
+        }
+        const anchor = document.createElement('span');
+        let prev = anchor;
+        parent.replaceChild(anchor, node);
+        for (const el of els) {
+            prev.insertAdjacentElement('afterend', el);
+            prev = el;
+        }
+        anchor.remove();
     }
 };
 
-const findMatches = (text, alreadyFound = [])=>{
+const findMatches = (text, alreadyFound = [], skipMatch=null)=>{
     const found = [...alreadyFound];
     const matches = [];
     for (const book of books) {
         for (const entryIdx of Object.keys(book.entries)) {
             const entry = book.entries[entryIdx];
+            if (book.name == skipMatch?.book && entry.uid == skipMatch?.entry) continue;
             const keys = entry.key.filter(it=>!settings.requirePrefix || it.startsWith('codex:'));
             for (const key of keys) {
                 if (settings.onlyFirst && found.includes(`${book.name}---${entry.uid}`)) break;
@@ -598,8 +614,8 @@ const restartIfBooksChanged = async ()=>{
 export const restartDebounced = debounceAsync(async()=>await restart());
 const start = async()=>{
     if (!settings.isEnabled || !getContext().chatId) return;
-    document.querySelector('#chat').style.setProperty('--stcdx--color', `${settings.color}`);
-    document.querySelector('#chat').style.setProperty('--stcdx--icon', `"${settings.icon}"`);
+    document.body.style.setProperty('--stcdx--color', `${settings.color}`);
+    document.body.style.setProperty('--stcdx--icon', `"${settings.icon}"`);
     await loadBooks();
     isReady = true;
     await updateChat();

@@ -82,12 +82,12 @@ export const initSettings = ()=>{
     });
     document.querySelector('#stcdx--color').addEventListener('change', (evt)=>{
         settings.color = evt.detail.rgba;
-        document.querySelector('#chat').style.setProperty('--stcdx--color', `${settings.color}`);
+        document.body.style.setProperty('--stcdx--color', `${settings.color}`);
         saveSettingsDebounced();
     });
     document.querySelector('#stcdx--icon').addEventListener('change', ()=>{
         settings.icon = document.querySelector('#stcdx--icon').value;
-        document.querySelector('#chat').style.setProperty('--stcdx--icon', `"${settings.icon}"`);
+        document.body.style.setProperty('--stcdx--icon', `"${settings.icon}"`);
         saveSettingsDebounced();
     });
     document.querySelector('#stcdx--template').value = settings.template;
