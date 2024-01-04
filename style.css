@@ -55,6 +55,11 @@ body {
   cursor: pointer;
   font-size: 2em;
   padding: 0.2em;
+  opacity: 0.5;
+  transition: 200ms;
+}
+.stcdx--root > .stcdx--header > .stcdx--menuTrigger:hover {
+  opacity: 1;
 }
 .stcdx--root > .stcdx--header > .stcdx--menuTrigger > .stcdx--books {
   cursor: default;
@@ -92,6 +97,27 @@ body {
 }
 .stcdx--root > .stcdx--header > .stcdx--menuTrigger > .stcdx--books > .stcdx--book > .stcdx--entries > .stcdx--entry:hover {
   opacity: 1;
+}
+.stcdx--root > .stcdx--header > .stcdx--back,
+.stcdx--root > .stcdx--header .stcdx--forward {
+  cursor: pointer;
+  font-size: 2em;
+  padding: 0.2em;
+  opacity: 0.5;
+  transition: 200ms;
+}
+.stcdx--root > .stcdx--header > .stcdx--back:hover,
+.stcdx--root > .stcdx--header .stcdx--forward:hover {
+  opacity: 1;
+}
+.stcdx--root > .stcdx--header > .stcdx--back.stcdx--end,
+.stcdx--root > .stcdx--header .stcdx--forward.stcdx--end {
+  cursor: default;
+  opacity: 0.25;
+}
+.stcdx--root > .stcdx--header > .stcdx--back.stcdx--end:hover,
+.stcdx--root > .stcdx--header .stcdx--forward.stcdx--end:hover {
+  opacity: 0.25;
 }
 .stcdx--root > .stcdx--header > .stcdx--search {
   position: relative;

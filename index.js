@@ -43,6 +43,14 @@ let root;
 let codexContent;
 /**@type {Number[]}*/
 const queue = [];
+/**@type {Object[]} */
+const hist = [];
+/**@type {Number} */
+let histIdx = 0;
+/**@type {HTMLElement}*/
+let histBack;
+/**@type {HTMLElement}*/
+let histForward;
 
 const queueMessage = async(...idxList)=>{
     if (!isReady) return;
@@ -116,7 +124,7 @@ const unrenderCodex = ()=>{
     codexContent = null;
     currentCodex = null;
 };
-const renderCodex = async(match, force=false)=>{
+const renderCodex = async(match, force=false, noHist=false)=>{
     if (!isReady) return;
     if (currentCodex && currentCodex.book == match?.book && currentCodex.entry == match?.entry) {
         if (!force) {
@@ -124,7 +132,14 @@ const renderCodex = async(match, force=false)=>{
         }
     }
     else {
+        if (!noHist && hist.slice(-1)[0] != match) {
+            hist.splice(histIdx+1, hist.length, match);
+            log('HIST', hist);
+            histIdx = hist.length - 1;
+        }
         if (!root) makeRoot();
+        histBack.classList[histIdx-1 >= 0 ? 'remove' : 'add']('stcdx--end');
+        histForward.classList[histIdx+1 < hist.length ? 'remove' : 'add']('stcdx--end');
         if (!match) return;
         const nc = document.createElement('div'); {
             nc.classList.add('stcdx--content');
@@ -474,6 +489,30 @@ const makeRoot = ()=>{
                 });
                 head.append(menu);
             }
+            const back = document.createElement('div'); {
+                histBack = back;
+                back.classList.add('stcdx--back');
+                back.textContent = '↩';
+                back.addEventListener('click', (evt)=>{
+                    evt.preventDefault();
+                    if (histIdx - 1 < 0) return;
+                    histIdx--;
+                    renderCodex(hist[histIdx], true, true);
+                });
+                head.append(back);
+            }
+            const forward = document.createElement('div'); {
+                histForward = forward;
+                forward.classList.add('stcdx--forward');
+                forward.textContent = '↪';
+                forward.addEventListener('click', (evt)=>{
+                    evt.preventDefault();
+                    if (histIdx + 1 >= hist.length) return;
+                    histIdx++;
+                    renderCodex(hist[histIdx], true, true);
+                });
+                head.append(forward);
+            }
             const search = document.createElement('div'); {
                 search.classList.add('stcdx--search');
                 const inp = document.createElement('input'); {
@@ -629,5 +668,6 @@ const end = async()=>{
     for (const msg of msgList) {
         restoreMessage(msg);
     }
+    while (hist.length > 0) hist.pop();
     clearCache();
 };

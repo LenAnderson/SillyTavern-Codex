@@ -56,6 +56,11 @@ body {
 			cursor: pointer;
 			font-size: 2em;
 			padding: 0.2em;
+			opacity: 0.5;
+			transition: 200ms;
+			&:hover {
+				opacity: 1;
+			}
 			> .stcdx--books {
 				cursor: default;
 				background-color: var(--SmartThemeBotMesBlurTintColor);
@@ -93,6 +98,23 @@ body {
 							}
 						}
 					}
+				}
+			}
+		}
+		> .stcdx--back, .stcdx--forward {
+			cursor: pointer;
+			font-size: 2em;
+			padding: 0.2em;
+			opacity: 0.5;
+			transition: 200ms;
+			&:hover {
+				opacity: 1;
+			}
+			&.stcdx--end {
+				cursor: default;
+				opacity: 0.25;
+				&:hover {
+					opacity: 0.25;
 				}
 			}
 		}
