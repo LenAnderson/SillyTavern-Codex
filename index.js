@@ -91,7 +91,7 @@ const cycle = async(matches)=>{
     isCycling = true;
     for (const match of matches) {
         await renderCodex(match);
-        await delay(1000);
+        await delay(settings.cycleDelay ?? 1000);
     }
     isCycling = false;
 };

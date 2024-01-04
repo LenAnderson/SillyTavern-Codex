@@ -13,6 +13,7 @@ export const initSettings = ()=>{
         template: '## {{key[0]}}\n\n{{content}}',
         templateList: [],
         cycle: true,
+        cycleDelay: 1000,
     }, extension_settings.codex ?? {});
     extension_settings.codex = settings;
 
@@ -46,6 +47,12 @@ export const initSettings = ()=>{
                         <label class="checkbox_label">
                             <input type="checkbox" id="stcdx--cycle" ${settings.cycle ? 'checked' : ''}>
                             Cycle through found entries on new message
+                        </label>
+                    </div>
+                    <div class="flex-container">
+                        <label>
+                            Cycle delay (ms)
+                            <input type="number" class="text_pole" id="stcdx--cycleDelay" min="0" value="${settings.cycleDelay}">
                         </label>
                     </div>
                     <div class="flex-container">
@@ -90,6 +97,13 @@ export const initSettings = ()=>{
     document.querySelector('#stcdx--cycle').addEventListener('click', ()=>{
         settings.cycle = document.querySelector('#stcdx--cycle').checked;
         saveSettingsDebounced();
+    });
+    document.querySelector('#stcdx--cycleDelay').addEventListener('input', ()=>{
+        try {
+            settings.cycleDelay = parseInt(document.querySelector('#stcdx--cycleDelay').value);
+            document.body.style.setProperty('--stcdx--cycleDelay', `"${settings.cycleDelay}"`);
+            saveSettingsDebounced();
+        } catch { /* empty */ }
     });
     document.querySelector('#stcdx--color').addEventListener('change', (evt)=>{
         settings.color = evt.detail.rgba;
