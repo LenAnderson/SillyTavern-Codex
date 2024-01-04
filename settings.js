@@ -12,6 +12,7 @@ export const initSettings = ()=>{
         requirePrefix: true,
         template: '## {{key[0]}}\n\n{{content}}',
         templateList: [],
+        cycle: true,
     }, extension_settings.codex ?? {});
     extension_settings.codex = settings;
 
@@ -39,6 +40,12 @@ export const initSettings = ()=>{
                         <label class="checkbox_label">
                             <input type="checkbox" id="stcdx--onlyFirst" ${settings.onlyFirst ? 'checked' : ''}>
                             Only create link on first occurrence in a message
+                        </label>
+                    </div>
+                    <div class="flex-container">
+                        <label class="checkbox_label">
+                            <input type="checkbox" id="stcdx--cycle" ${settings.cycle ? 'checked' : ''}>
+                            Cycle through found entries on new message
                         </label>
                     </div>
                     <div class="flex-container">
@@ -79,6 +86,10 @@ export const initSettings = ()=>{
         settings.onlyFirst = document.querySelector('#stcdx--onlyFirst').checked;
         saveSettingsDebounced();
         restartDebounced();
+    });
+    document.querySelector('#stcdx--cycle').addEventListener('click', ()=>{
+        settings.cycle = document.querySelector('#stcdx--cycle').checked;
+        saveSettingsDebounced();
     });
     document.querySelector('#stcdx--color').addEventListener('change', (evt)=>{
         settings.color = evt.detail.rgba;

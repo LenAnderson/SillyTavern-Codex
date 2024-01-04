@@ -58,6 +58,18 @@ const queueMessage = async(...idxList)=>{
     queue.push(...idxList);
     await processQueueDebounced();
 };
+const queueMessageAndCycle = async(...idxList)=>{
+    queueMessage(...idxList);
+    if (settings.cycle && idxList.length == 1) {
+        const idx = idxList[0];
+        const msg = document.querySelector(`#chat > .mes[mesid="${idx}"]`);
+        const nodes = document.evaluate('.//text()', msg.querySelector('.mes_text'), null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
+        const resultNodes = await checkNodes(nodes);
+        let matches = resultNodes.map(it=>it.matches.toSorted((a,b)=>a.start-b.start)).flat();
+        matches = matches.filter((m,idx)=>idx==matches.findIndex(it=>it.book==m.book&&it.entry==m.entry));
+        cycle(matches);
+    }
+};
 
 const processQueue = async()=>{
     if (queue.length == 0) return;
@@ -71,6 +83,18 @@ const processQueue = async()=>{
     }
 };
 const processQueueDebounced = debounceAsync(async()=>await processQueue());
+
+
+let isCycling = false;
+const cycle = async(matches)=>{
+    if (isCycling) return;
+    isCycling = true;
+    for (const match of matches) {
+        await renderCodex(match);
+        await delay(1000);
+    }
+    isCycling = false;
+};
 
 
 
@@ -96,8 +120,8 @@ const init = async()=>{
         document.querySelector(`#chat .mes[mesid="${idx}"] .mes_text`).removeAttribute('data-codex');
         queueMessage(idx);
     });
-    eventSource.on(event_types.USER_MESSAGE_RENDERED, (idx)=>queueMessage(idx));
-    eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (idx)=>queueMessage(idx));
+    eventSource.on(event_types.USER_MESSAGE_RENDERED, (idx)=>queueMessageAndCycle(idx));
+    eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (idx)=>queueMessageAndCycle(idx));
 
     registerSlashCommand('codex', ()=>renderCodex(), [], 'Open codex', true, true);
 };
