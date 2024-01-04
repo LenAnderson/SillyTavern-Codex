@@ -3,7 +3,7 @@ import { getContext } from '../../../extensions.js';
 import { groups } from '../../../group-chats.js';
 import { registerSlashCommand } from '../../../slash-commands.js';
 import { delay, uuidv4 } from '../../../utils.js';
-import { world_info } from '../../../world-info.js';
+import { world_info, world_info_case_sensitive } from '../../../world-info.js';
 import { initSettings, settings } from './settings.js';
 import { Tooltip } from './src/Tooltip.js';
 
@@ -347,6 +347,7 @@ const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
                 let searchKey = key.substring(settings.requirePrefix || key.startsWith('codex:') ? 6 : 0);
                 let re;
                 let plain;
+                let searchText = text;
                 if (searchKey.match(/^\/.+\/[a-z]*$/)) {
                     try {
                         re = new RegExp(searchKey.replace(/^\/(.+)\/([a-z]*)$/, '$1'), searchKey.replace(/^\/(.+)\/([a-z]*)$/, '$2'));
@@ -355,9 +356,13 @@ const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
                     }
                 } else {
                     plain = searchKey;
+                    if (!world_info_case_sensitive) {
+                        plain = plain.toLowerCase();
+                        searchText = searchText.toLowerCase();
+                    }
                 }
                 let offset = 0;
-                while (text.substring(offset).search(re ?? plain) != -1) {
+                while (searchText.substring(offset).search(re ?? plain) != -1) {
                     if (settings.onlyFirst && found.includes(`${book.name}---${entry.uid}`)) break;
                     // secondary keys
                     const ksList = entry.keysecondary;
@@ -377,7 +382,7 @@ const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
                             } else {
                                 plainKs = searchKs;
                             }
-                            if (text.search(reKs ?? plainKs) != -1) {
+                            if (searchText.search(reKs ?? plainKs) != -1) {
                                 any = true;
                             } else {
                                 all = false;
@@ -407,7 +412,7 @@ const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
                     let start;
                     let end;
                     if (re) {
-                        const match = text.substring(offset).match(re);
+                        const match = searchText.substring(offset).match(re);
                         let idx = offset + match.index;
                         if (match[1]) {
                             idx += match[0].search(match[1]);
@@ -415,7 +420,7 @@ const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
                         start = idx;
                         end = start + (match[1] ?? match[0]).length;
                     } else {
-                        start = offset + text.substring(offset).search(re ?? plain);
+                        start = offset + searchText.substring(offset).search(re ?? plain);
                         end = start + key.length - (key.startsWith('codex:') ? 6 : 0);
                     }
                     matches.push({
