@@ -31,8 +31,10 @@ body {
 .stcdx--root {
 	background-color: var(--SmartThemeBotMesBlurTintColor);
 	position: absolute;
-	top: calc(var(--top) * 1%);
+	top: 0;
 	bottom: 0;
+	max-height: unset;
+	max-width: unset;
 	left: calc(var(--position) * (100vw - var(--width)) / 100);
 	left: clamp(0vw, calc(var(--position) * (100vw - var(--width)) / 100 - var(--settings-panel-width, 0px)), calc(100vw - var(--width)));
 	width: var(--width);
