@@ -1,3 +1,10 @@
+body:has(.stcdx--root) #sheld:has(~ .stcdx--root) {
+  width: calc(100vw - var(--nav-bar-width) - var(--char-panel-width) - var(--settings-panel-width) - ((100vw - var(--sheldWidth)) / 2));
+}
+body:has(.stcdx--root) #sheld:has(~ .stcdx--root) > #chat,
+body:has(.stcdx--root) #sheld:has(~ .stcdx--root) > #form_sheld {
+  width: calc(100vw - var(--nav-bar-width) - var(--char-panel-width) - var(--settings-panel-width) - ((100vw - var(--sheldWidth)) / 2));
+}
 body {
   --stcdx--color: #00ffff;
   --stcdx--icon: "🧾";

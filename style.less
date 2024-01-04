@@ -1,17 +1,33 @@
+body:has(.stcdx--root) {
+	#sheld {
+		&:has(~ .stcdx--root) {
+			width: calc(100vw - var(--nav-bar-width) - var(--char-panel-width) - var(--settings-panel-width) - ((100vw - var(--sheldWidth)) / 2));
+			&>#chat,
+			&>#form_sheld {
+				width: calc(100vw - var(--nav-bar-width) - var(--char-panel-width) - var(--settings-panel-width) - ((100vw - var(--sheldWidth)) / 2));
+			}
+		}
+	}
+}
+
 body {
 	--stcdx--color: rgb(0, 255, 255);
 	--stcdx--icon: "🧾";
 }
+
 .stcdx--link {
 	cursor: help;
 	color: var(--stcdx--color);
 	transition: 400ms;
+
 	&:hover {
 		text-decoration: underline dotted;
+
 		&:after {
 			opacity: 1;
 		}
 	}
+
 	&:after {
 		content: var(--stcdx--icon);
 		opacity: 0.5;
@@ -28,6 +44,7 @@ body {
 	--position: 100;
 	--width: calc((100vw - var(--sheldWidth)) / 2);
 }
+
 .stcdx--root {
 	background-color: var(--SmartThemeBotMesBlurTintColor);
 	position: absolute;
@@ -43,9 +60,9 @@ body {
 	transition: calc(var(--transition) * 1ms);
 	display: grid;
 	grid-template-columns: 100%;
-    grid-template-rows: 0fr 1fr;
+	grid-template-rows: 0fr 1fr;
 
-	> .stcdx--header {
+	>.stcdx--header {
 		flex: 0 0 auto;
 		height: 2em;
 		position: relative;
@@ -54,16 +71,19 @@ body {
 		align-items: center;
 		padding-right: 2em;
 		gap: 1em;
-		> .stcdx--menuTrigger {
+
+		>.stcdx--menuTrigger {
 			cursor: pointer;
 			font-size: 2em;
 			padding: 0.2em;
 			opacity: 0.5;
 			transition: 200ms;
+
 			&:hover {
 				opacity: 1;
 			}
-			> .stcdx--books {
+
+			>.stcdx--books {
 				cursor: default;
 				background-color: var(--SmartThemeBotMesBlurTintColor);
 				border: 1px solid var(--SmartThemeBorderColor);
@@ -80,21 +100,25 @@ body {
 				list-style: none;
 				z-index: 99999;
 				max-width: 100%;
-				> .stcdx--book {
-					> .stcdx--name {
+
+				>.stcdx--book {
+					>.stcdx--name {
 						font-weight: bold;
 					}
-					> .stcdx--entries {
+
+					>.stcdx--entries {
 						list-style: none;
 						padding: 0 0.5em 0.5em 0.5em;
 						margin: 0;
-						> .stcdx--entry {
+
+						>.stcdx--entry {
 							cursor: pointer;
 							white-space: nowrap;
 							overflow: hidden;
 							text-overflow: ellipsis;
 							opacity: 0.8;
 							transition: 200ms;
+
 							&:hover {
 								opacity: 1;
 							}
@@ -103,27 +127,34 @@ body {
 				}
 			}
 		}
-		> .stcdx--back, .stcdx--forward {
+
+		>.stcdx--back,
+		.stcdx--forward {
 			cursor: pointer;
 			font-size: 2em;
 			padding: 0.2em;
 			opacity: 0.5;
 			transition: 200ms;
+
 			&:hover {
 				opacity: 1;
 			}
+
 			&.stcdx--end {
 				cursor: default;
 				opacity: 0.25;
+
 				&:hover {
 					opacity: 0.25;
 				}
 			}
 		}
-		> .stcdx--search {
+
+		>.stcdx--search {
 			position: relative;
 			flex: 1 1 auto;
-			> .stcdx--results {
+
+			>.stcdx--results {
 				background-color: var(--SmartThemeBotMesBlurTintColor);
 				border: 1px solid var(--SmartThemeBorderColor);
 				backdrop-filter: blur(var(--SmartThemeBlurStrength));
@@ -138,21 +169,25 @@ body {
 				list-style: none;
 				z-index: 99999;
 				width: 100%;
-				> .stcdx--result {
+
+				>.stcdx--result {
 					opacity: 0.8;
 					transition: 200ms;
 					cursor: pointer;
 					padding: 0.25em;
+
 					&:hover {
 						opacity: 1;
 					}
 				}
 			}
 		}
-		> .stcdx--controls {
+
+		>.stcdx--controls {
 			right: 0;
 			top: 0;
-			> .stcdx--close {
+
+			>.stcdx--close {
 				height: 15px;
 				aspect-ratio: 1 / 1;
 				font-size: 20px;
@@ -162,7 +197,7 @@ body {
 		}
 	}
 
-	> .stcdx--content {
+	>.stcdx--content {
 		grid-row: 2;
 		grid-column: 1;
 		height: 100%;
@@ -171,15 +206,20 @@ body {
 		padding: 1em;
 		text-align: justify;
 		transition: 400ms;
-		h1, h2, h3 {
+
+		h1,
+		h2,
+		h3 {
 			text-align: center;
 		}
+
 		img {
 			max-height: 50vh;
 			width: 100%;
 			object-fit: contain;
 			object-position: center;
 			cursor: zoom-in;
+
 			&:hover {
 				filter: drop-shadow(2px 4px 6px black);
 			}
@@ -206,19 +246,25 @@ body {
 	z-index: 99999;
 	padding: 1em;
 	text-align: justify;
-	> br {
+
+	>br {
 		display: none;
 	}
-	h1, h2, h3 {
+
+	h1,
+	h2,
+	h3 {
 		text-align: center;
 	}
+
 	img {
 		max-height: calc(60vh * 0.5);
 		width: 100%;
 		object-fit: contain;
 		object-position: center;
 	}
-	> p:last-child {
+
+	>p:last-child {
 		margin-bottom: 0;
 	}
 }
@@ -233,10 +279,12 @@ body {
 	backdrop-filter: blur(0px);
 	cursor: zoom-out;
 	transition: 400ms;
+
 	&.stcdx--active {
 		backdrop-filter: blur(10px);
 	}
-	> .stcdx--clone {
+
+	>.stcdx--clone {
 		position: absolute;
 		object-fit: contain;
 		object-position: center;
@@ -253,8 +301,8 @@ body {
 		padding-top: 1em;
 		margin-top: 1em;
 
-		> .stcdx--content {
-			> .stcdx--row {
+		>.stcdx--content {
+			>.stcdx--row {
 				display: flex;
 				gap: 0.5em;
 			}
