@@ -364,6 +364,7 @@ const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
     for (const book of books) {
         for (const entryIdx of Object.keys(book.entries)) {
             const entry = book.entries[entryIdx];
+            if (entry.key.includes('codex-skip:')) continue;
             if (book.name == skipMatch?.book && entry.uid == skipMatch?.entry) continue;
             const keys = entry.key.filter(it=>!settings.requirePrefix || it.startsWith('codex:'));
             for (const key of keys) {
@@ -487,6 +488,7 @@ const makeRoot = ()=>{
                             const entries = Object.keys(book.entries)
                                 .map(key=>book.entries[key])
                                 .filter(e=>e.key.find(k=>!settings.requirePrefix || k.startsWith('codex:')))
+                                .filter(e=>!e.key.includes('codex-skip:'))
                                 .map(entry=>({ ...entry, title:entry.comment.length > 50 ? entry.key?.join(' / ') : (entry.comment || entry.key?.join(' / ')) ?? '???' }))
                                 .toSorted((a,b)=>a.title.localeCompare(b.title))
                             ;
@@ -571,11 +573,11 @@ const makeRoot = ()=>{
                                 ...books
                                     .map(b=>Object.keys(b.entries).map(k=>({ book:b.name, ...b.entries[k] })))
                                     .flat()
-                                    .filter(e=>e.key.find(k=>k.toLowerCase().includes(text)))
+                                    .filter(e=>!e.key.includes('codex-skip:')&&e.key.find(k=>k.toLowerCase().includes(text)))
                                     .map(e=>({ book:e.book, entry:e.uid }))
                                 ,
                             ]
-                                .map(match=>({ ...match, title: `${match.book}: ${books.find(it=>it.name == match.book).entries[match.entry].key.filter(it=>!it.startsWith('codex-tpl:')).map(it=>it.substring(it.startsWith('codex:') ? 6 : 0)).join(' / ')}` }))
+                                .map(match=>({ ...match, title: `${match.book}: ${books.find(it=>it.name == match.book).entries[match.entry].key.filter(it=>!/^codex-[a-z]+:.*$/i.test(it)).map(it=>it.substring(it.startsWith('codex:') ? 6 : 0)).join(' / ')}` }))
                                 .toSorted((a,b)=>a.title.localeCompare(b.title))
                             ;
                             if (matches.length > 0) {
