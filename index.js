@@ -123,7 +123,7 @@ const init = async()=>{
     eventSource.on(event_types.USER_MESSAGE_RENDERED, (idx)=>queueMessageAndCycle(idx));
     eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (idx)=>queueMessageAndCycle(idx));
 
-    registerSlashCommand('codex', ()=>renderCodex(), [], 'Open codex', true, true);
+    registerSlashCommand('codex', ()=>root?unrenderCodex():renderCodex(), [], 'Open codex', true, true);
 };
 eventSource.on(event_types.APP_READY, ()=>init());
 
