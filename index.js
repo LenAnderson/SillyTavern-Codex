@@ -65,8 +65,8 @@ const queueMessageAndCycle = async(...idxList)=>{
         const msg = document.querySelector(`#chat > .mes[mesid="${idx}"]`);
         const nodes = document.evaluate('.//text()', msg.querySelector('.mes_text'), null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
         const resultNodes = await checkNodes(nodes);
-        let matches = resultNodes.map(it=>it.matches.toSorted((a,b)=>a.start-b.start)).flat();
-        matches = matches.filter((m,idx)=>idx==matches.findIndex(it=>it.book==m.book&&it.entry==m.entry));
+        let matches = resultNodes.map(it=>it.matches.toSorted((a,b)=>a.start - b.start)).flat();
+        matches = matches.filter((m,idx)=>idx == matches.findIndex(it=>it.book == m.book && it.entry == m.entry));
         cycle(matches);
     }
 };
@@ -598,12 +598,12 @@ const makeRoot = ()=>{
                             results?.remove();
                             results = null;
                         } else {
-                            const matches = [
+                            let matches = [
                                 ...findMatches(inp.value),
                                 ...books
                                     .map(b=>Object.keys(b.entries).map(k=>({ book:b.name, ...b.entries[k] })))
                                     .flat()
-                                    .filter(e=>!e.key.includes('codex-skip:')&&e.key.find(k=>k.toLowerCase().includes(text)))
+                                    .filter(e=>!e.key.includes('codex-skip:') && e.key.find(k=>k.toLowerCase().includes(text)))
                                     .map(e=>({ book:e.book, entry:e.uid }))
                                 ,
                             ]
@@ -611,6 +611,7 @@ const makeRoot = ()=>{
                                 .toSorted((a,b)=>a.title.localeCompare(b.title))
                             ;
                             if (matches.length > 0) {
+                                matches = matches.filter((m1,idx)=>idx == matches.findIndex(m2=>m1.book == m2.book && m1.entry == m2.entry));
                                 results = results ?? document.createElement('div'); {
                                     results.innerHTML = '';
                                     results.classList.add('stcdx--results');
