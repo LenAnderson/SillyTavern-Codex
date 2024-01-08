@@ -127,8 +127,17 @@ const init = async()=>{
         if (value && value.length > 0) {
             const matches = findMatches(value);
             if (matches.length > 0) {
-                if (isTrueBoolean(args.first)) {
-                    await renderCodex(matches[0]);
+                if (matches.length == 1 || isTrueBoolean(args.first)) {
+                    await renderCodex(matches[0], true);
+                    if (args.zoom !== null) {
+                        const zoom = Number(args.zoom);
+                        if (!Number.isNaN(zoom)) {
+                            const imgs = Array.from(codexContent.querySelectorAll('img'));
+                            if (imgs.length > zoom) {
+                                imgs[zoom].click();
+                            }
+                        }
+                    }
                 } else {
                     await cycle(matches);
                 }
@@ -153,7 +162,7 @@ const init = async()=>{
                 }
             }
         }
-    }, [], '<span class="monospace">[optional state=show|hide] [optional silent=true] (optional text / keys)</span> – Toggle codex. <code>state=show|hide</code> to explicitly show or hide codex. Provide text or keys to open a relevant entry (cycles through entries if multiple are found). <code>silent=true</code> to suppress warnings when no entries are found. <code>first=true</code> to prevent cycling and only show the first matching entry.', true, true);
+    }, [], '<span class="monospace">[optional state=show|hide] [optional silent=true] [optional zoom=number] (optional text / keys)</span> – Toggle codex. <code>state=show|hide</code> to explicitly show or hide codex. Provide text or keys to open a relevant entry (cycles through entries if multiple are found). <code>silent=true</code> to suppress warnings when no entries are found. <code>first=true</code> to prevent cycling and only show the first matching entry. <code>zoom=0|1|2|...</code> to zoom the n-th image of the opened codex entry (only works if a only single entry was found or first=true is set).', true, true);
 };
 eventSource.on(event_types.APP_READY, ()=>init());
 
