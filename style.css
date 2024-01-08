@@ -50,6 +50,28 @@ body {
   grid-template-columns: 100%;
   grid-template-rows: 0fr 1fr;
 }
+.stcdx--root.stcdx--editing > .stcdx--header {
+  pointer-events: none;
+}
+.stcdx--root.stcdx--editing > .stcdx--header > * {
+  display: none;
+}
+.stcdx--root.stcdx--editing > .stcdx--header > .stcdx--editHead {
+  display: block;
+}
+.stcdx--root.stcdx--editing > .stcdx--header > .stcdx--editTrigger {
+  display: block;
+  pointer-events: all;
+}
+.stcdx--root.stcdx--editing > .stcdx--editor {
+  opacity: 1;
+  pointer-events: all;
+}
+.stcdx--root.stcdx--editing > .stcdx--content,
+.stcdx--root.stcdx--editing > .stcdx--content.stcdx--active {
+  opacity: 0;
+  pointer-events: none;
+}
 .stcdx--root > .stcdx--header {
   flex: 0 0 auto;
   height: 2em;
@@ -108,7 +130,8 @@ body {
   opacity: 1;
 }
 .stcdx--root > .stcdx--header > .stcdx--back,
-.stcdx--root > .stcdx--header .stcdx--forward {
+.stcdx--root > .stcdx--header > .stcdx--forward,
+.stcdx--root > .stcdx--header > .stcdx--editTrigger {
   cursor: pointer;
   font-size: 2em;
   padding: 0.2em;
@@ -116,17 +139,25 @@ body {
   transition: 200ms;
 }
 .stcdx--root > .stcdx--header > .stcdx--back:hover,
-.stcdx--root > .stcdx--header .stcdx--forward:hover {
+.stcdx--root > .stcdx--header > .stcdx--forward:hover,
+.stcdx--root > .stcdx--header > .stcdx--editTrigger:hover {
   opacity: 1;
 }
 .stcdx--root > .stcdx--header > .stcdx--back.stcdx--end,
-.stcdx--root > .stcdx--header .stcdx--forward.stcdx--end {
+.stcdx--root > .stcdx--header > .stcdx--forward.stcdx--end,
+.stcdx--root > .stcdx--header > .stcdx--editTrigger.stcdx--end {
   cursor: default;
   opacity: 0.25;
 }
 .stcdx--root > .stcdx--header > .stcdx--back.stcdx--end:hover,
-.stcdx--root > .stcdx--header .stcdx--forward.stcdx--end:hover {
+.stcdx--root > .stcdx--header > .stcdx--forward.stcdx--end:hover,
+.stcdx--root > .stcdx--header > .stcdx--editTrigger.stcdx--end:hover {
   opacity: 0.25;
+}
+.stcdx--root > .stcdx--header > .stcdx--editHead {
+  display: none;
+  flex: 1 1 auto;
+  text-align: center;
 }
 .stcdx--root > .stcdx--header > .stcdx--search {
   position: relative;
@@ -168,6 +199,15 @@ body {
   opacity: 0.5;
   transition: all 250ms;
 }
+.stcdx--root > .stcdx--editor {
+  pointer-events: none;
+  opacity: 0;
+  grid-row: 2;
+  grid-column: 1;
+  height: 100%;
+  width: 100%;
+  transition: 400ms;
+}
 .stcdx--root > .stcdx--content {
   grid-row: 2;
   grid-column: 1;
@@ -177,6 +217,12 @@ body {
   padding: 1em;
   text-align: justify;
   transition: 400ms;
+  opacity: 0;
+  position: none;
+}
+.stcdx--root > .stcdx--content.stcdx--active {
+  opacity: 1;
+  pointer-events: all;
 }
 .stcdx--root > .stcdx--content h1,
 .stcdx--root > .stcdx--content h2,

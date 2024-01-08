@@ -1,7 +1,7 @@
 import { characters, chat_metadata, eventSource, event_types, getRequestHeaders, messageFormatting, substituteParams } from '../../../../script.js';
 import { getContext } from '../../../extensions.js';
 import { groups } from '../../../group-chats.js';
-import { registerSlashCommand } from '../../../slash-commands.js';
+import { executeSlashCommands, registerSlashCommand } from '../../../slash-commands.js';
 import { delay, isTrueBoolean, uuidv4 } from '../../../utils.js';
 import { world_info, world_info_case_sensitive } from '../../../world-info.js';
 import { initSettings, settings } from './settings.js';
@@ -51,6 +51,20 @@ let histIdx = 0;
 let histBack;
 /**@type {HTMLElement}*/
 let histForward;
+/**@type {HTMLElement}*/
+let editHead;
+/**@type {HTMLElement}*/
+let editTrigger;
+/**@type {HTMLElement}*/
+let editor;
+/**@type {Boolean}*/
+let isEditing = false;
+/**@type {String}*/
+let editBook;
+/**@type {Object}*/
+let editEntry;
+/**@type {Boolean}*/
+let needsReload = false;
 
 const queueMessage = async(...idxList)=>{
     if (!isReady) return;
@@ -201,13 +215,14 @@ const renderCodex = async(match, force = false, noHist = false)=>{
             histIdx = hist.length - 1;
         }
         if (!root) makeRoot();
+        editTrigger.classList.add('stcdx--end');
         histBack.classList[histIdx - 1 >= 0 ? 'remove' : 'add']('stcdx--end');
         histForward.classList[histIdx + 1 < hist.length ? 'remove' : 'add']('stcdx--end');
         if (!match) return;
+        editTrigger.classList.remove('stcdx--end');
         const nc = document.createElement('div'); {
             nc.classList.add('stcdx--content');
             nc.classList.add('mes_text');
-            nc.style.opacity = '0';
             nc.innerHTML = makeCodexDom(match);
             root.append(nc);
         }
@@ -225,12 +240,16 @@ const renderCodex = async(match, force = false, noHist = false)=>{
                     img.addEventListener('error', resolve);
                 })),
         );
-        codexContent.style.opacity = '0';
-        codexContent.style.pointerEvents = 'none';
-        nc.style.opacity = '1';
+        codexContent.classList.remove('stcdx--active');
+        nc.classList.add('stcdx--active');
         await delay(500);
         codexContent.remove();
         codexContent = nc;
+        const entry = books.find(b=>b.name == match.book)?.entries?.[match.entry];
+        editHead.textContent = `${match.book}: (${entry.uid}) ${entry.comment ?? entry.key.join(', ')}`;
+        editor.value = entry?.content;
+        editBook = match.book;
+        editEntry = entry;
         Array.from(codexContent.querySelectorAll('img')).forEach(img=>{
             img.addEventListener('click', async()=>{
                 const rect = img.getBoundingClientRect();
@@ -508,6 +527,7 @@ const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
 };
 
 const makeRoot = ()=>{
+    isEditing = false;
     root?.remove();
     root = document.createElement('div'); {
         root.classList.add('stcdx--root');
@@ -645,6 +665,29 @@ const makeRoot = ()=>{
                 }
                 head.append(search);
             }
+            editHead = document.createElement('div'); {
+                editHead.classList.add('stcdx--editHead');
+                head.append(editHead);
+            }
+            editTrigger = document.createElement('div'); {
+                editTrigger.classList.add('stcdx--editTrigger');
+                editTrigger.classList.add('stcdx--end');
+                editTrigger.textContent = '✎';
+                editTrigger.title = 'Edit entry';
+                editTrigger.addEventListener('click', async(evt)=>{
+                    evt.preventDefault();
+                    if (!currentCodex) return;
+                    root.classList.toggle('stcdx--editing');
+                    isEditing = !isEditing;
+                    if (!isEditing && needsReload) {
+                        needsReload = false;
+                        const match = { ...currentCodex };
+                        await restart();
+                        await renderCodex(match);
+                    }
+                });
+                head.append(editTrigger);
+            }
             const controls = document.createElement('div'); {
                 controls.classList.add('stcdx--controls');
                 controls.classList.add('panelControlBar');
@@ -669,6 +712,14 @@ const makeRoot = ()=>{
             }
             root.append(head);
         }
+        editor = document.createElement('textarea'); {
+            editor.classList.add('stcdx--editor');
+            editor.classList.add('text_pole');
+            editor.addEventListener('input', async()=>{
+                saveWorldDebounced();
+            });
+            root.append(editor);
+        }
         codexContent = document.createElement('div'); {
             codexContent.classList.add('stcdx--content');
             codexContent.classList.add('mes_text');
@@ -677,6 +728,21 @@ const makeRoot = ()=>{
         document.body.append(root);
     }
 };
+const saveWorldDebounced = debounceAsync(async()=>{
+    if (!isEditing) return;
+    editEntry.content = editor.value;
+    const result = await fetch('/api/worldinfo/get', {
+        method: 'POST',
+        headers: getRequestHeaders(),
+        body: JSON.stringify({ name:editBook }),
+    });
+    if (result.ok) {
+        const data = await result.json();
+        data.entries[editEntry.uid].content = editEntry.content;
+        log('UPDATE', editEntry.content.replace(/([{}|])/g, '\\\\$1'));
+        await executeSlashCommands(`/setentryfield file="${editBook}" uid=${editEntry.uid} field=content ${editEntry.content.replace(/([{}|])/g, '\\$1')}`);
+    }
+});
 
 const getBookNames = ()=>{
     const context = getContext();
@@ -712,6 +778,10 @@ let restarting = false;
 let isReady = false;
 const restart = async()=>{
     if (restarting) return;
+    if (isEditing) {
+        needsReload = true;
+        return;
+    }
     restarting = true;
     await end();
     await delay(500);
