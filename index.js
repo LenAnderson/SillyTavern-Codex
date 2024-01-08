@@ -2,7 +2,7 @@ import { characters, chat_metadata, eventSource, event_types, getRequestHeaders,
 import { getContext } from '../../../extensions.js';
 import { groups } from '../../../group-chats.js';
 import { registerSlashCommand } from '../../../slash-commands.js';
-import { delay, uuidv4 } from '../../../utils.js';
+import { delay, isTrueBoolean, uuidv4 } from '../../../utils.js';
 import { world_info, world_info_case_sensitive } from '../../../world-info.js';
 import { initSettings, settings } from './settings.js';
 import { Tooltip } from './src/Tooltip.js';
@@ -90,7 +90,7 @@ const cycle = async(matches)=>{
     if (isCycling) return;
     isCycling = true;
     for (const match of matches) {
-        await renderCodex(match);
+        await renderCodex(match, true);
         await delay(settings.cycleDelay ?? 1000);
     }
     isCycling = false;
@@ -123,7 +123,37 @@ const init = async()=>{
     eventSource.on(event_types.USER_MESSAGE_RENDERED, (idx)=>queueMessageAndCycle(idx));
     eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (idx)=>queueMessageAndCycle(idx));
 
-    registerSlashCommand('codex', ()=>root?unrenderCodex():renderCodex(), [], 'Open codex', true, true);
+    registerSlashCommand('codex', async(args, value)=>{
+        if (value && value.length > 0) {
+            const matches = findMatches(value);
+            if (matches.length > 0) {
+                if (isTrueBoolean(args.first)) {
+                    await renderCodex(matches[0]);
+                } else {
+                    await cycle(matches);
+                }
+            } else {
+                if (!isTrueBoolean(args.silent)) toastr.warning(`No codex entries found for: ${value}`);
+            }
+        } else {
+            switch (args.state) {
+                case 'show':
+                case 'on': {
+                    if (!root) renderCodex();
+                    break;
+                }
+                case 'hide':
+                case 'off': {
+                    if (root) unrenderCodex();
+                    break;
+                }
+                default: {
+                    root ? unrenderCodex() : renderCodex();
+                    break;
+                }
+            }
+        }
+    }, [], '<span class="monospace">[optional state=show|hide] [optional silent=true] (optional text / keys)</span> – Toggle codex. <code>state=show|hide</code> to explicitly show or hide codex. Provide text or keys to open a relevant entry (cycles through entries if multiple are found). <code>silent=true</code> to suppress warnings when no entries are found. <code>first=true</code> to prevent cycling and only show the first matching entry.', true, true);
 };
 eventSource.on(event_types.APP_READY, ()=>init());
 
