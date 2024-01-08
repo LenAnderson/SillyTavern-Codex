@@ -371,10 +371,13 @@ const updateNodes = async(nodes)=>{
                     el.classList.add('stcdx--link');
                     el.textContent = node.textContent.substring(match.start, match.end);
                     el.addEventListener('click', ()=>{
-                        tt.hide();
+                        tt?.hide();
                         renderCodex(match);
                     });
-                    const tt = new Tooltip(el, match);
+                    let tt;
+                    if (!settings.noTooltips) {
+                        tt = new Tooltip(el, match, settings.fixedTooltips);
+                    }
                     els.push(el);
                 }
                 idx = match.end;

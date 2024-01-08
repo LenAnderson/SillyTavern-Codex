@@ -9,6 +9,8 @@ export const initSettings = ()=>{
         color: 'rgba(0, 255, 255, 1)',
         icon: '🧾',
         onlyFirst: false,
+        noTooltips: false,
+        fixedTooltips: false,
         requirePrefix: true,
         template: '## {{key[0]}}\n\n{{content}}',
         templateList: [],
@@ -41,6 +43,18 @@ export const initSettings = ()=>{
                         <label class="checkbox_label">
                             <input type="checkbox" id="stcdx--onlyFirst" ${settings.onlyFirst ? 'checked' : ''}>
                             Only create link on first occurrence in a message
+                        </label>
+                    </div>
+                    <div class="flex-container">
+                        <label class="checkbox_label">
+                            <input type="checkbox" id="stcdx--noTooltips" ${settings.noTooltips ? 'checked' : ''}>
+                            Don't show tooltips
+                        </label>
+                    </div>
+                    <div class="flex-container">
+                        <label class="checkbox_label">
+                            <input type="checkbox" id="stcdx--fixedTooltips" ${settings.fixedTooltips ? 'checked' : ''}>
+                            Show tooltips on top of codex instead of at cursor
                         </label>
                     </div>
                     <div class="flex-container">
@@ -91,6 +105,16 @@ export const initSettings = ()=>{
     });
     document.querySelector('#stcdx--onlyFirst').addEventListener('click', ()=>{
         settings.onlyFirst = document.querySelector('#stcdx--onlyFirst').checked;
+        saveSettingsDebounced();
+        restartDebounced();
+    });
+    document.querySelector('#stcdx--noTooltips').addEventListener('click', ()=>{
+        settings.noTooltips = document.querySelector('#stcdx--noTooltips').checked;
+        saveSettingsDebounced();
+        restartDebounced();
+    });
+    document.querySelector('#stcdx--fixedTooltips').addEventListener('click', ()=>{
+        settings.fixedTooltips = document.querySelector('#stcdx--fixedTooltips').checked;
         saveSettingsDebounced();
         restartDebounced();
     });

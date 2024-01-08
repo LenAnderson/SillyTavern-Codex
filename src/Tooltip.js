@@ -7,16 +7,19 @@ export class Tooltip {
     /**@type {Function}*/ boundScroll;
     /**@type {Function}*/ updatePositionDebounced;
     /**@type {Object}*/ match;
+    /**@type {Boolean}*/ isFixed;
 
 
 
 
-    constructor(/**@type {HTMLElement}*/trigger, /**@type {Object}*/match) {
+    constructor(/**@type {HTMLElement}*/trigger, /**@type {Object}*/match, /**@type {Boolean}*/isFixed) {
         this.trigger = trigger;
         this.match = match;
+        this.isFixed = isFixed;
         const root = document.createElement('div'); {
             this.root = root;
             root.classList.add('stcdx--tooltip');
+            root.classList.add('stcdx--fixed');
             root.classList.add('mes_text');
         }
         this.boundMove = this.move.bind(this);
@@ -30,6 +33,7 @@ export class Tooltip {
 
 
     updatePosition(x, y) {
+        if (this.isFixed) return;
         const rect = this.root.getBoundingClientRect();
         const w = rect.width;
         const h = rect.height;

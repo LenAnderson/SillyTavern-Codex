@@ -239,13 +239,29 @@ body {
 	border-radius: 10px;
 	max-width: 30vw;
 	max-height: 60vh;
-	// min-width: 100px;
-	// min-height: 100px;
 	overflow: auto;
 	position: fixed;
 	z-index: 99999;
 	padding: 1em;
 	text-align: justify;
+
+	&.stcdx--fixed {
+		--scale-speaker: 100;
+		--top: calc(100 - 100 / var(--scale-speaker) * 100);
+		--offset: 25;
+		--transition: 400;
+		--scale-dropoff: 3;
+		--position: 100;
+		--width: calc((100vw - var(--sheldWidth)) / 2);
+		max-width: unset;
+		max-height: unset;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: calc(var(--position) * (100vw - var(--width)) / 100);
+		left: clamp(0vw, calc(var(--position) * (100vw - var(--width)) / 100 - var(--settings-panel-width, 0px)), calc(100vw - var(--width)));
+		width: var(--width);
+	}
 
 	>br {
 		display: none;
