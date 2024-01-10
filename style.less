@@ -1,10 +1,16 @@
 body:has(.stcdx--root) {
+	--stcdx--discordToggle: 0;
+	--stcdx--sheldWidth: calc(
+		((var(--stcdx--discordToggle) * -1 + 1) * var(--sheldWidth))
+		+
+		(var(--stcdx--discordToggle) * (100vw - var(--nav-bar-width, 0vw) - var(--char-panel-width, 0vw) - var(--settings-panel-width, 0vw) - ((100vw - var(--sheldWidth)) / 2)))
+	);
 	#sheld {
 		&:has(~ .stcdx--root) {
-			width: calc(100vw - var(--nav-bar-width) - var(--char-panel-width) - var(--settings-panel-width) - ((100vw - var(--sheldWidth)) / 2));
+			width: var(--stcdx--sheldWidth);
 			&>#chat,
 			&>#form_sheld {
-				width: calc(100vw - var(--nav-bar-width) - var(--char-panel-width) - var(--settings-panel-width) - ((100vw - var(--sheldWidth)) / 2));
+				width: var(--stcdx--sheldWidth);
 			}
 		}
 	}

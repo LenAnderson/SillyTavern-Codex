@@ -203,6 +203,7 @@ const unrenderCodex = ()=>{
 };
 const renderCodex = async(match, force = false, noHist = false)=>{
     if (!isReady) return;
+    document.body.style.setProperty('--stcdx--discordToggle', window.getComputedStyle(document.body).getPropertyValue('--nav-bar-width') ? 1 : 0);
     if (currentCodex && currentCodex.book == match?.book && currentCodex.entry == match?.entry) {
         if (!force) {
             unrenderCodex();
