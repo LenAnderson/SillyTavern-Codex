@@ -1,4 +1,4 @@
-import { characters, chat_metadata, eventSource, event_types, getRequestHeaders, messageFormatting, substituteParams } from '../../../../script.js';
+import { characters, chat, chat_metadata, eventSource, event_types, getRequestHeaders, messageFormatting, substituteParams } from '../../../../script.js';
 import { getContext } from '../../../extensions.js';
 import { groups } from '../../../group-chats.js';
 import { executeSlashCommands, registerSlashCommand } from '../../../slash-commands.js';
@@ -341,11 +341,15 @@ const clearCache = ()=>{
     Object.keys(originals).forEach(key=>delete originals[key]);
 };
 const restoreMessage = (/**@type {HTMLElement}*/msg) => {
-    const oldId = msg.querySelector('.mes_text').getAttribute('data-codex');
-    if (oldId && originals[oldId] && originals[oldId].textContent == msg.querySelector('.mes_text').textContent) {
-        msg.querySelector('.mes_text').replaceWith(originals[oldId]);
-        delete originals[oldId];
-        msg.querySelector('.mes_text').removeAttribute('data-codex');
+    if (msg.querySelector('[data-codex]')) {
+        let messageText = substituteParams(chat[Number(msg.getAttribute('mesid'))].mes);
+        messageText = messageFormatting(
+            messageText,
+            'Codex',
+            false,
+            false,
+        );
+        msg.querySelector('.mes_text').innerHTML = messageText;
     }
 };
 const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
@@ -354,10 +358,11 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
     const nodes = document.evaluate('.//text()', msg.querySelector('.mes_text'), null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
     const resultNodes = await checkNodes(nodes);
     if (resultNodes.length > 0) {
-        const id = uuidv4();
-        originals[id] = msg.querySelector('.mes_text').cloneNode(true);
-        msg.querySelector('.mes_text').setAttribute('data-codex', id);
         await updateNodes(resultNodes);
+        const fingerprint = document.createElement('span'); {
+            fingerprint.setAttribute('data-codex', uuidv4());
+            msg.querySelector('.mes_text').append(fingerprint);
+        }
     }
 };
 const checkNodes = async(nodes, skipMatch = null)=>{
@@ -390,13 +395,15 @@ const updateNodes = async(nodes)=>{
                 const el = document.createElement('span'); {
                     el.classList.add('stcdx--link');
                     el.textContent = node.textContent.substring(match.start, match.end);
-                    el.addEventListener('click', ()=>{
+                    el.addEventListener('click', async()=>{
                         tt?.hide();
-                        renderCodex(match);
+                        el.style.pointerEvents = 'none';
+                        await renderCodex(match);
+                        el.style.pointerEvents = '';
                     });
                     let tt;
                     if (!settings.noTooltips) {
-                        tt = new Tooltip(el, match, settings.fixedTooltips);
+                        tt = Tooltip.create(el, match, settings.fixedTooltips);
                     }
                     els.push(el);
                 }
@@ -823,5 +830,6 @@ const end = async()=>{
         restoreMessage(msg);
     }
     while (hist.length > 0) hist.pop();
+    Tooltip.clear();
     clearCache();
 };
