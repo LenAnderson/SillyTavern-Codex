@@ -400,10 +400,12 @@ const updateNodes = async(nodes)=>{
                     el.classList.add('stcdx--link');
                     el.textContent = node.textContent.substring(match.start, match.end);
                     el.addEventListener('click', async()=>{
-                        tt?.hide();
+                        tt.isFrozen = true;
                         el.style.pointerEvents = 'none';
                         await renderCodex(match);
                         el.style.pointerEvents = '';
+                        tt?.hide(true);
+                        tt.isFrozen = false;
                     });
                     let tt;
                     if (!settings.noTooltips) {

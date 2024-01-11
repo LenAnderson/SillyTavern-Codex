@@ -259,6 +259,10 @@ body {
 			pointer-events: all;
 		}
 
+		>br {
+			display: none;
+		}
+
 		h1,
 		h2,
 		h3 {
@@ -307,12 +311,32 @@ body {
 		--width: calc((100vw - var(--sheldWidth)) / 2);
 		max-width: unset;
 		max-height: unset;
+		padding: calc(1em + 5px);
+		padding-top: 1em;
 		position: absolute;
-		top: 0;
+		top: calc(2em + 5px);
 		bottom: 0;
 		left: calc(var(--position) * (100vw - var(--width)) / 100);
 		left: clamp(0vw, calc(var(--position) * (100vw - var(--width)) / 100 - var(--settings-panel-width, 0px)), calc(100vw - var(--width)));
 		width: var(--width);
+
+		h1,
+		h2,
+		h3 {
+			text-align: center;
+		}
+
+		img {
+			max-height: 50vh;
+			width: 100%;
+			object-fit: contain;
+			object-position: center;
+			cursor: zoom-in;
+
+			&:hover {
+				filter: drop-shadow(2px 4px 6px black);
+			}
+		}
 	}
 
 	>br {

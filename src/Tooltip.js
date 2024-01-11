@@ -26,6 +26,7 @@ export class Tooltip {
     /**@type {Function}*/ updatePositionDebounced;
     /**@type {Object}*/ match;
     /**@type {Boolean}*/ isFixed;
+    /**@type {Boolean}*/ isFrozen = false;
 
 
 
@@ -52,6 +53,7 @@ export class Tooltip {
 
     updatePosition(x, y) {
         if (this.isFixed) return;
+        if (this.isFrozen) return;
         const rect = this.root.getBoundingClientRect();
         const w = rect.width;
         const h = rect.height;
@@ -65,21 +67,25 @@ export class Tooltip {
         this.root.style.top = `${y}px`;
     }
     show(/**@type {PointerEvent}*/evt) {
+        if (this.isFrozen) return;
         this.root.innerHTML = makeCodexDom(this.match);
         document.body.append(this.root);
         this.updatePosition(evt.clientX, evt.clientY);
         window.addEventListener('pointermove', this.boundMove);
         this.trigger.addEventListener('wheel', this.boundScroll);
     }
-    hide() {
+    hide(isForced=false) {
+        if (!isForced && this.isFrozen) return;
         this.root?.remove();
         window.removeEventListener('pointermove', this.boundMove);
         window.removeEventListener('pointermove', this.boundScroll);
     }
     move(/**@type {PointerEvent}*/evt) {
+        if (this.isFrozen) return;
         this.updatePositionDebounced(evt.clientX, evt.clientY);
     }
     scroll(/**@type {WheelEvent}*/evt) {
+        if (this.isFrozen) return;
         evt.preventDefault();
         this.root.scrollTop += evt.deltaY;
     }

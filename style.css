@@ -228,6 +228,9 @@ body {
   opacity: 1;
   pointer-events: all;
 }
+.stcdx--root > .stcdx--content > br {
+  display: none;
+}
 .stcdx--root > .stcdx--content h1,
 .stcdx--root > .stcdx--content h2,
 .stcdx--root > .stcdx--content h3 {
@@ -268,12 +271,29 @@ body {
   --width: calc((100vw - var(--sheldWidth)) / 2);
   max-width: unset;
   max-height: unset;
+  padding: calc(1em + 5px);
+  padding-top: 1em;
   position: absolute;
-  top: 0;
+  top: calc(2em + 5px);
   bottom: 0;
   left: calc(var(--position) * (100vw - var(--width)) / 100);
   left: clamp(0vw, calc(var(--position) * (100vw - var(--width)) / 100 - var(--settings-panel-width, 0px)), calc(100vw - var(--width)));
   width: var(--width);
+}
+.stcdx--tooltip.mes_text.stcdx--fixed h1,
+.stcdx--tooltip.mes_text.stcdx--fixed h2,
+.stcdx--tooltip.mes_text.stcdx--fixed h3 {
+  text-align: center;
+}
+.stcdx--tooltip.mes_text.stcdx--fixed img {
+  max-height: 50vh;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+  cursor: zoom-in;
+}
+.stcdx--tooltip.mes_text.stcdx--fixed img:hover {
+  filter: drop-shadow(2px 4px 6px black);
 }
 .stcdx--tooltip.mes_text > br {
   display: none;
