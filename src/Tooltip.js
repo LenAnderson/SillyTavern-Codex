@@ -1,24 +1,6 @@
 import { debounceAsync, makeCodexDom } from '../index.js';
 
 export class Tooltip {
-    /**@type {Tooltip[]} */ static list = [];
-
-
-    static create(/**@type {HTMLElement}*/trigger, /**@type {Object}*/match, /**@type {Boolean}*/isFixed) {
-        const tt = new Tooltip(trigger, match, isFixed);
-        this.list.push(tt);
-        return tt;
-    }
-    static clear() {
-        while (this.list.length > 0) {
-            const tt = this.list.pop();
-            tt.hide();
-        }
-    }
-
-
-
-
     /**@type {HTMLElement}*/ trigger;
     /**@type {HTMLElement}*/ root;
     /**@type {Function}*/ boundMove;

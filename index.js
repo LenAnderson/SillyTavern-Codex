@@ -1,10 +1,9 @@
-import { characters, chat, chat_metadata, eventSource, event_types, getRequestHeaders, messageFormatting, registerMacro, substituteParams } from '../../../../script.js';
+import { characters, chat_metadata, eventSource, event_types, getRequestHeaders, messageFormatting, substituteParams } from '../../../../script.js';
 import { getContext } from '../../../extensions.js';
 import { groups } from '../../../group-chats.js';
 import { executeSlashCommands, registerSlashCommand } from '../../../slash-commands.js';
 import { delay, isTrueBoolean, uuidv4 } from '../../../utils.js';
 import { world_info, world_info_case_sensitive } from '../../../world-info.js';
-import { quickReplyApi } from '../../quick-reply/index.js';
 import { initSettings, settings } from './settings.js';
 import { Tooltip } from './src/Tooltip.js';
 
@@ -138,33 +137,6 @@ const init = async()=>{
     eventSource.on(event_types.USER_MESSAGE_RENDERED, (idx)=>queueMessageAndCycle(idx));
     eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (idx)=>queueMessageAndCycle(idx));
 
-    registerMacro(
-        /\{\{qr::(?:((?:(?!(?:::)).)+)::)?((?:(?!(?:::)).)+)\}\}/g,
-        (all, set, qr)=>`<button class='qrButton' data-set='${set}' data-qr='${qr}'>${qr}</button>`,
-        'qr::set::label',
-        'replaced with a QR button',
-    );
-    window.addEventListener('click', (evt)=>{
-        const target = evt.target;
-        if (target.classList.contains('custom-qrButton')) {
-            const set = target.getAttribute('data-set');
-            const qr = target.getAttribute('data-qr');
-            quickReplyApi.executeQuickReply(set, qr);
-        }
-    });
-    registerMacro(
-        /\{\{wi::(?:((?:(?!(?:::)).)+)::)?((?:(?!(?:::)).)+)\}\}/g,
-        (all, book, key)=>{
-            log('ARGS', { book, key });
-            const matches = findMatches(key).filter(it=>book === undefined || it.book.toLowerCase() == book.toLowerCase());
-            if (matches.length > 0) {
-                return substituteParams(matches[0].content);
-            }
-            return all;
-        },
-        'wi::bookName::entryKey',
-        'replaced with the contents of a matching World Info entry (use {{wi::entryKey}} to match from all active books)',
-    );
     registerSlashCommand('codex', async(args, value)=>{
         if (value && value.length > 0) {
             const matches = findMatches(value);
@@ -326,16 +298,25 @@ export const rerenderCodex = ()=>{
 };
 export const makeCodexDom = (match)=>{
     const entry = books.find(b=>b.name == match.book)?.entries?.[match.entry];
+    let text = entry?.content ?? '';
+    text = text.replace(/\{\{wi::(?:((?:(?!(?:::)).)+)::)?((?:(?!(?:::)).)+)\}\}/g, (all, book, key)=>{
+        log('ARGS', { book, key });
+        const b = books.find(it=>it.name == (book ?? match.book));
+        if (b) {
+            return Object.keys(b.entries).map(k=>b.entries[k]).find(it=>it.key.includes(key))?.content ?? all;
+        }
+        return all;
+    });
+    let messageText = substituteParams(text);
     let template = settings.templateList?.find(tpl=>tpl.name == entry?.key?.find(it=>it.startsWith('codex-tpl:'))?.substring(10))?.template ?? settings.template;
-    let messageText = template
+    messageText = template
         .replace(/\{\{comment\}\}/g, entry?.comment)
         .replace(/\{\{comment::url\}\}/g, encodeURIComponent(entry?.comment))
-        .replace(/\{\{content\}\}/g, entry?.content)
-        .replace(/\{\{content::url\}\}/g, encodeURIComponent(entry?.content))
+        .replace(/\{\{content\}\}/g, text)
+        .replace(/\{\{content::url\}\}/g, encodeURIComponent(text))
         .replace(/\{\{key\[(\d+)\]\}\}/g, (_,idx)=>entry?.key?.[idx]?.replace(/^codex:/, ''))
         .replace(/\{\{key\[(\d+)\]::url\}\}/g, (_,idx)=>encodeURIComponent(entry?.key?.[idx]?.replace(/^codex:/, '')))
     ;
-    messageText = substituteParams(messageText);
     messageText = messageFormatting(
         messageText,
         'Codex',
@@ -360,21 +341,11 @@ const clearCache = ()=>{
     Object.keys(originals).forEach(key=>delete originals[key]);
 };
 const restoreMessage = (/**@type {HTMLElement}*/msg) => {
-    // const oldId = msg.querySelector('.mes_text').getAttribute('data-codex');
-    // if (oldId && originals[oldId] && originals[oldId].textContent == msg.querySelector('.mes_text').textContent) {
-    //     msg.querySelector('.mes_text').replaceWith(originals[oldId]);
-    //     delete originals[oldId];
-    //     msg.querySelector('.mes_text').removeAttribute('data-codex');
-    // }
-    if (msg.querySelector('[data-codex]')) {
-        let messageText = substituteParams(chat[Number(msg.getAttribute('mesid'))].mes);
-        messageText = messageFormatting(
-            messageText,
-            'Codex',
-            false,
-            false,
-        );
-        msg.querySelector('.mes_text').innerHTML = messageText;
+    const oldId = msg.querySelector('.mes_text').getAttribute('data-codex');
+    if (oldId && originals[oldId] && originals[oldId].textContent == msg.querySelector('.mes_text').textContent) {
+        msg.querySelector('.mes_text').replaceWith(originals[oldId]);
+        delete originals[oldId];
+        msg.querySelector('.mes_text').removeAttribute('data-codex');
     }
 };
 const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
@@ -383,14 +354,10 @@ const updateMessage = async(/**@type {HTMLElement}*/msg)=>{
     const nodes = document.evaluate('.//text()', msg.querySelector('.mes_text'), null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
     const resultNodes = await checkNodes(nodes);
     if (resultNodes.length > 0) {
-        // const id = uuidv4();
-        // originals[id] = msg.querySelector('.mes_text').cloneNode(true);
-        // msg.querySelector('.mes_text').setAttribute('data-codex', id);
+        const id = uuidv4();
+        originals[id] = msg.querySelector('.mes_text').cloneNode(true);
+        msg.querySelector('.mes_text').setAttribute('data-codex', id);
         await updateNodes(resultNodes);
-        const fingerprint = document.createElement('span'); {
-            fingerprint.setAttribute('data-codex', uuidv4());
-            msg.querySelector('.mes_text').append(fingerprint);
-        }
     }
 };
 const checkNodes = async(nodes, skipMatch = null)=>{
@@ -423,15 +390,13 @@ const updateNodes = async(nodes)=>{
                 const el = document.createElement('span'); {
                     el.classList.add('stcdx--link');
                     el.textContent = node.textContent.substring(match.start, match.end);
-                    el.addEventListener('click', async()=>{
+                    el.addEventListener('click', ()=>{
                         tt?.hide();
-                        el.style.pointerEvents = 'none';
-                        await renderCodex(match);
-                        el.style.pointerEvents = '';
+                        renderCodex(match);
                     });
                     let tt;
                     if (!settings.noTooltips) {
-                        tt = Tooltip.create(el, match, settings.fixedTooltips);
+                        tt = new Tooltip(el, match, settings.fixedTooltips);
                     }
                     els.push(el);
                 }
@@ -858,6 +823,5 @@ const end = async()=>{
         restoreMessage(msg);
     }
     while (hist.length > 0) hist.pop();
-    Tooltip.clear();
     clearCache();
 };
