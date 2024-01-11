@@ -215,10 +215,6 @@ export class Map {
             dom.addEventListener('click', ()=>{
                 dom.remove();
             });
-            const title = document.createElement('h2'); {
-                title.textContent = getTitle(this.entry);
-                dom.append(title);
-            }
             const imgPromise = new Promise(resolve=>{
                 this.img.addEventListener('load', resolve);
                 this.img.addEventListener('error', resolve);
