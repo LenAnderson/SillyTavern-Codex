@@ -296,24 +296,28 @@ export const rerenderCodex = ()=>{
         renderCodex(match);
     }
 };
+const subParams = (text)=>{
+    return substituteParams(text).replace(
+        /\{\{wi::(?:((?:(?!(?:::)).)+)::)?((?:(?!(?:::)).)+)\}\}/g,
+        (all, book, key)=>{
+            log('ARGS', { book, key });
+            const matches = findMatches(key).filter(it=>book === undefined || it.book.toLowerCase() == book.toLowerCase());
+            if (matches.length > 0) {
+                return subParams(matches[0].content);
+            }
+            return all;
+        },
+    );
+};
 export const makeCodexDom = (match)=>{
     const entry = books.find(b=>b.name == match.book)?.entries?.[match.entry];
-    let text = entry?.content ?? '';
-    text = text.replace(/\{\{wi::(?:((?:(?!(?:::)).)+)::)?((?:(?!(?:::)).)+)\}\}/g, (all, book, key)=>{
-        log('ARGS', { book, key });
-        const b = books.find(it=>it.name == (book ?? match.book));
-        if (b) {
-            return Object.keys(b.entries).map(k=>b.entries[k]).find(it=>it.key.includes(key))?.content ?? all;
-        }
-        return all;
-    });
-    let messageText = substituteParams(text);
+    let messageText = subParams(entry?.content ?? '');
     let template = settings.templateList?.find(tpl=>tpl.name == entry?.key?.find(it=>it.startsWith('codex-tpl:'))?.substring(10))?.template ?? settings.template;
     messageText = template
         .replace(/\{\{comment\}\}/g, entry?.comment)
         .replace(/\{\{comment::url\}\}/g, encodeURIComponent(entry?.comment))
-        .replace(/\{\{content\}\}/g, text)
-        .replace(/\{\{content::url\}\}/g, encodeURIComponent(text))
+        .replace(/\{\{content\}\}/g, messageText)
+        .replace(/\{\{content::url\}\}/g, encodeURIComponent(messageText))
         .replace(/\{\{key\[(\d+)\]\}\}/g, (_,idx)=>entry?.key?.[idx]?.replace(/^codex:/, ''))
         .replace(/\{\{key\[(\d+)\]::url\}\}/g, (_,idx)=>encodeURIComponent(entry?.key?.[idx]?.replace(/^codex:/, '')))
     ;
