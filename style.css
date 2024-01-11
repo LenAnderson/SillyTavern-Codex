@@ -225,6 +225,9 @@ body {
   position: none;
   z-index: -1;
 }
+.stcdx--root > .stcdx--content:has(.stcdx--mapCodex) {
+  overflow: hidden;
+}
 .stcdx--root > .stcdx--content.stcdx--active {
   opacity: 1;
   pointer-events: all;
@@ -239,6 +242,7 @@ body {
 }
 .stcdx--root > .stcdx--content img {
   max-height: 50vh;
+  height: auto;
   width: 100%;
   object-fit: contain;
   object-position: center;
@@ -246,6 +250,177 @@ body {
 }
 .stcdx--root > .stcdx--content img:hover {
   filter: drop-shadow(2px 4px 6px black);
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  height: 100%;
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex > .stcdx--title {
+  grid-column: 1;
+  grid-row: 1;
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer {
+  flex: 0 0 auto;
+  display: grid;
+  position: relative;
+  cursor: zoom-in;
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer:hover {
+  filter: drop-shadow(2px 4px 6px black);
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map,
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover {
+  grid-column: 1;
+  grid-row: 2;
+  max-height: 50vh;
+  max-width: 100%;
+  height: auto;
+  width: auto;
+  margin: auto;
+  z-index: 1;
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--map,
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--map {
+  filter: saturate(0.5);
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--hover,
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover {
+  pointer-events: none;
+  transform: scale(1);
+  transition: transform 200ms, filter 200ms;
+  filter: drop-shadow(0 0 0px black);
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--zoneContainer {
+  grid-column: 1;
+  grid-row: 4;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--zoneContainer > .stcdx--map-zone {
+  opacity: 0.75;
+  transition: 200ms;
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--zoneContainer > .stcdx--map-zone.stcdx--active {
+  opacity: 1;
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--zoneContainer > .stcdx--map-zone > .stcdx--title {
+  font-weight: bold;
+}
+body > .stcdx--me {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+}
+body > .stcdx--me:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(var(--SmartThemeBlurStrength));
+}
+body > .stcdx--me > .stcdx--menu {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  align-items: top;
+  justify-content: end;
+  background-color: var(--greyCAIbg);
+  box-shadow: 0 0 6px rgba(0 0 0 / 0.5);
+  height: 2em;
+  position: relative;
+}
+body > .stcdx--me > .stcdx--menu > .stcdx--hintList {
+  cursor: help;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  justify-content: left;
+  background-color: var(--greyCAIbg);
+  position: relative;
+  z-index: 10;
+  height: 2em;
+  overflow: hidden;
+}
+body > .stcdx--me > .stcdx--menu > .stcdx--hintList:hover {
+  overflow: visible;
+}
+body > .stcdx--me > .stcdx--menu > .stcdx--hintList > .stcdx--hint {
+  font-size: smaller;
+  padding: 0.5em;
+  background-color: var(--greyCAIbg);
+}
+body > .stcdx--me > .stcdx--menu > .stcdx--actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  padding-left: 1em;
+}
+body > .stcdx--me > .stcdx--menu > .stcdx--actions > .menu_button {
+  margin: 0;
+  height: 2em;
+}
+body > .stcdx--me .stcdx--mapContainer {
+  flex: 0 0 auto;
+  display: grid;
+  position: relative;
+}
+body > .stcdx--me .stcdx--mapContainer > .stcdx--map,
+body > .stcdx--me .stcdx--mapContainer .stcdx--hover {
+  grid-column: 1;
+  grid-row: 2;
+  max-height: calc(100vh - 2em);
+  max-width: calc(100vw - 2em);
+  height: auto;
+  width: auto;
+  margin: auto;
+  z-index: 1;
+}
+body > .stcdx--me .stcdx--mapContainer > .stcdx--map.stcdx--hover,
+body > .stcdx--me .stcdx--mapContainer .stcdx--hover.stcdx--hover {
+  pointer-events: none;
+}
+body > .stcdx--mapCodex {
+  position: fixed;
+  inset: 0;
+  padding: 1em;
+  z-index: 10000;
+}
+body > .stcdx--mapCodex:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(var(--SmartThemeBlurStrength));
+}
+body > .stcdx--mapCodex .stcdx--mapContainer {
+  flex: 0 0 auto;
+  display: grid;
+  position: relative;
+  cursor: zoom-out;
+}
+body > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map,
+body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover {
+  grid-column: 1;
+  grid-row: 2;
+  max-height: calc(100vh - 2em);
+  max-width: calc(100vw - 2em);
+  height: auto;
+  width: auto;
+  margin: auto;
+  z-index: 1;
+}
+body > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--map,
+body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--map {
+  filter: saturate(0.5);
+}
+body > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--hover,
+body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover {
+  pointer-events: none;
+  transform: scale(1);
+  transition: transform 200ms;
+  filter: drop-shadow(0 0 3px black);
 }
 .stcdx--tooltip.mes_text {
   pointer-events: none;
@@ -329,6 +504,31 @@ body {
   object-fit: contain;
   object-position: center;
   transition: 400ms;
+}
+#stcdx--mapEditor,
+#stcdx--zoneEditor {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: 100%;
+}
+#stcdx--mapEditor > label:has(#stcdx--map-description),
+#stcdx--zoneEditor > label:has(#stcdx--map-description),
+#stcdx--mapEditor > label:has(#stcdx--zone-description),
+#stcdx--zoneEditor > label:has(#stcdx--zone-description) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+#stcdx--mapEditor > label:has(#stcdx--map-description) #stcdx--map-description,
+#stcdx--zoneEditor > label:has(#stcdx--map-description) #stcdx--map-description,
+#stcdx--mapEditor > label:has(#stcdx--zone-description) #stcdx--map-description,
+#stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--map-description,
+#stcdx--mapEditor > label:has(#stcdx--map-description) #stcdx--zone-description,
+#stcdx--zoneEditor > label:has(#stcdx--map-description) #stcdx--zone-description,
+#stcdx--mapEditor > label:has(#stcdx--zone-description) #stcdx--zone-description,
+#stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--zone-description {
+  flex: 1 1 auto;
 }
 .stcdx--settings .stcdx--template {
   border-top: 1px solid var(--SmartThemeBorderColor);

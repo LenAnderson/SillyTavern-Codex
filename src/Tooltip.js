@@ -66,9 +66,10 @@ export class Tooltip {
         this.root.style.left = `${x}px`;
         this.root.style.top = `${y}px`;
     }
-    show(/**@type {PointerEvent}*/evt) {
+    async show(/**@type {PointerEvent}*/evt) {
         if (this.isFrozen) return;
-        this.root.innerHTML = makeCodexDom(this.match);
+        this.root.innerHTML = '';
+        this.root.append(...await makeCodexDom(this.match));
         document.body.append(this.root);
         this.updatePosition(evt.clientX, evt.clientY);
         window.addEventListener('pointermove', this.boundMove);

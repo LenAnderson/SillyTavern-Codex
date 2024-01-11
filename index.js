@@ -6,6 +6,7 @@ import { delay, isTrueBoolean, uuidv4 } from '../../../utils.js';
 import { world_info, world_info_case_sensitive } from '../../../world-info.js';
 import { initSettings, settings } from './settings.js';
 import { Tooltip } from './src/Tooltip.js';
+import { Map } from './src/map/Map.js';
 
 export const log = (...msg)=>console.log('[STCDX]', ...msg);
 export const warn = (...msg)=>console.warn('[STCDX]', ...msg);
@@ -65,6 +66,8 @@ let editBook;
 let editEntry;
 /**@type {Boolean}*/
 let needsReload = false;
+/**@type {Map[]}*/
+let mapList = [];
 
 const queueMessage = async(...idxList)=>{
     if (!isReady) return;
@@ -224,7 +227,7 @@ const renderCodex = async(match, force = false, noHist = false)=>{
         const nc = document.createElement('div'); {
             nc.classList.add('stcdx--content');
             nc.classList.add('mes_text');
-            nc.innerHTML = makeCodexDom(match);
+            nc.append(...await makeCodexDom(match));
             root.append(nc);
         }
         const nodes = document.evaluate('.//text()', nc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
@@ -296,7 +299,7 @@ export const rerenderCodex = ()=>{
         renderCodex(match);
     }
 };
-const subParams = (text)=>{
+export const subParams = (text)=>{
     return substituteParams(text).replace(
         /\{\{wi::(?:((?:(?!(?:::)).)+)::)?((?:(?!(?:::)).)+)\}\}/g,
         (all, book, key)=>{
@@ -309,8 +312,30 @@ const subParams = (text)=>{
         },
     );
 };
-export const makeCodexDom = (match)=>{
+export const getTitle = (entry)=>{
+    const titleKey = entry.key.find(it=>it.startsWith('codex-title:'))?.substring(12);
+    if (titleKey) {
+        if (/^key\[\d+\]$/i.test(titleKey)) {
+            return entry.key[titleKey.replace(/^key\[(\d+)\]$/i, '$1')];
+        }
+        return entry[titleKey];
+    }
+    return entry.comment.length > 50 ? entry.key?.join(' / ') : (entry.comment || entry.key?.join(' / ')) ?? '???';
+};
+export const getEntry = (match)=>{
+    return books.find(it=>it.name == match.book)?.entries?.[match.entry];
+};
+export const makeCodexMapDom = async (book, entry)=>{
+    const data = JSON.parse(entry.content || '{}');
+    const map = Map.from(data, book, entry);
+    mapList.push(map);
+    return [await map.render()];
+};
+export const makeCodexDom = async (match)=>{
     const entry = books.find(b=>b.name == match.book)?.entries?.[match.entry];
+    if (entry.key.find(it=>it.startsWith('codex-map:'))) {
+        return await makeCodexMapDom(match.book, entry);
+    }
     let messageText = subParams(entry?.content ?? '');
     let template = settings.templateList?.find(tpl=>tpl.name == entry?.key?.find(it=>it.startsWith('codex-tpl:'))?.substring(10))?.template ?? settings.template;
     messageText = template
@@ -320,6 +345,8 @@ export const makeCodexDom = (match)=>{
         .replace(/\{\{content::url\}\}/g, encodeURIComponent(messageText))
         .replace(/\{\{key\[(\d+)\]\}\}/g, (_,idx)=>entry?.key?.[idx]?.replace(/^codex:/, ''))
         .replace(/\{\{key\[(\d+)\]::url\}\}/g, (_,idx)=>encodeURIComponent(entry?.key?.[idx]?.replace(/^codex:/, '')))
+        .replace(/\{\{title\}\}/g, ()=>getTitle(entry))
+        .replace(/\{\{title::url\}\}/g, ()=>encodeURIComponent(getTitle(entry)))
     ;
     messageText = messageFormatting(
         messageText,
@@ -327,7 +354,9 @@ export const makeCodexDom = (match)=>{
         false,
         false,
     );
-    return messageText;
+    const dom = document.createElement('div');
+    dom.innerHTML = messageText;
+    return Array.from(dom.children);
 };
 
 
@@ -374,7 +403,7 @@ const checkNodes = async(nodes, skipMatch = null)=>{
     const found = [];
     for (let i = 0; i < nodes.snapshotLength; i++) {
         const node = nodes.snapshotItem(i);
-        const matches = findMatches(node.textContent, found, skipMatch);
+        const matches = findMatches(node.textContent, true, found, skipMatch);
         found.push(...matches.map(it=>`${it.book}---${it.entry}`));
         if (matches.length) {
             resultNodes.push({ node, matches });
@@ -433,13 +462,14 @@ const updateNodes = async(nodes)=>{
     }
 };
 
-const findMatches = (text, alreadyFound = [], skipMatch = null)=>{
+export const findMatches = (text, includeMaps = true, alreadyFound = [], skipMatch = null)=>{
     const found = [...alreadyFound];
     const matches = [];
     for (const book of books) {
         for (const entryIdx of Object.keys(book.entries)) {
             const entry = book.entries[entryIdx];
             if (entry.key.includes('codex-skip:')) continue;
+            if (!includeMaps && entry.key.includes('codex-map:')) continue;
             if (book.name == skipMatch?.book && entry.uid == skipMatch?.entry) continue;
             const keys = entry.key.filter(it=>!settings.requirePrefix || it.startsWith('codex:'));
             for (const key of keys) {
@@ -691,8 +721,14 @@ const makeRoot = ()=>{
                 editTrigger.addEventListener('click', async(evt)=>{
                     evt.preventDefault();
                     if (!currentCodex) return;
-                    root.classList.toggle('stcdx--editing');
-                    isEditing = !isEditing;
+                    if (mapList.length > 0) {
+                        isEditing = true;
+                        await mapList.slice(-1)[0].showEditor();
+                        isEditing = false;
+                    } else {
+                        root.classList.toggle('stcdx--editing');
+                        isEditing = !isEditing;
+                    }
                     if (!isEditing && needsReload) {
                         needsReload = false;
                         const match = { ...currentCodex };
@@ -792,7 +828,7 @@ let restarting = false;
 let isReady = false;
 const restart = async()=>{
     if (restarting) return;
-    if (isEditing) {
+    if (isEditing || mapList.find(it=>it.isEditing)) {
         needsReload = true;
         return;
     }
@@ -836,6 +872,7 @@ const end = async()=>{
         restoreMessage(msg);
     }
     while (hist.length > 0) hist.pop();
+    while (mapList.length > 0) mapList.pop();
     Tooltip.clear();
     clearCache();
 };
