@@ -14,6 +14,8 @@ export class Zone {
     /**@type {String}*/ description;
     /**@type {String}*/ key;
     /**@type {Point[]}*/ polygon;
+    /**@type {String}*/ command;
+    /**@type {String}*/ qrSet;
 
     /**@type {HTMLElement}*/ dom;
 
@@ -24,6 +26,8 @@ export class Zone {
             description: this.description,
             key: this.key,
             polygon: this.polygon,
+            command: this.command,
+            qrSet: this.qrSet,
         };
     }
 }

@@ -1,7 +1,10 @@
 import { callPopup, messageFormatting } from '../../../../../../script.js';
 import { executeSlashCommands } from '../../../../../slash-commands.js';
 import { delay } from '../../../../../utils.js';
+import { quickReplyApi } from '../../../../quick-reply/index.js';
 import { findMatches, getEntry, getTitle, log, makeCodexDom, subParams } from '../../index.js';
+import { ContextMenu } from '../ContextMenu.js';
+import { MenuItem } from '../MenuItem.js';
 import { Point } from './Point.js';
 import { Zone } from './Zone.js';
 
@@ -18,6 +21,9 @@ export class Map {
     /**@type {String}*/ url;
     /**@type {String}*/ description;
     /**@type {Zone[]}*/ zoneList;
+    /**@type {String}*/ command;
+    /**@type {String}*/ qrSet;
+
     /**@type {String}*/ book;
     /**@type {Object}*/ entry;
 
@@ -68,6 +74,8 @@ export class Map {
             url: this.url,
             description: this.description,
             zoneList: this.zoneList,
+            command: this.command,
+            qrSet: this.qrSet,
         };
     }
 
@@ -111,6 +119,55 @@ export class Map {
                         evt.preventDefault();
                         zoneCont.scrollTop += evt.deltaY;
                     });
+                    canvas.addEventListener('click', async(evt)=>{
+                        const rect = canvas.getBoundingClientRect();
+                        const scale = canvas.width / rect.width;
+                        const x = (evt.x - rect.left) * scale;
+                        const y = (evt.y - rect.top) * scale;
+                        const p = new Point();
+                        p.x = x;
+                        p.y = y;
+                        const zone = this.zoneList.find(it=>this.pip(it.polygon, p));
+                        if (zone) {
+                            const cmd = zone.command || this.command;
+                            if (cmd) {
+                                evt.stopPropagation();
+                                await executeSlashCommands(
+                                    cmd
+                                        .replace(/{{map}}/gi, this.entry.comment)
+                                        .replace(/{{zone}}/gi, zone.label)
+                                    ,
+                                );
+                            }
+                        }
+                    });
+                    canvas.addEventListener('contextmenu', (evt)=>{
+                        const rect = canvas.getBoundingClientRect();
+                        const scale = canvas.width / rect.width;
+                        const x = (evt.x - rect.left) * scale;
+                        const y = (evt.y - rect.top) * scale;
+                        const p = new Point();
+                        p.x = x;
+                        p.y = y;
+                        const zone = this.zoneList.find(it=>this.pip(it.polygon, p));
+                        if (zone) {
+                            const qrs = zone.qrSet || this.qrSet;
+                            if (qrs) {
+                                const qrList = quickReplyApi.listQuickReplies(qrs);
+                                if (qrList.length > 0) {
+                                    evt.stopPropagation();
+                                    evt.preventDefault();
+                                    const menu = new ContextMenu(qrList.map(qr=>
+                                        new MenuItem(qr, ()=>quickReplyApi.executeQuickReply(qrs, qr, {
+                                            map: this.entry.comment,
+                                            zone: zone.label,
+                                        })),
+                                    ));
+                                    menu.show(evt);
+                                }
+                            }
+                        }
+                    });
                     canvas.addEventListener('pointermove', (evt)=>{
                         Array.from(dom.querySelectorAll('.stcdx--map-zone.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
                         const rect = canvas.getBoundingClientRect();
@@ -139,6 +196,8 @@ export class Map {
                             const cy = (zone.polygon.reduce((max,p)=>Math.max(max,p.y),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height);
                             hover.style.transformOrigin = `${cx / canvas.width * 100}% ${cy / canvas.height * 100}%`;
                             hover.style.transform = 'scale(1.1)';
+                            hover.style.filter = 'drop-shadow(0 0 3px black)';
+                            canvas.style.cursor = 'pointer';
                             if (zone.dom) {
                                 zone.dom.classList.add('stcdx--active');
                                 if (zone.dom['scrollIntoViewIfNeeded']) {
@@ -150,6 +209,8 @@ export class Map {
                         } else {
                             con.clearRect(0, 0, canvas.width, canvas.height);
                             hover.style.transform = '';
+                            hover.style.filter = '';
+                            canvas.style.cursor = '';
                         }
                     });
                     mapCont.append(canvas);
@@ -232,6 +293,57 @@ export class Map {
                     canvas.height = this.img.naturalHeight;
                     const mainCon = canvas.getContext('2d');
                     mainCon.drawImage(this.img, 0, 0);
+                    canvas.addEventListener('click', async(evt)=>{
+                        const rect = canvas.getBoundingClientRect();
+                        const scale = canvas.width / rect.width;
+                        const x = (evt.x - rect.left) * scale;
+                        const y = (evt.y - rect.top) * scale;
+                        const p = new Point();
+                        p.x = x;
+                        p.y = y;
+                        const zone = this.zoneList.find(it=>this.pip(it.polygon, p));
+                        if (zone) {
+                            const cmd = zone.command || this.command;
+                            if (cmd) {
+                                await executeSlashCommands(
+                                    cmd
+                                        .replace(/{{map}}/gi, this.entry.comment)
+                                        .replace(/{{zone}}/gi, zone.label)
+                                    ,
+                                );
+                            }
+                        }
+                    });
+                    canvas.addEventListener('contextmenu', (evt)=>{
+                        const rect = canvas.getBoundingClientRect();
+                        const scale = canvas.width / rect.width;
+                        const x = (evt.x - rect.left) * scale;
+                        const y = (evt.y - rect.top) * scale;
+                        const p = new Point();
+                        p.x = x;
+                        p.y = y;
+                        const zone = this.zoneList.find(it=>this.pip(it.polygon, p));
+                        if (zone) {
+                            const qrs = zone.qrSet || this.qrSet;
+                            if (qrs) {
+                                const qrList = quickReplyApi.listQuickReplies(qrs);
+                                if (qrList.length > 0) {
+                                    evt.stopPropagation();
+                                    evt.preventDefault();
+                                    const menu = new ContextMenu(qrList.map(qr=>
+                                        new MenuItem(qr, ()=>{
+                                            quickReplyApi.executeQuickReply(qrs, qr, {
+                                                map: this.entry.comment,
+                                                zone: zone.label,
+                                            });
+                                            dom?.remove();
+                                        }),
+                                    ));
+                                    menu.show(evt);
+                                }
+                            }
+                        }
+                    });
                     canvas.addEventListener('pointermove', (evt)=>{
                         Array.from(dom.querySelectorAll('.stcdx--map-zone.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
                         const rect = canvas.getBoundingClientRect();
@@ -364,6 +476,17 @@ export class Map {
                     <input type="text" class="text_pole" id="stcdx--map-url" placeholder="URL: /user/images/codex/map.png">
                 </label>
                 <label>
+                    <span class="stcdx--labelText">Default Command</span><br>
+                    <small>Macros: <code>{{map}} {{zone}}</code></small>
+                    <textarea type="text" class="text_pole" id="stcdx--map-command"></textarea>
+                </label>
+                <label>
+                    <span class="stcdx--labelText">Default Context Menu (QR Set, <small><code>{{args::map}} {{args::zone}}</code></small>)</span>
+                    <select class="text_pole" id="stcdx--map-qrSet">
+                        <option value="">--Pick a QR set--</option>
+                    </select>
+                </label>
+                <label>
                     <span class="stcdx--labelText">Description</span>
                     <textarea type="text" class="text_pole" id="stcdx--map-description"></textarea>
                 </label>
@@ -385,6 +508,23 @@ export class Map {
         description.addEventListener('input', ()=>{
             this.description = description.value.trim();
         });
+        const command = dom.querySelector('#stcdx--map-command');
+        command.value = this.command ?? '';
+        command.addEventListener('input', ()=>{
+            this.command = command.value.trim();
+        });
+        const qrSet = dom.querySelector('#stcdx--map-qrSet');
+        quickReplyApi.listSets().forEach(qrs=>{
+            const opt = document.createElement('option'); {
+                opt.value = qrs;
+                opt.textContent = qrs;
+                qrSet.append(opt);
+            }
+        });
+        qrSet.value = this.qrSet ?? '';
+        qrSet.addEventListener('change', ()=>{
+            this.qrSet = qrSet.value.trim();
+        });
         await popProm;
         await this.save();
         if (this.url != oldUrl) {
@@ -398,6 +538,17 @@ export class Map {
                 <label>
                     <span class="stcdx--labelText">Label</span>
                     <input type="text" class="text_pole" id="stcdx--zone-label">
+                </label>
+                <label>
+                    <span class="stcdx--labelText">Command</span><br>
+                    <small>Macros: <code>{{map}} {{zone}}</code></small>
+                    <textarea type="text" class="text_pole" id="stcdx--zone-command"></textarea>
+                </label>
+                <label>
+                    <span class="stcdx--labelText">Context Menu (QR Set, <small><code>{{args::map}} {{args::zone}}</code></small>)</span>
+                    <select class="text_pole" id="stcdx--zone-qrSet">
+                        <option value="">--Pick a QR set--</option>
+                    </select>
                 </label>
                 <label>
                     <span class="stcdx--labelText">World Info Key</span>
@@ -418,6 +569,23 @@ export class Map {
         label.value = zone.label ?? '';
         label.addEventListener('input', ()=>{
             zone.label = label.value.trim();
+        });
+        const command = dom.querySelector('#stcdx--zone-command');
+        command.value = zone.command ?? '';
+        command.addEventListener('input', ()=>{
+            zone.command = command.value.trim();
+        });
+        const qrSet = dom.querySelector('#stcdx--zone-qrSet');
+        quickReplyApi.listSets().forEach(qrs=>{
+            const opt = document.createElement('option'); {
+                opt.value = qrs;
+                opt.textContent = qrs;
+                qrSet.append(opt);
+            }
+        });
+        qrSet.value = zone.qrSet ?? '';
+        qrSet.addEventListener('change', ()=>{
+            zone.qrSet = qrSet.value.trim();
         });
         const key = dom.querySelector('#stcdx--zone-key');
         key.value = zone.key ?? '';
