@@ -223,6 +223,7 @@ body {
   transition: 400ms;
   opacity: 0;
   position: none;
+  z-index: -1;
 }
 .stcdx--root > .stcdx--content.stcdx--active {
   opacity: 1;
