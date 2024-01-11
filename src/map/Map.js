@@ -481,7 +481,7 @@ export class Map {
                     <textarea type="text" class="text_pole" id="stcdx--map-command"></textarea>
                 </label>
                 <label>
-                    <span class="stcdx--labelText">Default Context Menu (QR Set, <small><code>{{args::map}} {{args::zone}}</code></small>)</span>
+                    <span class="stcdx--labelText">Default Context Menu (QR Set, <small><code>{{arg::map}} {{arg::zone}}</code></small>)</span>
                     <select class="text_pole" id="stcdx--map-qrSet">
                         <option value="">--Pick a QR set--</option>
                     </select>
@@ -545,7 +545,7 @@ export class Map {
                     <textarea type="text" class="text_pole" id="stcdx--zone-command"></textarea>
                 </label>
                 <label>
-                    <span class="stcdx--labelText">Context Menu (QR Set, <small><code>{{args::map}} {{args::zone}}</code></small>)</span>
+                    <span class="stcdx--labelText">Context Menu (QR Set, <small><code>{{arg::map}} {{arg::zone}}</code></small>)</span>
                     <select class="text_pole" id="stcdx--zone-qrSet">
                         <option value="">--Pick a QR set--</option>
                     </select>
