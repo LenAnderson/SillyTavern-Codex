@@ -17,4 +17,12 @@ export class Point {
             y: this.y,
         };
     }
+
+
+
+
+    checkHover(/**@type {Point*/that) {
+        const size = 5;
+        return Math.abs(this.x - that.x) <= size && Math.abs(this.y - that.y) <= 5;
+    }
 }

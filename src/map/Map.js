@@ -36,6 +36,7 @@ export class Map {
     /**@type {HTMLCanvasElement}*/ hoverCanvas;
     /**@type {CanvasRenderingContext2D}*/ con;
     /**@type {Zone}*/ hoverZone;
+    /**@type {Point}*/ hoverPoint;
     /**@type {HTMLImageElement}*/ img;
 
 
@@ -267,7 +268,7 @@ export class Map {
                     let ze;
                     let zm;
                     if (zone.key) {
-                        zm = findMatches(zone.key, true, [{book:this.book, entry:this.entry.uid}])?.[0];
+                        zm = findMatches(zone.key, true, [{ book:this.book, entry:this.entry.uid }])?.[0];
                         if (zm) {
                             ze = getEntry(zm);
                         }
@@ -490,6 +491,11 @@ export class Map {
             }
             con.closePath();
             con.stroke();
+        }
+        if (this.hoverPoint) {
+            con.strokeStyle = 'rgba(255, 255, 0, 1)';
+            con.lineWidth = 5;
+            con.strokeRect(this.hoverPoint.x - pointSize, this.hoverPoint.y - pointSize, pointSize * 2, pointSize * 2);
         }
         if (poly) {
             for (const p of poly) {
@@ -834,14 +840,28 @@ export class Map {
                             if (this.isDrawing) return;
                             const p = this.getPoint(evt);
                             const zone = this.zoneList.find(it=>this.pip(it.polygon, p));
+                            let needsUpdate = false;
                             if (zone && this.hoverZone != zone) {
                                 this.hoverZone = zone;
-                                this.updateHover();
+                                needsUpdate = true;
                                 evt.stopPropagation();
                             } else if (this.hoverZone && !zone) {
                                 this.hoverZone = null;
-                                this.updateHover();
+                                needsUpdate = true;
                                 evt.stopPropagation();
+                            }
+                            let hp;
+                            if (zone) {
+                                hp = zone.polygon.find(it=>it.checkHover(p));
+                            } else {
+                                hp = this.zoneList.map(z=>z.polygon.find(it=>it.checkHover(p))).find(it=>it);
+                            }
+                            if (hp != this.hoverPoint) {
+                                this.hoverPoint = hp;
+                                needsUpdate = true;
+                            }
+                            if (needsUpdate) {
+                                this.updateHover();
                             }
                         });
                         canvas.addEventListener('pointerdown', async(evt)=>{
