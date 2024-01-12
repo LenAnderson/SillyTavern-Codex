@@ -19,6 +19,10 @@ body:has(.stcdx--root) {
 body {
 	--stcdx--color: rgb(0, 255, 255);
 	--stcdx--icon: "🧾";
+	--stcdx--mapZoom: 10;
+	--stcdx--mapShadow: 3;
+	--stcdx--mapShadowColor: rgba(0 0 0 / 1);
+	--stcdx--mapDesaturate: 50;
 }
 
 .stcdx--link {
@@ -314,13 +318,17 @@ body {
 					margin: auto;
 					z-index: 1;
 					&.stcdx--map {
-						filter: saturate(0.5);
+						filter: saturate(calc(1 - var(--stcdx--mapDesaturate) / 100));
 					}
 					&.stcdx--hover {
 						pointer-events: none;
 						transform: scale(1);
 						transition: transform 200ms, filter 200ms;
 						filter: drop-shadow(0 0 0 rgba(0 0 0 / 0));
+						&.stcdx--hovered {
+							transform: scale(calc(1 + var(--stcdx--mapZoom) / 100));
+							filter: drop-shadow(0 0 calc(var(--stcdx--mapShadow) * 1px) var(--stcdx--mapShadowColor));
+						}
 					}
 				}
 			}
@@ -449,13 +457,17 @@ body > .stcdx--mapCodex {
 			margin: auto;
 			z-index: 1;
 			&.stcdx--map {
-				filter: saturate(0.5);
+				filter: saturate(calc(1 - var(--stcdx--mapDesaturate) / 100));
 			}
 			&.stcdx--hover {
 				pointer-events: none;
 				transform: scale(1);
 				transition: transform 200ms, filter 200ms;
 				filter: drop-shadow(0 0 0 rgba(0 0 0 / 0));
+				&.stcdx--hovered {
+					transform: scale(calc(1 + var(--stcdx--mapZoom) / 100));
+					filter: drop-shadow(0 0 calc(var(--stcdx--mapShadow) * 1px) var(--stcdx--mapShadowColor));
+				}
 			}
 		}
 	}
@@ -564,15 +576,6 @@ body > .stcdx--mapCodex {
 				width: auto;
 				margin: auto;
 				z-index: 1;
-				&.stcdx--map {
-					filter: saturate(0.5);
-				}
-				&.stcdx--hover {
-					pointer-events: none;
-					transform: scale(1);
-					transition: transform 200ms, filter 200ms;
-					filter: drop-shadow(0 0 0 rgba(0 0 0 / 0));
-				}
 			}
 		}
 		.stcdx--zoneContainer {
@@ -641,15 +644,18 @@ body > .stcdx--mapCodex {
 
 
 .stcdx--settings {
-	.stcdx--template {
-		border-top: 1px solid var(--SmartThemeBorderColor);
-		padding-top: 1em;
-		margin-top: 1em;
+	.stcdx--templatesContainer {
+		flex: 1 1 auto;
+		.stcdx--template {
+			border-top: 1px solid var(--SmartThemeBorderColor);
+			padding-top: 1em;
+			margin-top: 1em;
 
-		>.stcdx--content {
-			>.stcdx--row {
-				display: flex;
-				gap: 0.5em;
+			>.stcdx--content {
+				>.stcdx--row {
+					display: flex;
+					gap: 0.5em;
+				}
 			}
 		}
 	}

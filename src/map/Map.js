@@ -195,8 +195,7 @@ export class Map {
                             const cx = (zone.polygon.reduce((max,p)=>Math.max(max,p.x),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width);
                             const cy = (zone.polygon.reduce((max,p)=>Math.max(max,p.y),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height);
                             hover.style.transformOrigin = `${cx / canvas.width * 100}% ${cy / canvas.height * 100}%`;
-                            hover.style.transform = 'scale(1.1)';
-                            hover.style.filter = 'drop-shadow(0 0 3px black)';
+                            hover.classList.add('stcdx--hovered');
                             canvas.style.cursor = 'pointer';
                             if (zone.dom) {
                                 zone.dom.classList.add('stcdx--active');
@@ -208,8 +207,7 @@ export class Map {
                             }
                         } else {
                             con.clearRect(0, 0, canvas.width, canvas.height);
-                            hover.style.transform = '';
-                            hover.style.filter = '';
+                            hover.classList.remove('stcdx--hovered');
                             canvas.style.cursor = '';
                         }
                     });
@@ -371,13 +369,11 @@ export class Map {
                             const cx = (zone.polygon.reduce((max,p)=>Math.max(max,p.x),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width);
                             const cy = (zone.polygon.reduce((max,p)=>Math.max(max,p.y),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height);
                             hover.style.transformOrigin = `${cx / canvas.width * 100}% ${cy / canvas.height * 100}%`;
-                            hover.style.transform = 'scale(1.1)';
-                            hover.style.filter = 'drop-shadow(0 0 3px black)';
+                            hover.classList.add('stcdx--hovered');
                             canvas.style.cursor = 'pointer';
                         } else {
                             con.clearRect(0, 0, canvas.width, canvas.height);
-                            hover.style.transform = '';
-                            hover.style.filter = '';
+                            hover.classList.remove('stcdx--hovered');
                             canvas.style.cursor = '';
                         }
                     });

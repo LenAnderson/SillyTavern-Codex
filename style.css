@@ -12,6 +12,10 @@ body:has(.stcdx--root) #sheld:has(~ .stcdx--root) > #form_sheld {
 body {
   --stcdx--color: #00ffff;
   --stcdx--icon: "🧾";
+  --stcdx--mapZoom: 10;
+  --stcdx--mapShadow: 3;
+  --stcdx--mapShadowColor: rgba(0 0 0 / 1);
+  --stcdx--mapDesaturate: 50;
 }
 .stcdx--link {
   cursor: help;
@@ -286,7 +290,7 @@ body {
 }
 .stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--map,
 .stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--map {
-  filter: saturate(0.5);
+  filter: saturate(calc(1 - var(--stcdx--mapDesaturate) / 100));
 }
 .stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--hover,
 .stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover {
@@ -294,6 +298,11 @@ body {
   transform: scale(1);
   transition: transform 200ms, filter 200ms;
   filter: drop-shadow(0 0 0 rgba(0 0 0 / 0));
+}
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--hover.stcdx--hovered,
+.stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover.stcdx--hovered {
+  transform: scale(calc(1 + var(--stcdx--mapZoom) / 100));
+  filter: drop-shadow(0 0 calc(var(--stcdx--mapShadow) * 1px) var(--stcdx--mapShadowColor));
 }
 .stcdx--root > .stcdx--content > .stcdx--mapCodex .stcdx--zoneContainer {
   grid-column: 1;
@@ -416,7 +425,7 @@ body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover {
 }
 body > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--map,
 body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--map {
-  filter: saturate(0.5);
+  filter: saturate(calc(1 - var(--stcdx--mapDesaturate) / 100));
 }
 body > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--hover,
 body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover {
@@ -424,6 +433,11 @@ body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover {
   transform: scale(1);
   transition: transform 200ms, filter 200ms;
   filter: drop-shadow(0 0 0 rgba(0 0 0 / 0));
+}
+body > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--hover.stcdx--hovered,
+body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover.stcdx--hovered {
+  transform: scale(calc(1 + var(--stcdx--mapZoom) / 100));
+  filter: drop-shadow(0 0 calc(var(--stcdx--mapShadow) * 1px) var(--stcdx--mapShadowColor));
 }
 .stcdx--tooltip.mes_text {
   pointer-events: none;
@@ -521,17 +535,6 @@ body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover {
   margin: auto;
   z-index: 1;
 }
-.stcdx--tooltip.mes_text > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--map,
-.stcdx--tooltip.mes_text > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--map {
-  filter: saturate(0.5);
-}
-.stcdx--tooltip.mes_text > .stcdx--mapCodex .stcdx--mapContainer > .stcdx--map.stcdx--hover,
-.stcdx--tooltip.mes_text > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover {
-  pointer-events: none;
-  transform: scale(1);
-  transition: transform 200ms, filter 200ms;
-  filter: drop-shadow(0 0 0 rgba(0 0 0 / 0));
-}
 .stcdx--tooltip.mes_text > .stcdx--mapCodex .stcdx--zoneContainer {
   grid-column: 1;
   grid-row: 4;
@@ -590,12 +593,15 @@ body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover {
 #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--zone-description {
   flex: 1 1 auto;
 }
-.stcdx--settings .stcdx--template {
+.stcdx--settings .stcdx--templatesContainer {
+  flex: 1 1 auto;
+}
+.stcdx--settings .stcdx--templatesContainer .stcdx--template {
   border-top: 1px solid var(--SmartThemeBorderColor);
   padding-top: 1em;
   margin-top: 1em;
 }
-.stcdx--settings .stcdx--template > .stcdx--content > .stcdx--row {
+.stcdx--settings .stcdx--templatesContainer .stcdx--template > .stcdx--content > .stcdx--row {
   display: flex;
   gap: 0.5em;
 }

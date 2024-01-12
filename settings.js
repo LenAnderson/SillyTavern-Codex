@@ -16,6 +16,10 @@ export const initSettings = ()=>{
         templateList: [],
         cycle: true,
         cycleDelay: 1000,
+        mapZoom: 10,
+        mapShadow: 3,
+        mapShadowColor: 'rgba(0, 0, 0, 1)',
+        mapDesaturate: 50,
     }, extension_settings.codex ?? {});
     extension_settings.codex = settings;
 
@@ -81,11 +85,35 @@ export const initSettings = ()=>{
                     </div>
                     <div class="flex-container">
                         <label>
-                            Codex template (markdown)<br>
-                            <small>macros: <code>{{comment}} {{key[0]}} {{key[1]}} {{key[2]}} ... {{content}}</code></small>
-                            <textarea class="text_pole" id="stcdx--template" rows="6"></textarea>
-                            <div id="stcdx--addTemplate" class="menu_button menu_button_icon fa-solid fa-plus" title="Add template"></div>
+                            Maps: zone zoom amount (hover) [%]
+                            <input type="number" class="text_pole" min="0" id="stcdx--mapZoom" value="${settings.mapZoom ?? 10}">
                         </label>
+                    </div>
+                    <div class="flex-container">
+                        <label>
+                            Maps: zone shadow strength (hover) [px]
+                            <input type="number" class="text_pole" min="0" id="stcdx--mapShadow" value="${settings.mapShadow ?? 3}">
+                        </label>
+                    </div>
+                    <div class="flex-container">
+                        <toolcool-color-picker id="stcdx--mapShadowColor" color="${settings.mapShadowColor}"></toolcool-color-picker>
+                        <span>Maps: zone shadow color (hover)</span>
+                    </div>
+                    <div class="flex-container">
+                        <label>
+                            Maps: desaturation (before hover) [%]
+                            <input type="number" class="text_pole" min="0" max="100" id="stcdx--mapDesaturate" value="${settings.mapDesaturate ?? 50}">
+                        </label>
+                    </div>
+                    <div class="flex-container">
+                        <div class="stcdx--templatesContainer">
+                            <label>
+                                Codex template (markdown)<br>
+                                <small>macros: <code>{{comment}} {{key[0]}} {{key[1]}} {{key[2]}} ... {{content}}</code></small>
+                                <textarea class="text_pole" id="stcdx--template" rows="6"></textarea>
+                            </label>
+                            <div id="stcdx--addTemplate" class="menu_button menu_button_icon fa-solid fa-plus" title="Add template"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -138,6 +166,32 @@ export const initSettings = ()=>{
         settings.icon = document.querySelector('#stcdx--icon').value;
         document.body.style.setProperty('--stcdx--icon', `"${settings.icon}"`);
         saveSettingsDebounced();
+    });
+    document.querySelector('#stcdx--mapZoom').addEventListener('input', ()=>{
+        try {
+            settings.mapZoom = parseInt(document.querySelector('#stcdx--mapZoom').value);
+            document.body.style.setProperty('--stcdx--mapZoom', `${settings.mapZoom}`);
+            saveSettingsDebounced();
+        } catch { /* empty */ }
+    });
+    document.querySelector('#stcdx--mapShadow').addEventListener('input', ()=>{
+        try {
+            settings.mapShadow = parseInt(document.querySelector('#stcdx--mapShadow').value);
+            document.body.style.setProperty('--stcdx--mapShadow', `${settings.mapShadow}`);
+            saveSettingsDebounced();
+        } catch { /* empty */ }
+    });
+    document.querySelector('#stcdx--mapShadowColor').addEventListener('change', (evt)=>{
+        settings.mapShadowColor = evt.detail.rgba;
+        document.body.style.setProperty('--stcdx--mapShadowColor', `${settings.mapShadowColor}`);
+        saveSettingsDebounced();
+    });
+    document.querySelector('#stcdx--mapDesaturate').addEventListener('input', ()=>{
+        try {
+            settings.mapDesaturate = parseInt(document.querySelector('#stcdx--mapDesaturate').value);
+            document.body.style.setProperty('--stcdx--mapDesaturate', `${settings.mapDesaturate}`);
+            saveSettingsDebounced();
+        } catch { /* empty */ }
     });
     document.querySelector('#stcdx--template').value = settings.template;
     document.querySelector('#stcdx--template').addEventListener('change', ()=>{
