@@ -176,7 +176,6 @@ export class Map {
                     canvas.addEventListener('pointermove', async(evt)=>{
                         if (busy) return;
                         busy = true;
-                        Array.from(dom.querySelectorAll('.stcdx--map-zone.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
                         const rect = canvas.getBoundingClientRect();
                         const scale = canvas.width / rect.width;
                         const x = (evt.x - rect.left) * scale;
@@ -203,6 +202,7 @@ export class Map {
                                     log('ACTIVATING ZONE');
                                     hoverZone = zone;
                                 }
+                                Array.from(dom.querySelectorAll('.stcdx--map-zone.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
                                 const last = zone.polygon.slice(-1)[0];
                                 con.clearRect(0, 0, canvas.width, canvas.height);
                                 hover.style.transform = '';
@@ -228,9 +228,18 @@ export class Map {
                                     hover.style.filter = '';
                                 }
                                 canvas.style.cursor = 'pointer';
+                                if (zone.dom) {
+                                    zone.dom.classList.add('stcdx--active');
+                                    if (zone.dom['scrollIntoViewIfNeeded']) {
+                                        zone.dom['scrollIntoViewIfNeeded']();
+                                    } else {
+                                        zone.dom.scrollIntoView();
+                                    }
+                                }
                             }
                         } else if (hoverZone) {
                             log('DEACTIVATING ZONE');
+                            Array.from(dom.querySelectorAll('.stcdx--map-zone.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
                             const hz = hoverZone;
                             hover.style.transition = 'none';
                             await new Promise(resolve=>requestAnimationFrame(resolve));
