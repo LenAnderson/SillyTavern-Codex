@@ -4,6 +4,9 @@ export class Zone {
     static from(props) {
         const instance = Object.assign(new this(), props);
         instance.polygon = (props.polygon ?? []).map(it=>Point.from(it));
+        instance.label = instance.label ? window.atob(instance.label) : null;
+        instance.description = instance.description ? window.atob(instance.description) : null;
+        instance.command = instance.command ? window.atob(instance.command) : null;
         return instance;
     }
 
@@ -28,11 +31,11 @@ export class Zone {
 
     toJSON() {
         return {
-            label: this.label,
-            description: this.description,
+            label: this.label ? window.btoa(this.label) : null,
+            description: this.description ? window.btoa(this.description) : null,
             key: this.key,
             polygon: this.polygon,
-            command: this.command,
+            command: this.command ? window.btoa(this.command) : null,
             qrSet: this.qrSet,
             overrideZoom: this.overrideZoom,
             zoom: this.zoom,

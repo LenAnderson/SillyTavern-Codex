@@ -149,7 +149,7 @@ const init = async()=>{
                     if (args.zoom !== null) {
                         const zoom = Number(args.zoom);
                         if (!Number.isNaN(zoom)) {
-                            const imgs = Array.from(codexContent.querySelectorAll('img'));
+                            const imgs = Array.from(codexContent.querySelectorAll('img, canvas'));
                             if (imgs.length > zoom) {
                                 imgs[zoom].click();
                             }

@@ -13,6 +13,9 @@ export class Map {
     static from(props, book, entry) {
         const instance = Object.assign(new this(book, entry), props);
         instance.zoneList = (props.zoneList ?? []).map(it=>Zone.from(it));
+        instance.url = instance.url ? window.atob(instance.url) : null;
+        instance.description = instance.description ? window.atob(instance.description) : null;
+        instance.command = instance.command ? window.atob(instance.command) : null;
         return instance;
     }
 
@@ -73,16 +76,16 @@ export class Map {
 
     toJSON() {
         return {
-            url: this.url,
-            description: this.description,
+            url: this.url ? window.btoa(this.url) : null,
+            description: this.description ? window.btoa(this.description) : null,
             zoneList: this.zoneList,
-            command: this.command,
+            command: this.command ? window.btoa(this.command) : null,
             qrSet: this.qrSet,
         };
     }
 
     async save() {
-        await executeSlashCommands(`/setentryfield file="${this.book}" uid=${this.entry.uid} field=content ${JSON.stringify(this)}`);
+        await executeSlashCommands(`/setentryfield file="${this.book}" uid=${this.entry.uid} field=content ${JSON.stringify(this).replace(/\|/g,'\\|')}`);
     }
 
 
@@ -138,6 +141,7 @@ export class Map {
                                     cmd
                                         .replace(/{{map}}/gi, this.entry.comment)
                                         .replace(/{{zone}}/gi, zone.label)
+                                        .replace(/{{zoom}}/g, 'false')
                                     ,
                                 );
                             }
@@ -163,6 +167,7 @@ export class Map {
                                         new MenuItem(qr, ()=>quickReplyApi.executeQuickReply(qrs, qr, {
                                             map: this.entry.comment,
                                             zone: zone.label,
+                                            zoom: false,
                                         })),
                                     ));
                                     menu.show(evt);
@@ -350,6 +355,7 @@ export class Map {
                                     cmd
                                         .replace(/{{map}}/gi, this.entry.comment)
                                         .replace(/{{zone}}/gi, zone.label)
+                                        .replace(/{{zoom}}/g, 'true')
                                     ,
                                 );
                             }
@@ -376,6 +382,7 @@ export class Map {
                                             quickReplyApi.executeQuickReply(qrs, qr, {
                                                 map: this.entry.comment,
                                                 zone: zone.label,
+                                                zoom: true,
                                             });
                                             dom?.remove();
                                         }),
@@ -561,11 +568,11 @@ export class Map {
                 </label>
                 <label>
                     <span class="stcdx--labelText">Default Command</span><br>
-                    <small>Macros: <code>{{map}} {{zone}}</code></small>
+                    <small>Macros: <code>{{map}} {{zone}} {{zoom}}</code></small>
                     <textarea type="text" class="text_pole" id="stcdx--map-command"></textarea>
                 </label>
                 <label>
-                    <span class="stcdx--labelText">Default Context Menu (QR Set, <small><code>{{arg::map}} {{arg::zone}}</code></small>)</span>
+                    <span class="stcdx--labelText">Default Context Menu (QR Set, <small><code>{{arg::map}} {{arg::zone}} {{arg::zoom}}</code></small>)</span>
                     <select class="text_pole" id="stcdx--map-qrSet">
                         <option value="">--Pick a QR set--</option>
                     </select>
@@ -625,11 +632,11 @@ export class Map {
                 </label>
                 <label>
                     <span class="stcdx--labelText">Command</span><br>
-                    <small>Macros: <code>{{map}} {{zone}}</code></small>
+                    <small>Macros: <code>{{map}} {{zone}} {{zoom}}</code></small>
                     <textarea type="text" class="text_pole" id="stcdx--zone-command"></textarea>
                 </label>
                 <label>
-                    <span class="stcdx--labelText">Context Menu (QR Set, <small><code>{{arg::map}} {{arg::zone}}</code></small>)</span>
+                    <span class="stcdx--labelText">Context Menu (QR Set, <small><code>{{arg::map}} {{arg::zone}} {{arg::zoom}}</code></small>)</span>
                     <select class="text_pole" id="stcdx--zone-qrSet">
                         <option value="">--Pick a QR set--</option>
                     </select>

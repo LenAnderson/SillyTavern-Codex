@@ -13,15 +13,15 @@ export class Point {
 
     toJSON() {
         return {
-            x: this.x,
-            y: this.y,
+            x: Math.round(this.x),
+            y: Math.round(this.y),
         };
     }
 
 
 
 
-    checkHover(/**@type {Point*/that) {
+    checkHover(/**@type {Point}*/that) {
         const size = 5;
         return Math.abs(this.x - that.x) <= size && Math.abs(this.y - that.y) <= 5;
     }
