@@ -3,6 +3,7 @@ import { executeSlashCommands } from '../../../../../slash-commands.js';
 import { delay } from '../../../../../utils.js';
 import { quickReplyApi } from '../../../../quick-reply/index.js';
 import { findMatches, getEntry, getTitle, log, makeCodexDom, subParams } from '../../index.js';
+import { settings } from '../../settings.js';
 import { ContextMenu } from '../ContextMenu.js';
 import { MenuItem } from '../MenuItem.js';
 import { Point } from './Point.js';
@@ -168,7 +169,12 @@ export class Map {
                             }
                         }
                     });
-                    canvas.addEventListener('pointermove', (evt)=>{
+                    /**@type {Zone}*/
+                    let hoverZone;
+                    let busy = false;
+                    canvas.addEventListener('pointermove', async(evt)=>{
+                        if (busy) return;
+                        busy = true;
                         Array.from(dom.querySelectorAll('.stcdx--map-zone.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
                         const rect = canvas.getBoundingClientRect();
                         const scale = canvas.width / rect.width;
@@ -178,38 +184,65 @@ export class Map {
                         p.x = x;
                         p.y = y;
                         const zone = this.zoneList.find(it=>this.pip(it.polygon, p));
-                        if (zone && zone.polygon && zone.polygon.length > 0) {
-                            const last = zone.polygon.slice(-1)[0];
-                            con.clearRect(0, 0, canvas.width, canvas.height);
-                            hover.style.transform = '';
-                            con.save();
-                            con.beginPath();
-                            con.moveTo(last.x, last.y);
-                            for (const p of zone.polygon) {
-                                con.lineTo(p.x, p.y);
-                            }
-                            con.closePath();
-                            con.clip();
-                            con.drawImage(this.img, 0, 0);
-                            con.restore();
-                            const cx = (zone.polygon.reduce((max,p)=>Math.max(max,p.x),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width);
-                            const cy = (zone.polygon.reduce((max,p)=>Math.max(max,p.y),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height);
-                            hover.style.transformOrigin = `${cx / canvas.width * 100}% ${cy / canvas.height * 100}%`;
-                            hover.classList.add('stcdx--hovered');
-                            canvas.style.cursor = 'pointer';
-                            if (zone.dom) {
-                                zone.dom.classList.add('stcdx--active');
-                                if (zone.dom['scrollIntoViewIfNeeded']) {
-                                    zone.dom['scrollIntoViewIfNeeded']();
+                        if (zone) {
+                            if (zone != hoverZone && zone.polygon && zone.polygon.length > 0) {
+                                if (hoverZone) {
+                                    log('SWITCHING ZONES');
+                                    hoverZone = zone;
+                                    hover.style.transition = 'none';
+                                    await new Promise(resolve=>requestAnimationFrame(resolve));
+                                    hover.classList.remove('stcdx--hovered');
+                                    hover.style.transform = '';
+                                    hover.style.filter = '';
+                                    canvas.style.cursor = '';
+                                    con.clearRect(0, 0, canvas.width, canvas.height);
+                                    await new Promise(resolve=>requestAnimationFrame(resolve));
+                                    hover.style.transition = '';
                                 } else {
-                                    zone.dom.scrollIntoView();
+                                    log('ACTIVATING ZONE');
+                                    hoverZone = zone;
                                 }
+                                const last = zone.polygon.slice(-1)[0];
+                                con.clearRect(0, 0, canvas.width, canvas.height);
+                                hover.style.transform = '';
+                                con.save();
+                                con.beginPath();
+                                con.moveTo(last.x, last.y);
+                                for (const p of zone.polygon) {
+                                    con.lineTo(p.x, p.y);
+                                }
+                                con.closePath();
+                                con.clip();
+                                con.drawImage(this.img, 0, 0);
+                                con.restore();
+                                const cx = (zone.polygon.reduce((max,p)=>Math.max(max,p.x),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width);
+                                const cy = (zone.polygon.reduce((max,p)=>Math.max(max,p.y),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height);
+                                hover.style.transformOrigin = `${cx / canvas.width * 100}% ${cy / canvas.height * 100}%`;
+                                hover.classList.add('stcdx--hovered');
+                                if (zone.overrideZoom) hover.style.transform = `scale(${1 + zone.zoom / 100})`;
+                                else hover.style.transform = '';
+                                if (zone.overrideShadow || zone.overrideShadowColor) {
+                                    hover.style.filter = `drop-shadow(0 0 ${zone.overrideShadow ? zone.shadow : settings.mapShadow}px ${zone.overrideShadowColor ? zone.shadowColor : settings.mapShadowColor})`;
+                                } else {
+                                    hover.style.filter = '';
+                                }
+                                canvas.style.cursor = 'pointer';
                             }
-                        } else {
-                            con.clearRect(0, 0, canvas.width, canvas.height);
+                        } else if (hoverZone) {
+                            log('DEACTIVATING ZONE');
+                            const hz = hoverZone;
+                            hover.style.transition = 'none';
+                            await new Promise(resolve=>requestAnimationFrame(resolve));
                             hover.classList.remove('stcdx--hovered');
+                            hover.style.transform = '';
+                            hover.style.filter = '';
                             canvas.style.cursor = '';
+                            con.clearRect(0, 0, canvas.width, canvas.height);
+                            await new Promise(resolve=>requestAnimationFrame(resolve));
+                            hover.style.transition = '';
+                            if (hoverZone == hz) hoverZone = null;
                         }
+                        busy = false;
                     });
                     mapCont.append(canvas);
                 }
@@ -342,7 +375,12 @@ export class Map {
                             }
                         }
                     });
-                    canvas.addEventListener('pointermove', (evt)=>{
+                    /**@type {Zone}*/
+                    let hoverZone;
+                    let busy = false;
+                    canvas.addEventListener('pointermove', async(evt)=>{
+                        if (busy) return;
+                        busy = true;
                         Array.from(dom.querySelectorAll('.stcdx--map-zone.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
                         const rect = canvas.getBoundingClientRect();
                         const scale = canvas.width / rect.width;
@@ -352,30 +390,65 @@ export class Map {
                         p.x = x;
                         p.y = y;
                         const zone = this.zoneList.find(it=>this.pip(it.polygon, p));
-                        if (zone && zone.polygon && zone.polygon.length > 0) {
-                            const last = zone.polygon.slice(-1)[0];
-                            con.clearRect(0, 0, canvas.width, canvas.height);
-                            hover.style.transform = '';
-                            con.save();
-                            con.beginPath();
-                            con.moveTo(last.x, last.y);
-                            for (const p of zone.polygon) {
-                                con.lineTo(p.x, p.y);
+                        if (zone) {
+                            if (zone != hoverZone && zone.polygon && zone.polygon.length > 0) {
+                                if (hoverZone) {
+                                    log('SWITCHING ZONES');
+                                    hoverZone = zone;
+                                    hover.style.transition = 'none';
+                                    await new Promise(resolve=>requestAnimationFrame(resolve));
+                                    hover.classList.remove('stcdx--hovered');
+                                    hover.style.transform = '';
+                                    hover.style.filter = '';
+                                    canvas.style.cursor = '';
+                                    con.clearRect(0, 0, canvas.width, canvas.height);
+                                    await new Promise(resolve=>requestAnimationFrame(resolve));
+                                    hover.style.transition = '';
+                                } else {
+                                    log('ACTIVATING ZONE');
+                                    hoverZone = zone;
+                                }
+                                const last = zone.polygon.slice(-1)[0];
+                                con.clearRect(0, 0, canvas.width, canvas.height);
+                                hover.style.transform = '';
+                                con.save();
+                                con.beginPath();
+                                con.moveTo(last.x, last.y);
+                                for (const p of zone.polygon) {
+                                    con.lineTo(p.x, p.y);
+                                }
+                                con.closePath();
+                                con.clip();
+                                con.drawImage(this.img, 0, 0);
+                                con.restore();
+                                const cx = (zone.polygon.reduce((max,p)=>Math.max(max,p.x),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width);
+                                const cy = (zone.polygon.reduce((max,p)=>Math.max(max,p.y),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height);
+                                hover.style.transformOrigin = `${cx / canvas.width * 100}% ${cy / canvas.height * 100}%`;
+                                hover.classList.add('stcdx--hovered');
+                                if (zone.overrideZoom) hover.style.transform = `scale(${1 + zone.zoom / 100})`;
+                                else hover.style.transform = '';
+                                if (zone.overrideShadow || zone.overrideShadowColor) {
+                                    hover.style.filter = `drop-shadow(0 0 ${zone.overrideShadow ? zone.shadow : settings.mapShadow}px ${zone.overrideShadowColor ? zone.shadowColor : settings.mapShadowColor})`;
+                                } else {
+                                    hover.style.filter = '';
+                                }
+                                canvas.style.cursor = 'pointer';
                             }
-                            con.closePath();
-                            con.clip();
-                            con.drawImage(this.img, 0, 0);
-                            con.restore();
-                            const cx = (zone.polygon.reduce((max,p)=>Math.max(max,p.x),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width);
-                            const cy = (zone.polygon.reduce((max,p)=>Math.max(max,p.y),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height);
-                            hover.style.transformOrigin = `${cx / canvas.width * 100}% ${cy / canvas.height * 100}%`;
-                            hover.classList.add('stcdx--hovered');
-                            canvas.style.cursor = 'pointer';
-                        } else {
-                            con.clearRect(0, 0, canvas.width, canvas.height);
+                        } else if (hoverZone) {
+                            log('DEACTIVATING ZONE');
+                            const hz = hoverZone;
+                            hover.style.transition = 'none';
+                            await new Promise(resolve=>requestAnimationFrame(resolve));
                             hover.classList.remove('stcdx--hovered');
+                            hover.style.transform = '';
+                            hover.style.filter = '';
                             canvas.style.cursor = '';
+                            con.clearRect(0, 0, canvas.width, canvas.height);
+                            await new Promise(resolve=>requestAnimationFrame(resolve));
+                            hover.style.transition = '';
+                            if (hoverZone == hz) hoverZone = null;
                         }
+                        busy = false;
                     });
                     mapCont.append(canvas);
                 }
@@ -528,7 +601,7 @@ export class Map {
         }
         return true;
     }
-    async editZone(zone) {
+    async editZone(/**@type {Zone}*/zone) {
         const html = `
             <div id="stcdx--zoneEditor">
                 <label>
@@ -546,6 +619,27 @@ export class Map {
                         <option value="">--Pick a QR set--</option>
                     </select>
                 </label>
+                <div class="stcdx--overrideContainer">
+                    <span class="stcdx--labelText">Override zoom (hover) [%]</span>
+                    <div class="stcdx--inputs">
+                        <input type="checkbox" id="stcdx--zone-overrideZoom">
+                        <input type="number" class="text_pole" id="stcdx--zone-zoom" min="0">
+                    </div>
+                </div>
+                <div class="stcdx--overrideContainer">
+                    <span class="stcdx--labelText">Override shadow strength (hover) [px]</span>
+                    <div class="stcdx--inputs">
+                        <input type="checkbox" id="stcdx--zone-overrideShadow">
+                        <input type="number" class="text_pole" id="stcdx--zone-shadow" min="0">
+                    </div>
+                </div>
+                <div class="stcdx--overrideContainer">
+                    <span class="stcdx--labelText">Override shadow color (hover)</span>
+                    <div class="stcdx--inputs">
+                        <input type="checkbox" id="stcdx--zone-overrideShadowColor">
+                        <toolcool-color-picker id="stcdx--zone-shadowColor"></toolcool-color-picker>
+                    </div>
+                </div>
                 <label>
                     <span class="stcdx--labelText">World Info Key</span>
                     <input type="text" class="text_pole" id="stcdx--zone-key" placeholder="Leave description blank to use WI">
@@ -583,6 +677,39 @@ export class Map {
         qrSet.addEventListener('change', ()=>{
             zone.qrSet = qrSet.value.trim();
         });
+
+        const oZoom = dom.querySelector('#stcdx--zone-overrideZoom');
+        oZoom.checked = zone.overrideZoom ?? false;
+        oZoom.addEventListener('click', ()=>{
+            zone.overrideZoom = oZoom.checked;
+        });
+        const zoom = dom.querySelector('#stcdx--zone-zoom');
+        zoom.value = zone.zoom ?? 10;
+        zoom.addEventListener('input', ()=>{
+            zone.zoom = zoom.value;
+        });
+        const oShadow = dom.querySelector('#stcdx--zone-overrideShadow');
+        oShadow.checked = zone.overrideShadow ?? false;
+        oShadow.addEventListener('click', ()=>{
+            zone.overrideShadow = oShadow.checked;
+        });
+        const shadow = dom.querySelector('#stcdx--zone-shadow');
+        shadow.value = zone.shadow ?? 3;
+        shadow.addEventListener('input', ()=>{
+            zone.shadow = shadow.value;
+        });
+
+        const oShadowColor = dom.querySelector('#stcdx--zone-overrideShadowColor');
+        oShadowColor.checked = zone.overrideShadowColor ?? false;
+        oShadowColor.addEventListener('click', ()=>{
+            zone.overrideShadowColor = oShadowColor.checked;
+        });
+        const shadowColor = dom.querySelector('#stcdx--zone-shadowColor');
+        shadowColor.color = zone.shadowColor;
+        shadowColor.addEventListener('change', (evt)=>{
+            zone.shadowColor = evt.detail.rgba;
+        });
+
         const key = dom.querySelector('#stcdx--zone-key');
         key.value = zone.key ?? '';
         key.addEventListener('input', ()=>{

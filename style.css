@@ -593,6 +593,11 @@ body > .stcdx--mapCodex .stcdx--mapContainer .stcdx--hover.stcdx--hover.stcdx--h
 #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--zone-description {
   flex: 1 1 auto;
 }
+#stcdx--mapEditor .stcdx--inputs,
+#stcdx--zoneEditor .stcdx--inputs {
+  display: flex;
+  align-items: baseline;
+}
 .stcdx--settings .stcdx--templatesContainer {
   flex: 1 1 auto;
 }
