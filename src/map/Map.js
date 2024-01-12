@@ -2,7 +2,7 @@ import { callPopup, messageFormatting } from '../../../../../../script.js';
 import { executeSlashCommands } from '../../../../../slash-commands.js';
 import { delay } from '../../../../../utils.js';
 import { quickReplyApi } from '../../../../quick-reply/index.js';
-import { findMatches, getEntry, getTitle, log, makeCodexDom, subParams } from '../../index.js';
+import { findMatches, getEntry, getTitle, log, makeCodexDom, subParams, tryDecodeBase64 } from '../../index.js';
 import { settings } from '../../settings.js';
 import { ContextMenu } from '../ContextMenu.js';
 import { MenuItem } from '../MenuItem.js';
@@ -13,9 +13,9 @@ export class Map {
     static from(props, book, entry) {
         const instance = Object.assign(new this(book, entry), props);
         instance.zoneList = (props.zoneList ?? []).map(it=>Zone.from(it));
-        instance.url = instance.url ? window.atob(instance.url) : null;
-        instance.description = instance.description ? window.atob(instance.description) : null;
-        instance.command = instance.command ? window.atob(instance.command) : null;
+        instance.url = instance.url ? tryDecodeBase64(instance.url) : null;
+        instance.description = instance.description ? tryDecodeBase64(instance.description) : null;
+        instance.command = instance.command ? tryDecodeBase64(instance.command) : null;
         return instance;
     }
 

@@ -1,12 +1,13 @@
+import { tryDecodeBase64 } from '../../index.js';
 import { Point } from './Point.js';
 
 export class Zone {
     static from(props) {
         const instance = Object.assign(new this(), props);
         instance.polygon = (props.polygon ?? []).map(it=>Point.from(it));
-        instance.label = instance.label ? window.atob(instance.label) : null;
-        instance.description = instance.description ? window.atob(instance.description) : null;
-        instance.command = instance.command ? window.atob(instance.command) : null;
+        instance.label = instance.label ? tryDecodeBase64(instance.label) : null;
+        instance.description = instance.description ? tryDecodeBase64(instance.description) : null;
+        instance.command = instance.command ? tryDecodeBase64(instance.command) : null;
         return instance;
     }
 

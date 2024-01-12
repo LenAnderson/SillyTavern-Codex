@@ -11,6 +11,14 @@ import { Map } from './src/map/Map.js';
 export const log = (...msg)=>console.log('[STCDX]', ...msg);
 export const warn = (...msg)=>console.warn('[STCDX]', ...msg);
 
+export const tryDecodeBase64 = (text) => {
+    try {
+        return atob(text);
+    } catch {
+        return text;
+    }
+}
+
 export function debounceAsync(func, timeout = 300) {
     let timer;
     /**@type {Promise}*/
