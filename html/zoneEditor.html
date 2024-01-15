@@ -1,0 +1,46 @@
+<div id="stcdx--zoneEditor">
+	<label>
+		<span class="stcdx--labelText">Label</span>
+		<input type="text" class="text_pole" id="stcdx--zone-label">
+	</label>
+	<label>
+		<span class="stcdx--labelText">Command</span><br>
+		<small>Macros: <code>{{map}} {{zone}} {{zoom}}</code></small>
+		<textarea type="text" class="text_pole" id="stcdx--zone-command"></textarea>
+	</label>
+	<label>
+		<span class="stcdx--labelText">Context Menu (QR Set, <small><code>{{arg::map}} {{arg::zone}} {{arg::zoom}}</code></small>)</span>
+		<select class="text_pole" id="stcdx--zone-qrSet">
+			<option value="">--Pick a QR set--</option>
+		</select>
+	</label>
+	<div class="stcdx--overrideContainer">
+		<span class="stcdx--labelText">Override zoom (hover) [%]</span>
+		<div class="stcdx--inputs">
+			<input type="checkbox" id="stcdx--zone-overrideZoom">
+			<input type="number" class="text_pole" id="stcdx--zone-zoom" min="0">
+		</div>
+	</div>
+	<div class="stcdx--overrideContainer">
+		<span class="stcdx--labelText">Override shadow strength (hover) [px]</span>
+		<div class="stcdx--inputs">
+			<input type="checkbox" id="stcdx--zone-overrideShadow">
+			<input type="number" class="text_pole" id="stcdx--zone-shadow" min="0">
+		</div>
+	</div>
+	<div class="stcdx--overrideContainer">
+		<span class="stcdx--labelText">Override shadow color (hover)</span>
+		<div class="stcdx--inputs">
+			<input type="checkbox" id="stcdx--zone-overrideShadowColor">
+			<toolcool-color-picker id="stcdx--zone-shadowColor"></toolcool-color-picker>
+		</div>
+	</div>
+	<label>
+		<span class="stcdx--labelText">World Info Key</span>
+		<input type="text" class="text_pole" id="stcdx--zone-key" placeholder="Leave description blank to use WI">
+	</label>
+	<label>
+		<span class="stcdx--labelText">Description</span>
+		<textarea type="text" class="text_pole" id="stcdx--zone-description" placeholder="Leave blank to use WI matched by World Info Key"></textarea>
+	</label>
+</div>

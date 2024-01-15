@@ -1,0 +1,112 @@
+<div id="stcdx--settings">
+	<div class="inline-drawer">
+		<div class="inline-drawer-toggle inline-drawer-header">
+			<b>Codex</b>
+			<div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+		</div>
+		<div class="inline-drawer-content" style="font-size:small;">
+			<div class="flex-container">
+				<label class="checkbox_label">
+					<input type="checkbox" id="stcdx--isEnabled" >
+					Enable codex
+				</label>
+			</div>
+			<div class="flex-container">
+				<label class="checkbox_label">
+					<input type="checkbox" id="stcdx--requirePrefix" >
+					Only match keys with <code>codex:</code> prefix
+				</label>
+			</div>
+			<div class="flex-container">
+				<label class="checkbox_label">
+					<input type="checkbox" id="stcdx--onlyFirst" >
+					Only create link on first occurrence in a message
+				</label>
+			</div>
+			<div class="flex-container">
+				<label class="checkbox_label">
+					<input type="checkbox" id="stcdx--noTooltips" >
+					Don't show tooltips
+				</label>
+			</div>
+			<div class="flex-container">
+				<label class="checkbox_label">
+					<input type="checkbox" id="stcdx--fixedTooltips" >
+					Show tooltips on top of codex instead of at cursor
+				</label>
+			</div>
+			<div class="flex-container">
+				<label>
+					Transition duration [ms]
+					<input type="number" class="text_pole" min="0" id="stcdx--transitionTime" value="">
+				</label>
+			</div>
+			<div class="flex-container">
+				<label>
+					Zoom duration (images and maps) [ms]
+					<input type="number" class="text_pole" min="0" id="stcdx--zoomTime" value="">
+				</label>
+			</div>
+			<div class="flex-container">
+				<label class="checkbox_label">
+					<input type="checkbox" id="stcdx--cycle" >
+					Cycle through found entries on new message
+				</label>
+			</div>
+			<div class="flex-container">
+				<label>
+					Cycle delay (ms)
+					<input type="number" class="text_pole" id="stcdx--cycleDelay" min="0" value="">
+				</label>
+			</div>
+			<div class="flex-container">
+				<toolcool-color-picker id="stcdx--color" color=""></toolcool-color-picker>
+				<span>Codex link color</span>
+			</div>
+			<div class="flex-container">
+				<label>
+					Icon next to codex link
+					<input type="text" class="text_pole" id="stcdx--icon" value="">
+				</label>
+			</div>
+			<div class="flex-container">
+				<label>
+					Maps: zone zoom duration (hover) [ms]
+					<input type="number" class="text_pole" min="0" id="stcdx--mapZoneZoomTime" value="">
+				</label>
+			</div>
+			<div class="flex-container">
+				<label>
+					Maps: zone zoom amount (hover) [%]
+					<input type="number" class="text_pole" min="0" id="stcdx--mapZoom" value="">
+				</label>
+			</div>
+			<div class="flex-container">
+				<label>
+					Maps: zone shadow strength (hover) [px]
+					<input type="number" class="text_pole" min="0" id="stcdx--mapShadow" value="">
+				</label>
+			</div>
+			<div class="flex-container">
+				<toolcool-color-picker id="stcdx--mapShadowColor" color=""></toolcool-color-picker>
+				<span>Maps: zone shadow color (hover)</span>
+			</div>
+			<div class="flex-container">
+				<label>
+					Maps: desaturation (before hover) [%]
+					<input type="number" class="text_pole" min="0" max="100" id="stcdx--mapDesaturate" value="">
+				</label>
+			</div>
+			<div class="flex-container">
+				<div class="stcdx--templatesContainer">
+					<label>
+						Codex template (markdown)<br>
+						<small>macros: <code>{{comment}} {{key[0]}} {{key[1]}} {{key[2]}} ... {{content}}</code></small>
+						<textarea class="text_pole" id="stcdx--template" rows="6"></textarea>
+					</label>
+					<div id="stcdx--addTemplate" class="menu_button menu_button_icon fa-solid fa-plus" title="Add template"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
