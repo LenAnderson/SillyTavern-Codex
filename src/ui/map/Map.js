@@ -50,7 +50,8 @@ export class Map extends MapBase {
             if (this.onZoneContext) {
                 this.onZoneContext(this.zone, evt);
             }
-        }}
+        }
+    }
 
     async updateHover() {
         const zone = this.zone;
