@@ -89,7 +89,11 @@ export class CodexMap extends CodexBaseEntry {
     async renderContent() {
         this.dom.innerHTML = '';
         const title = document.createElement('h2'); {
+            title.classList.add('stcdx--title');
             title.textContent = this.entry.title;
+            title.addEventListener('click', async()=>{
+                await this.renderZoom();
+            });
             this.dom.append(title);
         }
 

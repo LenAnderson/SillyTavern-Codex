@@ -276,6 +276,19 @@
   height: 100%;
   overflow: hidden;
 }
+.stcdx--root > .stcdx--content.stcdx--map > .stcdx--title {
+  cursor: zoom-in;
+}
+.stcdx--root > .stcdx--content.stcdx--map > .stcdx--title:after {
+  content: "🔎︎";
+  font-size: 0.8em;
+  margin-left: 0.5em;
+  opacity: 0.5;
+  transition: 200ms;
+}
+.stcdx--root > .stcdx--content.stcdx--map > .stcdx--title:hover:after {
+  opacity: 0.9;
+}
 .stcdx--root > .stcdx--content.stcdx--map > .stcdx--mapContainer {
   flex: 0 0 auto;
   position: relative;

@@ -291,6 +291,17 @@
 			height: 100%;
 			overflow: hidden;
 			> .stcdx--title {
+				cursor: zoom-in;
+				&:after {
+					content: "🔎︎";
+					font-size: 0.8em;
+					margin-left: 0.5em;
+					opacity: 0.5;
+					transition: 200ms;
+				}
+				&:hover:after {
+					opacity: 0.9;
+				}
 			}
 			> .stcdx--mapContainer {
 				flex: 0 0 auto;
