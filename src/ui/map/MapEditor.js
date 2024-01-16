@@ -361,6 +361,7 @@ export class MapEditor extends MapBase {
     async editZone(zone) {
         const editor = new ZoneEditor(zone);
         await editor.show();
+        await this.save();
     }
     async editDetails() {
         const editor = new MapDetailsEditor(this.codexMap);
