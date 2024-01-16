@@ -90,7 +90,7 @@ export class Matcher {
                     }
                     let offset = 0;
                     while (searchText.substring(offset).search(re ?? plain) != -1) {
-                        if (this.settings.onlyFirst && found.find(it=>it == entry)) continue;
+                        if (this.settings.onlyFirst && found.find(it=>it == entry)) break;
                         // secondary keys
                         if (entry.secondaryKeyList.length > 0) {
                             let any = false;
