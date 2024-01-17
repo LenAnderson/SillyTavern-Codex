@@ -1,5 +1,6 @@
 import { delay } from '../../../../../../utils.js';
 import { log } from '../../lib/log.js';
+import { HoverCanvas } from './HoverCanvas.js';
 import { MapBase } from './MapBase.js';
 
 
@@ -9,9 +10,29 @@ export class Map extends MapBase {
     /**@type {Object}*/ hovers = {};
     /**@type {HTMLCanvasElement[]}*/ activeHovers = [];
 
+    /**@type {HoverCanvas[]}*/ hoverList = [];
+
     /**@type {Function}*/ onZoneHover;
     /**@type {Function}*/ onZoneClick;
     /**@type {Function}*/ onZoneContext;
+
+
+
+
+    async render() {
+        const hadDom = this.dom;
+        await super.render();
+        if (!hadDom) {
+            log('DID NOT HAVE DOM');
+            for (const zone of this.zoneList) {
+                const hc = new HoverCanvas(zone, this.hoverCanvas.cloneNode(true));
+                this.hoverCanvas.insertAdjacentElement('afterend', hc.canvas);
+                this.hoverList.push(hc);
+            }
+        }
+        this.updateHover();
+        return this.dom;
+    }
 
 
     async handleMove(evt) {
@@ -58,72 +79,32 @@ export class Map extends MapBase {
         let nc;
         if (zone) {
             /**@type {HTMLCanvasElement} */
-            const canvas = this.hovers[zone.label] ?? this.hoverCanvas.cloneNode(true);
+            let canvas = this.hoverList.find(it=>it.zone == zone).canvas;
             this.hovers[zone.label] = canvas;
             nc = canvas;
             const con = canvas.getContext('2d');
             this.hoverCanvas.insertAdjacentElement('afterend', canvas);
             const last = zone.polygon.slice(-1)[0];
             con.clearRect(0, 0, canvas.width, canvas.height);
-            con.save();
-            con.beginPath();
-            con.moveTo(last.x, last.y);
-            for (const p of zone.polygon) {
-                con.lineTo(p.x, p.y);
-            }
-            con.closePath();
-            con.clip();
             if (zone.url) {
-                const minX = zone.polygon.reduce((min,p)=>Math.min(min,p.x),Number.MAX_SAFE_INTEGER);
-                const minY = zone.polygon.reduce((min,p)=>Math.min(min,p.y),Number.MAX_SAFE_INTEGER);
-                const maxX = zone.polygon.reduce((max,p)=>Math.max(max,p.x),0);
-                const maxY = zone.polygon.reduce((max,p)=>Math.max(max,p.y),0);
-                const img = new Image();
-                await new Promise(resolve=>{
-                    img.addEventListener('load', resolve);
-                    img.addEventListener('error', resolve);
-                    img.src = zone.url;
-                    if (img.complete) resolve();
-                });
-                const imgAspect = img.naturalWidth / img.naturalHeight;
-                const imgW = img.naturalWidth;
-                const imgH = img.naturalHeight;
-                const zoneW = maxX-minX;
-                const zoneH = maxY-minY;
-                const zoneAspect = zoneW/zoneH;
-                let targetW;
-                let targetH;
-                let targetX;
-                let targetY;
-                if (zoneAspect > imgAspect) {
-                    // zone is wider than img -> center horizontally
-                    targetH = zoneH;
-                    targetW = zoneH * imgAspect;
-                    targetX = minX + (zoneW - targetW) / 2;
-                    targetY = minY;
+                this.drawImageInsidePolygon(con, await zone.getImage(), zone.polygon);
+                if (!zone.isAlwaysVisible) {
+                    canvas.classList.add('stcdx--fade');
                 } else {
-                    // zone is narrower than img -> center vertically
-                    targetW = zoneW;
-                    targetH = zoneW / imgAspect;
-                    targetX = minX;
-                    targetY = minY + (zoneH - targetH) / 2;
+                    canvas.classList.remove('stcdx--fade');
                 }
+            } else {
                 con.save();
                 con.beginPath();
-                con.moveTo(zone.polygon.slice(-1)[0].x, zone.polygon.slice(-1)[0].y);
+                con.moveTo(last.x, last.y);
                 for (const p of zone.polygon) {
                     con.lineTo(p.x, p.y);
                 }
                 con.closePath();
                 con.clip();
-                con.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, targetX, targetY, targetW, targetH);
-                con.restore();
-                canvas.classList.add('stcdx--fade');
-            }
-            else {
                 con.drawImage(this.image, 0, 0);
+                con.restore();
             }
-            con.restore();
             const cx = (zone.polygon.reduce((max,p)=>Math.max(max,p.x),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width);
             const cy = (zone.polygon.reduce((max,p)=>Math.max(max,p.y),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.y),canvas.height);
             canvas.style.transformOrigin = `${cx / canvas.width * 100}% ${cy / canvas.height * 100}%`;
@@ -136,20 +117,22 @@ export class Map extends MapBase {
             canvas.classList.add('stcdx--hovered');
             this.mapCanvas.style.cursor = 'pointer';
         }
-        {
-            const cc = [];
-            while (this.activeHovers.length > 0) cc.push(this.activeHovers.pop());
-            cc.forEach(async(canvas)=>{
-                canvas.classList.remove('stcdx--hovered');
-                await delay(this.settings.mapZoneZoomTime + 10);
-                if (this.activeHovers.includes(canvas)) return;
-                canvas.remove();
-            });
-        }
-        if (nc) {
-            this.activeHovers.push(nc);
-        } else {
+        if (!nc) {
             this.mapCanvas.style.cursor = '';
+        }
+        for (const hc of this.hoverList) {
+            if (hc.zone.url && hc.zone.isAlwaysVisible && hc.zone != this.zone) {
+                hc.context.clearRect(0, 0, hc.canvas.width, hc.canvas.height);
+                log('DRAW IMAGE');
+                this.drawImageInsidePolygon(hc.context, await hc.zone.getImage(), hc.zone.polygon);
+            }
+            if (hc.zone != this.zone && hc.canvas.classList.contains('stcdx--hovered')) {
+                hc.canvas.classList.remove('stcdx--hovered');
+                await delay(this.settings.mapZoneZoomTime + 10);
+                if (hc.zone != this.zone && (!hc.zone.url || !hc.zone.isAlwaysVisible)) {
+                    hc.clear();
+                }
+            }
         }
     }
 }

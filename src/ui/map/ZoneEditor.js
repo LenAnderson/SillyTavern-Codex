@@ -43,6 +43,12 @@ export class ZoneEditor {
         url.addEventListener('input', ()=>{
             this.zone.url = url.value.trim();
         });
+        /**@type {HTMLInputElement}*/
+        const isAlwaysVisible = dom.querySelector('#stcdx--zone-isAlwaysVisible');
+        isAlwaysVisible.checked = this.zone.isAlwaysVisible ?? false;
+        isAlwaysVisible.addEventListener('click', ()=>{
+            this.zone.isAlwaysVisible = isAlwaysVisible.checked;
+        });
         /**@type {HTMLTextAreaElement}*/
         const command = dom.querySelector('#stcdx--zone-command');
         command.value = this.zone.command ?? '';

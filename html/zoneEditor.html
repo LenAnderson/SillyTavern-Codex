@@ -4,8 +4,12 @@
 		<input type="text" class="text_pole" id="stcdx--zone-label">
 	</label>
 	<label>
-		<span class="stcdx--labelText">Custom Hover Image (URL)</span>
+		<span class="stcdx--labelText">Custom hover image (URL)</span>
 		<input type="text" class="text_pole" id="stcdx--zone-url" placeholder="URL: /user/images/codex/myZoneImage.png">
+	</label>
+	<label>
+		<span class="stcdx--labelText">Always show image</span>
+		<input type="checkbox" class="text_pole" id="stcdx--zone-isAlwaysVisible">
 	</label>
 	<label>
 		<span class="stcdx--labelText">Command</span><br>
@@ -13,7 +17,7 @@
 		<textarea type="text" class="text_pole" id="stcdx--zone-command"></textarea>
 	</label>
 	<label>
-		<span class="stcdx--labelText">Context Menu (QR Set, <small><code>{{arg::map}} {{arg::zone}} {{arg::zoom}}</code></small>)</span>
+		<span class="stcdx--labelText">Context menu (QR Set, <small><code>{{arg::map}} {{arg::zone}} {{arg::zoom}}</code></small>)</span>
 		<select class="text_pole" id="stcdx--zone-qrSet">
 			<option value="">--Pick a QR set--</option>
 		</select>
@@ -40,7 +44,7 @@
 		</div>
 	</div>
 	<label>
-		<span class="stcdx--labelText">World Info Key</span>
+		<span class="stcdx--labelText">World info key</span>
 		<input type="text" class="text_pole" id="stcdx--zone-key" placeholder="Leave description blank to use WI">
 	</label>
 	<label>

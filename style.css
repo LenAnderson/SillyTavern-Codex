@@ -498,4 +498,6 @@
   max-height: 100%;
   inset: 0;
   position: absolute;
+  filter: none;
+  opacity: 1;
 }

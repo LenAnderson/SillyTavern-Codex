@@ -1,4 +1,5 @@
 import { tryDecodeBase64 } from '../../lib/base64.js';
+import { log } from '../../lib/log.js';
 import { Point } from './Point.js';
 
 
@@ -20,7 +21,7 @@ export class Zone {
 
     /**@type {String}*/ label;
     /**@type {String}*/ url;
-    //TODO always visible hover image
+    /**@type {Promise}*/ imageLoaded;
     /**@type {Boolean}*/ isAlwaysVisible = false;
     /**@type {String}*/ description;
     /**@type {String}*/ key;
@@ -31,16 +32,20 @@ export class Zone {
     /**@type {Boolean}*/ overrideShadowColor = false;
     /**@type {String}*/ shadowColor = 'rgba(0, 0, 0, 1)';
     /**@type {Point[]}*/ polygon;
+    //TODO add bool for not closing zoomed map on click
     /**@type {String}*/ command;
     /**@type {String}*/ qrSet;
 
     /**@type {HTMLElement}*/ dom;
+    /**@type {HTMLImageElement}*/ image;
+    /**@type {String}*/ imageSrc;
 
 
     toJSON() {
         return {
             label: this.label ? window.btoa(this.label) : null,
             url: this.url ? window.btoa(this.url) : null,
+            isAlwaysVisible: this.isAlwaysVisible,
             description: this.description ? window.btoa(this.description) : null,
             key: this.key,
             polygon: this.polygon,
@@ -53,5 +58,44 @@ export class Zone {
             overrideShadowColor: this.overrideShadowColor,
             shadowColor: this.shadowColor,
         };
+    }
+
+
+
+
+    async init() {
+        // await this.loadImage();
+    }
+
+    async loadImage() {
+        if (this.url) {
+            log('LOAD IMAGE', this.url);
+            if (!this.imageLoaded || this.imageSrc != this.url) {
+                log('NEW IMAGE', this.url, this.imageSrc);
+                const img = new Image();
+                this.image = img;
+                this.imageLoaded = new Promise(resolve=>{
+                    img.addEventListener('load', resolve);
+                    img.addEventListener('error', resolve);
+                    img.src = this.url;
+                    this.imageSrc = this.url;
+                    if (img.complete) {
+                        log('IS COMPLETE', this.url);
+                        resolve();
+                    } else {
+                        log('WAITING', this.url);
+                    }
+                });
+            } else {
+                log('OLD IMAGE', this.url);
+            }
+            await this.imageLoaded;
+            log('IMAGE LOADED', this.url, this.image.naturalWidth, this.image.naturalHeight);
+        }
+        return this.image;
+    }
+
+    async getImage() {
+        return await this.loadImage();
     }
 }

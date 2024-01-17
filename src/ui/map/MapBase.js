@@ -28,6 +28,7 @@ export class MapBase {
         this.settings = settings;
         this.image = image;
         this.zoneList = zoneList;
+        zoneList.forEach(it=>it.init());
     }
 
 
@@ -71,6 +72,45 @@ export class MapBase {
                 return zone;
             }
         }
+    }
+
+    drawImageInsidePolygon(con, img, polygon) {
+        const minX = polygon.reduce((min,p)=>Math.min(min,p.x),Number.MAX_SAFE_INTEGER);
+        const minY = polygon.reduce((min,p)=>Math.min(min,p.y),Number.MAX_SAFE_INTEGER);
+        const maxX = polygon.reduce((max,p)=>Math.max(max,p.x),0);
+        const maxY = polygon.reduce((max,p)=>Math.max(max,p.y),0);
+
+        const imgAspect = img.naturalWidth / img.naturalHeight;
+        const zoneW = maxX - minX;
+        const zoneH = maxY - minY;
+        const zoneAspect = zoneW / zoneH;
+        let targetW;
+        let targetH;
+        let targetX;
+        let targetY;
+        if (zoneAspect > imgAspect) {
+            // zone is wider than img -> center horizontally
+            targetH = zoneH;
+            targetW = zoneH * imgAspect;
+            targetX = minX + (zoneW - targetW) / 2;
+            targetY = minY;
+        } else {
+            // zone is narrower than img -> center vertically
+            targetW = zoneW;
+            targetH = zoneW / imgAspect;
+            targetX = minX;
+            targetY = minY + (zoneH - targetH) / 2;
+        }
+        con.save();
+        con.beginPath();
+        con.moveTo(polygon.slice(-1)[0].x, polygon.slice(-1)[0].y);
+        for (const p of polygon) {
+            con.lineTo(p.x, p.y);
+        }
+        con.closePath();
+        con.clip();
+        con.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, targetX, targetY, targetW, targetH);
+        con.restore();
     }
 
 

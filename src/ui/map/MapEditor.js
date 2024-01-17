@@ -314,50 +314,7 @@ export class MapEditor extends MapBase {
                 con.strokeStyle = 'rgba(255 0 0 / 0.5)';
             }
             if (zone.url) {
-                const minX = zone.polygon.reduce((min,p)=>Math.min(min,p.x),Number.MAX_SAFE_INTEGER);
-                const minY = zone.polygon.reduce((min,p)=>Math.min(min,p.y),Number.MAX_SAFE_INTEGER);
-                const maxX = zone.polygon.reduce((max,p)=>Math.max(max,p.x),0);
-                const maxY = zone.polygon.reduce((max,p)=>Math.max(max,p.y),0);
-                const img = new Image();
-                await new Promise(resolve=>{
-                    img.addEventListener('load', resolve);
-                    img.addEventListener('error', resolve);
-                    img.src = zone.url;
-                    if (img.complete) resolve();
-                });
-                const imgAspect = img.naturalWidth / img.naturalHeight;
-                const imgW = img.naturalWidth;
-                const imgH = img.naturalHeight;
-                const zoneW = maxX-minX;
-                const zoneH = maxY-minY;
-                const zoneAspect = zoneW/zoneH;
-                let targetW;
-                let targetH;
-                let targetX;
-                let targetY;
-                if (zoneAspect > imgAspect) {
-                    // zone is wider than img -> center horizontally
-                    targetH = zoneH;
-                    targetW = zoneH * imgAspect;
-                    targetX = minX + (zoneW - targetW) / 2;
-                    targetY = minY;
-                } else {
-                    // zone is narrower than img -> center vertically
-                    targetW = zoneW;
-                    targetH = zoneW / imgAspect;
-                    targetX = minX;
-                    targetY = minY + (zoneH - targetH) / 2;
-                }
-                con.save();
-                con.beginPath();
-                con.moveTo(zone.polygon.slice(-1)[0].x, zone.polygon.slice(-1)[0].y);
-                for (const p of zone.polygon) {
-                    con.lineTo(p.x, p.y);
-                }
-                con.closePath();
-                con.clip();
-                con.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, targetX, targetY, targetW, targetH);
-                con.restore();
+                this.drawImageInsidePolygon(con, await zone.getImage(), zone.polygon);
             }
             this.drawPolygon(zone.polygon, fs);
         }
@@ -407,6 +364,7 @@ export class MapEditor extends MapBase {
     async editZone(zone) {
         const editor = new ZoneEditor(zone);
         await editor.show();
+        await this.refreshMap();
         await this.save();
     }
     async editDetails() {
