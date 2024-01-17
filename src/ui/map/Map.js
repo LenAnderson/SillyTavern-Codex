@@ -123,7 +123,6 @@ export class Map extends MapBase {
         for (const hc of this.hoverList) {
             if (hc.zone.url && hc.zone.isAlwaysVisible && hc.zone != this.zone) {
                 hc.context.clearRect(0, 0, hc.canvas.width, hc.canvas.height);
-                log('DRAW IMAGE');
                 this.drawImageInsidePolygon(hc.context, await hc.zone.getImage(), hc.zone.polygon);
             }
             if (hc.zone != this.zone && hc.canvas.classList.contains('stcdx--hovered')) {

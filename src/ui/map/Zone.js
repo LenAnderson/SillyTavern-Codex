@@ -69,9 +69,7 @@ export class Zone {
 
     async loadImage() {
         if (this.url) {
-            log('LOAD IMAGE', this.url);
             if (!this.imageLoaded || this.imageSrc != this.url) {
-                log('NEW IMAGE', this.url, this.imageSrc);
                 const img = new Image();
                 this.image = img;
                 this.imageLoaded = new Promise(resolve=>{
@@ -80,17 +78,11 @@ export class Zone {
                     img.src = this.url;
                     this.imageSrc = this.url;
                     if (img.complete) {
-                        log('IS COMPLETE', this.url);
                         resolve();
-                    } else {
-                        log('WAITING', this.url);
                     }
                 });
-            } else {
-                log('OLD IMAGE', this.url);
             }
             await this.imageLoaded;
-            log('IMAGE LOADED', this.url, this.image.naturalWidth, this.image.naturalHeight);
         }
         return this.image;
     }

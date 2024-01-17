@@ -127,6 +127,7 @@ export class MapBase {
                 canvas.height = this.image.naturalHeight;
                 this.mapContext = canvas.getContext('2d');
                 this.mapContext.drawImage(this.image, 0, 0);
+                canvas.addEventListener('selectstart', (evt)=>evt.preventDefault());
                 canvas.addEventListener('pointermove', (evt)=>this.handleMove(evt));
                 canvas.addEventListener('pointerdown', (evt)=>this.handlePointerDown(evt));
                 canvas.addEventListener('pointerup', (evt)=>this.handlePointerUp(evt));

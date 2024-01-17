@@ -1,4 +1,5 @@
 // eslint-disable-next-line no-unused-vars
+import { log } from '../../lib/log.js';
 import { CodexMap } from '../CodexMap.js';
 import { Line } from './Line.js';
 import { MapBase } from './MapBase.js';
@@ -24,6 +25,8 @@ export class MapEditor extends MapBase {
     /**@type {Point[]}*/ newPoly;
 
     /**@type {Boolean}*/ isDrawing = false;
+    /**@type {Boolean}*/ isRectangling = false;
+    /**@type {Point}*/ rectangleStart;
     /**@type {Boolean}*/ isDragging = false;
 
     /**@type {Function}*/ handleKeyDownBound;
@@ -92,6 +95,7 @@ export class MapEditor extends MapBase {
                         [
                             '[HELP]',
                             'hold ctrl and click to draw a new zone',
+                            'hold ctrl and shift and drag to create a new rectangular zone',
                             'click into a zone to edit a zone',
                             'hold alt and click into a zone to remove a zone',
                             'drag a point to move a point',
@@ -156,6 +160,18 @@ export class MapEditor extends MapBase {
 
 
     async handleMove(evt) {
+        if (this.isDrawing && this.isRectangling && this.rectangleStart) {
+            const p = this.getPoint(evt);
+            this.newPoly = [
+                this.rectangleStart,
+                Point.from({ x:p.x, y:this.rectangleStart.y }),
+                p,
+                Point.from({ x:this.rectangleStart.x, y:p.y }),
+            ];
+            log(this.newPoly);
+            this.updateHover(this.newPoly);
+            return;
+        }
         if (this.isDrawing) {
             return;
         }
@@ -204,6 +220,10 @@ export class MapEditor extends MapBase {
      * @param {PointerEvent} evt
      */
     async handlePointerDown(evt) {
+        if (this.isDrawing && this.isRectangling) {
+            this.rectangleStart = this.getPoint(evt);
+            return;
+        }
         if (evt.ctrlKey || evt.altKey) return;
         if (this.hoverPoint) {
             this.isDragging = true;
@@ -228,6 +248,18 @@ export class MapEditor extends MapBase {
         }
     }
     async handlePointerUp(evt) {
+        if (this.isDrawing && this.isRectangling && this.rectangleStart) {
+            this.isDrawing = false;
+            this.isRectangling = false;
+            const zone = Zone.from({ polygon:this.newPoly });
+            this.rectangleStart = null;
+            this.newPoly = [];
+            await this.editZone(zone);
+            this.zoneList.push(zone);
+            await this.save();
+            this.updateHover();
+            return;
+        }
         if (this.isDragging) {
             this.isDragging = false;
             window.addEventListener('click', (evt)=>evt.stopPropagation(), { capture:true, once:true });
@@ -269,14 +301,17 @@ export class MapEditor extends MapBase {
     async handleContext(evt) {}
 
     async handleKeyDown(evt) {
-        if (!this.editorDom || this.isDrawing || this.isDragging) return;
-        if (evt.key == 'Control') {
+        if (!this.editorDom || this.isDragging) return;
+        if (!this.isDrawing && evt.key == 'Control') {
             this.isDrawing = true;
             this.newPoly = [];
         }
+        if (evt.key == 'Shift') {
+            this.isRectangling = true;
+        }
     }
     async handleKeyUp(evt) {
-        if (!this.dom || !this.isDrawing) return;
+        if (!this.dom || !this.isDrawing || this.isRectangling) return;
         if (evt.key == 'Control') {
             this.isDrawing = false;
             if (!this.isDragging) {
