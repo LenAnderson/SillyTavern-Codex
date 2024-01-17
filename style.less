@@ -93,16 +93,21 @@
 	max-height: unset;
 	max-width: unset;
 	width: calc((100vw - var(--sheldWidth)) / 2);
+	transition: calc(1ms * var(--stcdx--transitionTime));
 
 	&.stcdx--active {
 		display: grid;
+	}
+	&.stcdx--maximized {
+		width: calc(100vw - var(--nav-bar-width));
+		z-index: 1000;
 	}
 
 	&.stcdx--isEditing {
 		> .stcdx--header {
 			> .stcdx--action, > .stcdx--search {
 				display: none;
-				&.stcdx--edit, &.stcdx--close {
+				&.stcdx--edit, &.stcdx--max, &.stcdx--close {
 					display: block;
 				}
 			}

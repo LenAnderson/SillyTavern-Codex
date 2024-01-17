@@ -269,6 +269,16 @@ export class Codex {
                         drag.classList.add('drag-grabber');
                         head.append(drag);
                     }
+                    const max = document.createElement('div'); {
+                        max.classList.add('stcdx--action');
+                        max.classList.add('stcdx--max');
+                        max.textContent = '◱';
+                        max.title = 'Maximize';
+                        max.addEventListener('click', ()=>{
+                            root.classList.toggle('stcdx--maximized');
+                        });
+                        head.append(max);
+                    }
                     const close = document.createElement('div'); {
                         close.classList.add('stcdx--close');
                         close.classList.add('stcdx--action');
