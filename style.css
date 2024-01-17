@@ -384,13 +384,21 @@
 .stcdx--mapContainer > .stcdx--map.stcdx--hover,
 .stcdx--mapContainer > .stcdx--hover.stcdx--hover {
   pointer-events: none;
-  transition: transform calc(1ms * var(--stcdx--mapZoneZoomTime)), filter calc(1ms * var(--stcdx--mapZoneZoomTime));
+  transition: opacity calc(1ms * var(--stcdx--mapZoneZoomTime)), transform calc(1ms * var(--stcdx--mapZoneZoomTime)), filter calc(1ms * var(--stcdx--mapZoneZoomTime));
+}
+.stcdx--mapContainer > .stcdx--map.stcdx--hover.stcdx--fade,
+.stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--fade {
+  opacity: 0;
 }
 .stcdx--mapContainer > .stcdx--map.stcdx--hover.stcdx--hovered,
 .stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--hovered {
   transform: scale(calc(1 + var(--stcdx--mapZoom) / 100));
   filter: saturate(1) drop-shadow(0 0 calc(1px * var(--stcdx--mapShadow)) var(--stcdx--mapShadowColor));
   z-index: 2;
+}
+.stcdx--mapContainer > .stcdx--map.stcdx--hover.stcdx--hovered.stcdx--fade,
+.stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--hovered.stcdx--fade {
+  opacity: 1;
 }
 .stcdx--mapEditor {
   display: flex;

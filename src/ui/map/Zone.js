@@ -9,6 +9,7 @@ export class Zone {
         const instance = Object.assign(new this(), props);
         instance.polygon = (props.polygon ?? []).map(it => Point.from(it));
         instance.label = instance.label ? tryDecodeBase64(instance.label) : null;
+        instance.url = instance.url ? tryDecodeBase64(instance.url) : null;
         instance.description = instance.description ? tryDecodeBase64(instance.description) : null;
         instance.command = instance.command ? tryDecodeBase64(instance.command) : null;
         return instance;
@@ -18,6 +19,9 @@ export class Zone {
 
 
     /**@type {String}*/ label;
+    /**@type {String}*/ url;
+    //TODO always visible hover image
+    /**@type {Boolean}*/ isAlwaysVisible = false;
     /**@type {String}*/ description;
     /**@type {String}*/ key;
     /**@type {Boolean}*/ overrideZoom = false;
@@ -36,6 +40,7 @@ export class Zone {
     toJSON() {
         return {
             label: this.label ? window.btoa(this.label) : null,
+            url: this.url ? window.btoa(this.url) : null,
             description: this.description ? window.btoa(this.description) : null,
             key: this.key,
             polygon: this.polygon,

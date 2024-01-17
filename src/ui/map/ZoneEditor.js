@@ -37,6 +37,12 @@ export class ZoneEditor {
         label.addEventListener('input', ()=>{
             this.zone.label = label.value.trim();
         });
+        /**@type {HTMLInputElement}*/
+        const url = dom.querySelector('#stcdx--zone-url');
+        url.value = this.zone.url ?? '';
+        url.addEventListener('input', ()=>{
+            this.zone.url = url.value.trim();
+        });
         /**@type {HTMLTextAreaElement}*/
         const command = dom.querySelector('#stcdx--zone-command');
         command.value = this.zone.command ?? '';

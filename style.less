@@ -409,12 +409,18 @@
 
 		&.stcdx--hover {
 			pointer-events: none;
-			transition: transform calc(1ms * var(--stcdx--mapZoneZoomTime)), filter calc(1ms * var(--stcdx--mapZoneZoomTime));
+			transition: opacity calc(1ms * var(--stcdx--mapZoneZoomTime)), transform calc(1ms * var(--stcdx--mapZoneZoomTime)), filter calc(1ms * var(--stcdx--mapZoneZoomTime));
+			&.stcdx--fade {
+				opacity: 0;
+			}
 
 			&.stcdx--hovered {
 				transform: scale(calc(1 + var(--stcdx--mapZoom) / 100));
 				filter: saturate(1) drop-shadow(0 0 calc(1px * var(--stcdx--mapShadow)) var(--stcdx--mapShadowColor));
 				z-index: 2;
+				&.stcdx--fade {
+					opacity: 1;
+				}
 			}
 		}
 	}
