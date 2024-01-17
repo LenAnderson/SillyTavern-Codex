@@ -9,7 +9,7 @@ import { Matcher } from '../Matcher.js';
 // eslint-disable-next-line no-unused-vars
 import { Settings } from '../Settings.js';
 // eslint-disable-next-line no-unused-vars
-import { Book } from '../wi/Book.js';
+import { Book } from '../st/wi/Book.js';
 // eslint-disable-next-line no-unused-vars
 import { CodexBaseEntry } from './CodexBaseEntry.js';
 import { CodexEntry } from './CodexEntry.js';

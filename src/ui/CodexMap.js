@@ -34,12 +34,12 @@ export class CodexMap extends CodexBaseEntry {
 
     constructor(entry, settings, matcher, linker) {
         super(entry, settings, matcher, linker);
-        const data = JSON.parse(entry.content ?? '{}');
+        const data = JSON.parse(entry.content || '{}');
         this.url = tryDecodeBase64(data.url);
         this.description = tryDecodeBase64(data.description);
         this.command = tryDecodeBase64(data.command);
         this.qrSet = tryDecodeBase64(data.qrSet);
-        this.zoneList = data.zoneList.map(it=>Zone.from(it));
+        this.zoneList = (data.zoneList ?? []).map(it=>Zone.from(it));
     }
 
 

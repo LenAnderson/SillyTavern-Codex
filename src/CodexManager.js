@@ -10,9 +10,9 @@ import { Settings } from './Settings.js';
 import { debounceAsync } from './lib/debounce.js';
 import { log } from './lib/log.js';
 import { Codex } from './ui/Codex.js';
-import { Book } from './wi/Book.js';
-import { Entry } from './wi/Entry.js';
-import { WorldInfoSettings } from './wi/Settings.js';
+import { Book } from './st/wi/Book.js';
+import { Entry } from './st/wi/Entry.js';
+import { WorldInfoSettings } from './st/wi/Settings.js';
 
 
 

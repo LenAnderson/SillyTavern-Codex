@@ -9,7 +9,7 @@ import { Matcher } from '../Matcher.js';
 import { Settings } from '../Settings.js';
 import { waitForFrame } from '../lib/wait.js';
 // eslint-disable-next-line no-unused-vars
-import { Entry } from '../wi/Entry.js';
+import { Entry } from '../st/wi/Entry.js';
 
 
 

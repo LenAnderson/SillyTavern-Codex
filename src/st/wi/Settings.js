@@ -1,10 +1,10 @@
-import { characters, chat_metadata, eventSource, event_types } from '../../../../../../script.js';
-import { getContext } from '../../../../../extensions.js';
-import { groups } from '../../../../../group-chats.js';
-import { world_info, world_info_case_sensitive, world_info_match_whole_words } from '../../../../../world-info.js';
+import { characters, chat_metadata, eventSource, event_types } from '../../../../../../../script.js';
+import { getContext } from '../../../../../../extensions.js';
+import { groups } from '../../../../../../group-chats.js';
+import { world_info, world_info_case_sensitive, world_info_match_whole_words } from '../../../../../../world-info.js';
 
-import { debounceAsync } from '../lib/debounce.js';
-import { log } from '../lib/log.js';
+import { debounceAsync } from '../../lib/debounce.js';
+import { log } from '../../lib/log.js';
 
 export class WorldInfoSettings {
     /**@type {Boolean}*/ isCaseSensitive;

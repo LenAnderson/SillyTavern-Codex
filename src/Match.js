@@ -1,4 +1,4 @@
-import { Entry } from './wi/Entry.js';
+import { Entry } from './st/wi/Entry.js';
 
 
 

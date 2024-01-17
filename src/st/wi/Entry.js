@@ -1,4 +1,4 @@
-import { debounceAsync } from '../lib/debounce.js';
+import { debounceAsync } from '../../lib/debounce.js';
 
 
 
@@ -33,6 +33,7 @@ export class Entry {
     /**@type {Function}*/ onSave;
 
     get isMap() { return this.keyList.includes('codex-map:'); }
+    get isCharList() { return this.keyList.includes('codex-chars:'); }
 
     get title() {
         const key = this.keyList.find(it=>it.startsWith('codex-title:'))?.substring(12);

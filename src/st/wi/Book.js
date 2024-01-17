@@ -1,8 +1,8 @@
 // eslint-disable-next-line no-unused-vars
-import { getRequestHeaders } from '../../../../../../script.js';
-import { executeSlashCommands } from '../../../../../slash-commands.js';
+import { getRequestHeaders } from '../../../../../../../script.js';
+import { executeSlashCommands } from '../../../../../../slash-commands.js';
 
-import { log, warn } from '../lib/log.js';
+import { log, warn } from '../../lib/log.js';
 import { Entry } from './Entry.js';
 
 

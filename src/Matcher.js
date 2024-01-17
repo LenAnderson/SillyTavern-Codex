@@ -4,11 +4,11 @@ import { ResultNode } from './ResultNode.js';
 import { Settings } from './Settings.js';
 import { log, warn } from './lib/log.js';
 // eslint-disable-next-line no-unused-vars
-import { Book } from './wi/Book.js';
-import { Entry } from './wi/Entry.js';
-import { worldInfoLogic } from './wi/Logic.js';
+import { Book } from './st/wi/Book.js';
+import { Entry } from './st/wi/Entry.js';
+import { worldInfoLogic } from './st/wi/Logic.js';
 // eslint-disable-next-line no-unused-vars
-import { WorldInfoSettings } from './wi/Settings.js';
+import { WorldInfoSettings } from './st/wi/Settings.js';
 
 export class Matcher {
     /**@type {Settings}*/ settings;
