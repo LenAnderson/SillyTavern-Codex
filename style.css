@@ -322,6 +322,38 @@
 .stcdx--root > .stcdx--content.stcdx--map > .stcdx--zoneContainer > .stcdx--zone > .stcdx--title {
   font-weight: bold;
 }
+.stcdx--root > .stcdx--content.stcdx--charList > .stcdx--chars {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: start;
+}
+.stcdx--root > .stcdx--content.stcdx--charList > .stcdx--chars:after {
+  content: "";
+  flex: 1 1 auto;
+}
+.stcdx--root > .stcdx--content.stcdx--charList > .stcdx--chars > .stcdx--char {
+  transition: 400ms;
+  transform: scale(1);
+  filter: drop-shadow(0 0 0 transparent);
+}
+.stcdx--root > .stcdx--content.stcdx--charList > .stcdx--chars > .stcdx--char:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 6px black);
+}
+.stcdx--root > .stcdx--content.stcdx--charList > .stcdx--chars > .stcdx--char > .stcdx--image {
+  --stcdx--cardHeight: 200px;
+  --stcdx--cardWidth: calc(var(--stcdx--cardHeight) / 144 * 96);
+  height: var(--stcdx--cardHeight);
+  width: var(--stcdx--cardWidth);
+  background-size: contain;
+  background-position: bottom;
+  background-repeat: no-repeat;
+}
+.stcdx--root > .stcdx--content.stcdx--charList > .stcdx--chars > .stcdx--char > .stcdx--name {
+  text-align: center;
+}
 .stcdx--blocker {
   position: fixed;
   inset: 0;

@@ -12,6 +12,7 @@ import { Settings } from '../Settings.js';
 import { Book } from '../st/wi/Book.js';
 // eslint-disable-next-line no-unused-vars
 import { CodexBaseEntry } from './CodexBaseEntry.js';
+import { CodexCharList } from './CodexCharList.js';
 import { CodexEntry } from './CodexEntry.js';
 import { CodexMap } from './CodexMap.js';
 
@@ -318,6 +319,8 @@ export class Codex {
             let content;
             if (match.entry.isMap) {
                 content = new CodexMap(match.entry, this.settings, this.matcher, this.linker);
+            } else if (match.entry.isCharList) {
+                content = new CodexCharList(match.entry, this.settings, this.matcher, this.linker);
             } else {
                 content = new CodexEntry(match.entry, this.settings, this.matcher, this.linker);
             }
