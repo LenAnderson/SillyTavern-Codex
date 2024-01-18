@@ -32,7 +32,7 @@ export class Zone {
     /**@type {Boolean}*/ overrideShadowColor = false;
     /**@type {String}*/ shadowColor = 'rgba(0, 0, 0, 1)';
     /**@type {Point[]}*/ polygon;
-    //TODO add bool for not closing zoomed map on click
+    /**@type {Boolean}*/ keepZoomed = false;
     /**@type {String}*/ command;
     /**@type {String}*/ qrSet;
 
@@ -49,6 +49,7 @@ export class Zone {
             description: this.description ? window.btoa(this.description) : null,
             key: this.key,
             polygon: this.polygon,
+            keepZoomed : this.keepZoomed,
             command: this.command ? window.btoa(this.command) : null,
             qrSet: this.qrSet,
             overrideZoom: this.overrideZoom,

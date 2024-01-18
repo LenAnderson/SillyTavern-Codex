@@ -151,7 +151,9 @@ export class CodexMap extends CodexBaseEntry {
             const map = new Map(this.settings, await this.fetchImage(), this.zoneList);
             //TODO map listeners (click, context, hover)
             map.onZoneClick = async(zone, evt) => {
-                await this.unrenderZoom();
+                if (!zone.keepZoomed) {
+                    await this.unrenderZoom();
+                }
                 this.handleZoneClicked(zone, evt, true);
             };
             this.zoomedMap = map;

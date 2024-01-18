@@ -70,6 +70,13 @@ export class ZoneEditor {
         });
 
         /**@type {HTMLInputElement}*/
+        const keepZoomed = dom.querySelector('#stcdx--zone-keepZoomed');
+        keepZoomed.checked = this.zone.keepZoomed ?? false;
+        keepZoomed.addEventListener('click', ()=>{
+            this.zone.keepZoomed = keepZoomed.checked;
+        });
+
+        /**@type {HTMLInputElement}*/
         const oZoom = dom.querySelector('#stcdx--zone-overrideZoom');
         oZoom.checked = this.zone.overrideZoom ?? false;
         oZoom.addEventListener('click', ()=>{
