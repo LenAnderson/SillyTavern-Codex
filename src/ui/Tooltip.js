@@ -36,6 +36,8 @@ export class Tooltip {
     /**@type {Matcher}*/ matcher;
     /**@type {Linker}*/ linker;
 
+    /**@type {Boolean}*/ isFrozen = false;
+
     /**@type {Function}*/ boundMove;
     /**@type {Function}*/ boundScroll;
 
@@ -84,6 +86,11 @@ export class Tooltip {
         while (this.triggerList.includes(el)) {
             this.triggerList.splice(this.triggerList.indexOf(el), 1);
         }
+    }
+
+
+    freeze() {
+        this.isFrozen = true;
     }
 
 
@@ -138,7 +145,9 @@ export class Tooltip {
         document.body.append(this.dom);
     }
 
-    hide() {
+    hide(isForced = false) {
+        if (this.isFrozen && !isForced) return;
+        this.isFrozen = false;
         this.dom?.remove();
         // @ts-ignore
         window.removeEventListener('pointermove', this.boundMove);

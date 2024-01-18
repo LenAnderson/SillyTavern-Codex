@@ -78,9 +78,11 @@ export class Linker {
                     const el = document.createElement('span'); {
                         el.classList.add('stcdx--link');
                         el.textContent = node.textContent.substring(match.start, match.end);
-                        el.addEventListener('click', ()=>{
+                        el.addEventListener('click', async()=>{
                             if (this.onShowCodex) {
-                                this.onShowCodex(match);
+                                tt.freeze();
+                                await this.onShowCodex(match);
+                                tt.hide(true);
                             }
                         });
                         const tt = Tooltip.get(match.entry, this.settings, this.matcher, this);
