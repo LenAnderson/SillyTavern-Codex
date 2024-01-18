@@ -164,7 +164,7 @@ export class Settings {
         transitionTime.addEventListener('input', () => {
             try {
                 this.transitionTime = parseInt(transitionTime.value);
-                document.body.style.setProperty('--stcdx--transitionTime', `"${this.transitionTime}"`);
+                document.body.style.setProperty('--stcdx--transitionTime', `${this.transitionTime}`);
                 this.save();
             } catch { /* empty */ }
         });
@@ -174,7 +174,7 @@ export class Settings {
         zoomTime.addEventListener('input', () => {
             try {
                 this.zoomTime = parseInt(zoomTime.value);
-                document.body.style.setProperty('--stcdx--zoomTime', `"${this.zoomTime}"`);
+                document.body.style.setProperty('--stcdx--zoomTime', `${this.zoomTime}`);
                 this.save();
             } catch { /* empty */ }
         });
@@ -191,7 +191,7 @@ export class Settings {
         cycleDelay.addEventListener('input', () => {
             try {
                 this.cycleDelay = parseInt(cycleDelay.value);
-                document.body.style.setProperty('--stcdx--cycleDelay', `"${this.cycleDelay}"`);
+                document.body.style.setProperty('--stcdx--cycleDelay', `${this.cycleDelay}`);
                 this.save();
             } catch { /* empty */ }
         });
