@@ -1,7 +1,10 @@
+import { sendSystemMessage } from '../../../../../script.js';
 import { registerSlashCommand } from '../../../../slash-commands.js';
-import { isTrueBoolean } from '../../../../utils.js';
+import { delay, isTrueBoolean } from '../../../../utils.js';
 // eslint-disable-next-line no-unused-vars
 import { CodexManager } from './CodexManager.js';
+import { warn } from './lib/log.js';
+import { waitForFrame } from './lib/wait.js';
 
 
 
@@ -25,6 +28,28 @@ export class SlashCommandHandler {
             true,
             true,
         );
+
+        registerSlashCommand(
+            'codex?',
+            ()=>this.showHelp(),
+            [],
+            ' – get help on how to use the Codex extension',
+            true,
+            true,
+        );
+
+        window.addEventListener('click', async(evt)=>{
+            if (evt.target.hasAttribute && evt.target.hasAttribute('data-stcdx--href')) {
+                const mes = evt.target.closest('.mes_text');
+                const target = mes.querySelector(`#stcdx--help--${evt.target.getAttribute('data-stcdx--href')}`);
+                if (target) {
+                    target.scrollIntoView();
+                    target.classList.add('stcdx--flash');
+                    await delay(510);
+                    target.classList.remove('stcdx--flash');
+                }
+            }
+        });
     }
 
 
@@ -66,5 +91,17 @@ export class SlashCommandHandler {
                 }
             }
         }
+    }
+
+
+    async showHelp() {
+        const response = await fetch('/scripts/extensions/third-party/SillyTavern-Codex/html/help.html');
+        if (!response.ok) {
+            return warn('failed to fetch template: help.html');
+        }
+        const now = new Date().getTime();
+        sendSystemMessage('generic', (await response.text()).replaceAll('%%TIMESTAMP%%', `${now}`));
+        await waitForFrame();
+        document.querySelector(`#stcdx--help--${now}`)?.scrollIntoView();
     }
 }

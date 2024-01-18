@@ -527,3 +527,52 @@
   filter: none;
   opacity: 1;
 }
+@keyframes stcdx--flash {
+  0% {
+    filter: invert(0);
+  }
+  50% {
+    filter: invert(1);
+  }
+  100% {
+    filter: invert(0);
+  }
+}
+.stcdx--flash {
+  animation-name: flash;
+  animation-duration: 500ms;
+  animation-timing-function: linear;
+  animation-delay: 0s;
+  animation-iteration-count: 1;
+}
+#stcdx--help code > em {
+  color: var(--SmartThemeQuoteColor);
+}
+.mes[is_system="true"][ch_name="SillyTavern System"] .mes_text #stcdx--help br {
+  display: block;
+}
+#stcdx--help hr {
+  display: block;
+  margin: 4em 0;
+}
+#stcdx--help a[data-stcdx--href] {
+  cursor: pointer;
+}
+#stcdx--help a[data-stcdx--href]:hover {
+  text-decoration: dotted underline 1px orange;
+}
+#stcdx--help h1 > a[data-stcdx--href],
+#stcdx--help h2 > a[data-stcdx--href],
+#stcdx--help h3 > a[data-stcdx--href],
+#stcdx--help h4 > a[data-stcdx--href] {
+  cursor: pointer;
+  display: inline-block;
+  padding: 0 0.25em;
+}
+#stcdx--help h1 > a[data-stcdx--href]:hover,
+#stcdx--help h2 > a[data-stcdx--href]:hover,
+#stcdx--help h3 > a[data-stcdx--href]:hover,
+#stcdx--help h4 > a[data-stcdx--href]:hover {
+  filter: drop-shadow(0px 0px 3px orange);
+  -webkit-text-stroke: 1px;
+}

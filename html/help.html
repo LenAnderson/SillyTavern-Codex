@@ -1,0 +1,135 @@
+<div id="stcdx--help">
+	<h1 id="stcdx--help--%%TIMESTAMP%%">Codex</h1>
+	<p>
+		Codex will search all chat messages for matching World Info entries.<br>
+		If matching WI entries are found, the relevant words in the chat messages are highlighted and can be clicked to open
+		the corresponding WI entry next to the chat.<br>
+		Codex renders the WI entries just like chat messages, with full markdown and macro support. This means you can include
+		formatting, images, code blocks, links, and everything else that is supported in chat messages.<br>
+		In addition to regular WI entries, you can create <a data-stcdx--href="maps">maps</a> and
+		<a data-stcdx--href="charLists">character lists</a>.
+	</p>
+
+	<hr>
+
+	<h2 id="stcdx--help--keywords">
+		<a data-stcdx--href="%%TIMESTAMP%%">↑</a>
+		Special World Info Keywords
+	</h2>
+	<ul>
+		<li>
+			<code>codex:<q>text</q></code>
+			<p>Prefixed keyword. Only neccessary if <em>Only create links with codex: prefix</em> is enabled.</p>
+		</li>
+		<li>
+			<code>codex:<q>/regex/flags</q></code>
+			<p>Prefixed regex keyword. Only neccessary if <em>Only create links with codex: prefix</em> is enabled. Uses the provided regular expression to match the WI entry against text.</p>
+		</li>
+		<li>
+			<code><q>/regex/flags</q></code>
+			<p>Regex keyword. Uses the provided regular expression to match the WI entry against text.</p>
+		</li>
+		<li>
+			<code>codex-tpl:<q>templateName</q></code>
+			<p>Assigns a custom <a data-stcdx--href="templates">template</a> to a WI entry.</p>
+		</li>
+		<li>
+			<code>codex-title:<q>comment|key[0]|key[1]|...</q></code>
+			<p>Assigns which field of the WI entry to use as its title.</p>
+		</li>
+		<li>
+			<code>codex-skip:</code>
+			<p>WI entries with this key will be excluded from Codex.</p>
+		</li>
+		<li>
+			<code>codex-map:</code>
+			<p>WI entries with this key will be treated as a <a data-stcdx--href="maps">map</a>.</p>
+		</li>
+		<li>
+			<code>codex-chars:</code>
+			<p>WI entries with this key will be treated as a <a data-stcdx--href="charLists">character list</a>.</p>
+		</li>
+	</ul>
+
+	<hr>
+
+	<h2 id="stcdx--help--templates">
+		<a data-stcdx--href="%%TIMESTAMP%%">↑</a>
+		Templates
+	</h2>
+	<p>...</p>
+	<h3>Macros</h3>
+	<ul>
+		<li>
+			<code>{{comment}}</code>
+			<p>The WI entry's comment / title / memo</p>
+		</li>
+		<li>
+			<code>{{comment::url}}</code>
+			<p>The WI entry's comment / title / memo. Special characters are escaped for use in URLs (e.g., images or links).</p>
+		</li>
+		<li>
+			<code>{{content}}</code>
+			<p>The WI entry's content.</p>
+		</li>
+		<li>
+			<code>{{content::url}}</code>
+			<p>The WI entry's content. Special characters are escaped for use in URLs (e.g., images or links).</p>
+		</li>
+		<li>
+			<code>{{key[<q>n</q>]}}</code>
+			<p>The WI entry's <q>n-th</q> key (starting at 0).</p>
+		</li>
+		<li>
+			<code>{{key[<q>n</q>]::url}}</code>
+			<p>The WI entry's <q>n-th</q> key (starting at 0). Special characters are escaped for use in URLs (e.g., images or links).</p>
+		</li>
+		<li>
+			<code>{{title}}</code>
+			<p>The WI entry's title. If no <code>codex-title:</code> key is present, this defaults to either the comment (if less than 50 characters) or the keys, separated by a forward slash.</p>
+		</li>
+		<li>
+			<code>{{title::url}}</code>
+			<p>The WI entry's title. If no <code>codex-title:</code> key is present, this defaults to either the comment (if less than 50 characters) or the keys, separated by a forward slash. Special characters are escaped for use in URLs (e.g., images or links).</p>
+		</li>
+	</ul>
+
+	<hr>
+
+	<h2 id="stcdx--help--maps">
+		<a data-stcdx--href="%%TIMESTAMP%%">↑</a>
+		Maps
+	</h2>
+	<p>
+		Add the key <code>codex-map:</code> to an empty WI entry.<br>
+		Then open the entry in Codex and click on the edit button.
+	</p>
+	<h3>Zones</h3>
+	<p>...</p>
+	<h4>Macros</h4>
+	<ul>
+		<li>
+			<code>{{map}}</code>
+			<p>The map's WI entry's title.</p>
+		</li>
+		<li>
+			<code>{{zone}}</code>
+			<p>The zone's label.</p>
+		</li>
+		<li>
+			<code>{{zoom}}</code>
+			<p>Whether or not the map was zoomed / expanded / fullsceen while clicking. Either <code>true</code> or <code>false</code>.</p>
+		</li>
+	</ul>
+
+	<hr>
+
+	<h2 id="stcdx--help--charLists">
+		<a data-stcdx--href="%%TIMESTAMP%%">↑</a>
+		Character Lists
+	</h2>
+	<p>
+		Add the key <code>codex-chars:</code> to the WI entry.<br>
+		Put a list of names in the WI entry's content. Separate the names either with a comma or write one name per line.
+	</p>
+</div>
