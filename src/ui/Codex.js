@@ -154,6 +154,7 @@ export class Codex {
                 this.dom = root;
                 root.id = 'stcdx--codex';
                 root.classList.add('stcdx--root');
+                root.classList.add('stcdx--codex');
                 root.classList.add('draggable');
                 const head = document.createElement('div'); {
                     head.classList.add('stcdx--header');

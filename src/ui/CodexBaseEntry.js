@@ -103,6 +103,10 @@ export class CodexBaseEntry {
         this.dom = null;
     }
 
+    scroll(deltaY) {
+        this.dom.scrollTop += deltaY;
+    }
+
 
     async show() {
         await this.render();

@@ -1,10 +1,14 @@
 import { chat, messageFormatting, substituteParams } from '../../../../../script.js';
 import { uuidv4 } from '../../../../utils.js';
 
+// eslint-disable-next-line no-unused-vars
 import { Matcher } from './Matcher.js';
+// eslint-disable-next-line no-unused-vars
 import { ResultNode } from './ResultNode.js';
+// eslint-disable-next-line no-unused-vars
 import { Settings } from './Settings.js';
 import { log } from './lib/log.js';
+import { Tooltip } from './ui/Tooltip.js';
 
 
 
@@ -79,7 +83,8 @@ export class Linker {
                                 this.onShowCodex(match);
                             }
                         });
-                        //TODO codex link tooltip
+                        const tt = Tooltip.get(match.entry, this.settings, this.matcher, this);
+                        tt.addTrigger(el);
                         els.push(el);
                     }
                     idx = match.end;

@@ -27,6 +27,7 @@ export class CodexMap extends CodexBaseEntry {
 
     /**@type {MapEditor}*/ editor;
 
+    /**@type {HTMLElement}*/ zoneListDom;
     /**@type {HTMLElement}*/ zoomedMapContainer;
 
 
@@ -86,6 +87,11 @@ export class CodexMap extends CodexBaseEntry {
         return this.dom;
     }
 
+    scroll(deltaY) {
+        if (!this.zoneListDom) return;
+        this.zoneListDom.scrollTop += deltaY;
+    }
+
     async renderContent() {
         this.dom.innerHTML = '';
         const title = document.createElement('h2'); {
@@ -110,6 +116,7 @@ export class CodexMap extends CodexBaseEntry {
         }
 
         const zoneCont = document.createElement('div'); {
+            this.zoneListDom = zoneCont;
             zoneCont.classList.add('stcdx--zoneContainer');
             for (const zone of this.zoneList?.toSorted((a,b)=>(a.label ?? '').localeCompare(b.label ?? '')) ?? []) {
                 let entry;
