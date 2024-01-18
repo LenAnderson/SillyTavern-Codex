@@ -5,6 +5,7 @@ import { delay, isTrueBoolean } from '../../../../utils.js';
 import { CodexManager } from './CodexManager.js';
 import { warn } from './lib/log.js';
 import { waitForFrame } from './lib/wait.js';
+import { CodexMap } from './ui/CodexMap.js';
 
 
 
@@ -30,6 +31,16 @@ export class SlashCommandHandler {
         );
 
         registerSlashCommand(
+            'codex-map',
+            (args, value)=>this.handleCodexMap(args, value),
+            [],
+            '',
+            true,
+            true,
+        );
+
+
+        registerSlashCommand(
             'codex?',
             ()=>this.showHelp(),
             [],
@@ -37,7 +48,6 @@ export class SlashCommandHandler {
             true,
             true,
         );
-
         window.addEventListener('click', async(evt)=>{
             if (evt.target.hasAttribute && evt.target.hasAttribute('data-stcdx--href')) {
                 const mes = evt.target.closest('.mes_text');
@@ -90,6 +100,16 @@ export class SlashCommandHandler {
                     break;
                 }
             }
+        }
+    }
+
+
+    async handleCodexMap(args, value) {
+        const matches = this.matcher.findMatches(value);
+        if (matches.length > 0) {
+            const map = new CodexMap(matches[0].entry, this.manager.settings, this.matcher, this.manager.linker);
+            await map.render();
+            await map.renderZoom();
         }
     }
 

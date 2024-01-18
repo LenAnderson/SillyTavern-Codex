@@ -145,6 +145,7 @@ export class CodexMap extends CodexBaseEntry {
     }
 
     async renderZoom() {
+        let mapEl;
         const container = document.createElement('div'); {
             this.zoomedMapContainer = container;
             container.classList.add('stcdx--map-zoomed');
@@ -157,7 +158,7 @@ export class CodexMap extends CodexBaseEntry {
                 this.handleZoneClicked(zone, evt, true);
             };
             this.zoomedMap = map;
-            const mapEl = await map.render();
+            mapEl = await map.render();
             mapEl.addEventListener('click', async()=>{
                 await this.unrenderZoom();
                 container.remove();
@@ -166,12 +167,21 @@ export class CodexMap extends CodexBaseEntry {
         }
 
         const rect = this.map.mapCanvas.getBoundingClientRect();
-        this.zoomedMap.dom.style.top = `${rect.top}px`;
-        this.zoomedMap.dom.style.left = `${rect.left}px`;
-        this.zoomedMap.dom.style.width = `${rect.width}px`;
-        this.zoomedMap.dom.style.height = `${rect.height}px`;
-        document.body.append(container);
-        await waitForFrame();
+        if (rect.width == 0 || rect.height == 0) {
+            mapEl.style.transition = 'none';
+            document.body.append(container);
+            await waitForFrame();
+            this.zoomedMap.dom.style.left = '100vw';
+            await waitForFrame();
+            mapEl.style.transition = '';
+        } else {
+            this.zoomedMap.dom.style.top = `${rect.top}px`;
+            this.zoomedMap.dom.style.left = `${rect.left}px`;
+            this.zoomedMap.dom.style.width = `${rect.width}px`;
+            this.zoomedMap.dom.style.height = `${rect.height}px`;
+            document.body.append(container);
+            await waitForFrame();
+        }
         container.classList.add('stcdx--active');
         this.zoomedMap.dom.style.top = '';
         this.zoomedMap.dom.style.left = '';
@@ -182,10 +192,15 @@ export class CodexMap extends CodexBaseEntry {
 
     async unrenderZoom() {
         const rect = this.map.mapCanvas.getBoundingClientRect();
-        this.zoomedMap.dom.style.top = `${rect.top}px`;
-        this.zoomedMap.dom.style.left = `${rect.left}px`;
-        this.zoomedMap.dom.style.width = `${rect.width}px`;
-        this.zoomedMap.dom.style.height = `${rect.height}px`;
+        if (rect.width == 0 || rect.height == 0) {
+            const zr = this.zoomedMap.dom.getBoundingClientRect();
+            this.zoomedMap.dom.style.top = `${-zr.height}px`;
+        } else {
+            this.zoomedMap.dom.style.top = `${rect.top}px`;
+            this.zoomedMap.dom.style.left = `${rect.left}px`;
+            this.zoomedMap.dom.style.width = `${rect.width}px`;
+            this.zoomedMap.dom.style.height = `${rect.height}px`;
+        }
         this.zoomedMapContainer.classList.remove('stcdx--active');
         await delay(this.settings.zoomTime + 10);
         this.zoomedMapContainer.remove();
