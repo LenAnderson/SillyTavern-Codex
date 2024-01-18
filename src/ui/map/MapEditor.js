@@ -22,12 +22,15 @@ export class MapEditor extends MapBase {
     /**@type {Point}*/ hoverPoint;
     /**@type {Line}*/ hoverLine;
     /**@type {Point}*/ dragPoint;
+    /**@type {Point}*/ zoneDragPoint;
     /**@type {Point[]}*/ newPoly;
 
     /**@type {Boolean}*/ isDrawing = false;
     /**@type {Boolean}*/ isRectangling = false;
     /**@type {Point}*/ rectangleStart;
     /**@type {Boolean}*/ isDragging = false;
+    /**@type {Boolean}*/ isStartZoneDragging = false;
+    /**@type {Boolean}*/ isZoneDragging = false;
 
     /**@type {Function}*/ handleKeyDownBound;
     /**@type {Function}*/ handleKeyUpBound;
@@ -97,6 +100,7 @@ export class MapEditor extends MapBase {
                             'hold ctrl and click to draw a new zone',
                             'hold ctrl and shift and drag to create a new rectangular zone',
                             'click into a zone to edit a zone',
+                            'drag a zone to move a zone',
                             'hold alt and click into a zone to remove a zone',
                             'drag a point to move a point',
                             'click a line to add a point',
@@ -182,6 +186,21 @@ export class MapEditor extends MapBase {
             this.updateHover();
             return;
         }
+        if (this.isStartZoneDragging) {
+            if (!this.isZoneDragging) {
+                this.isZoneDragging = true;
+            }
+            const p = this.getPoint(evt);
+            const dx = this.zoneDragPoint.x - p.x;
+            const dy = this.zoneDragPoint.y - p.y;
+            for (const zp of this.zone.polygon) {
+                zp.x -= dx;
+                zp.y -= dy;
+            }
+            this.zoneDragPoint = p;
+            this.updateHover();
+            return;
+        }
         // handle hovering
         let needsUpdate = false;
         const p = this.getPoint(evt);
@@ -246,8 +265,14 @@ export class MapEditor extends MapBase {
             this.hoverLine = null;
             return;
         }
+        if (this.zone) {
+            this.isStartZoneDragging = true;
+            this.zoneDragPoint = this.getPoint(evt);
+            return;
+        }
     }
     async handlePointerUp(evt) {
+        log('UP');
         if (this.isDrawing && this.isRectangling && this.rectangleStart) {
             this.isDrawing = false;
             this.isRectangling = false;
@@ -267,8 +292,22 @@ export class MapEditor extends MapBase {
             this.save();
             return;
         }
+        if (this.isStartZoneDragging && !this.isZoneDragging) {
+            this.isStartZoneDragging = false;
+            return;
+        }
+        if (this.isZoneDragging) {
+            this.isZoneDragging = false;
+            this.isStartZoneDragging = false;
+            this.zoneDragPoint = null;
+            window.addEventListener('click', (evt)=>evt.stopPropagation(), { capture:true, once:true });
+            this.updateHover();
+            this.save();
+            return;
+        }
     }
     async handleClick(evt) {
+        log('CLICK');
         if (this.isDrawing) {
             const p = this.getPoint(evt);
             this.newPoly.push(p);
