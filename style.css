@@ -20,6 +20,7 @@
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
+  gap: 1em;
   height: 100%;
 }
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(#stcdx--map-description),
@@ -52,12 +53,37 @@
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--zone-description {
   flex: 1 1 auto;
 }
+#shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(input[type="checkbox"]),
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(input[type="checkbox"]),
+#shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]),
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]) {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  align-items: baseline;
+  justify-content: center;
+}
+#shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after,
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after,
+#shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after,
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after {
+  content: ": ";
+}
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor .stcdx--inputs,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor .stcdx--inputs,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor .stcdx--inputs,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor .stcdx--inputs {
   display: flex;
   align-items: baseline;
+}
+#shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor .stcdx--hoverSettings,
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor .stcdx--hoverSettings,
+#shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor .stcdx--hoverSettings,
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor .stcdx--hoverSettings {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  justify-content: space-evenly;
 }
 #stcdx--settings .stcdx--templatesContainer {
   flex: 1 1 auto;

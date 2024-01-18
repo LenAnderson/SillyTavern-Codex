@@ -21,6 +21,7 @@
 			display: flex;
 			flex-direction: column;
 			flex: 1 1 auto;
+			gap: 1em;
 			height: 100%;
 			> label:has(#stcdx--map-description), > label:has(#stcdx--zone-description) {
 				flex: 1 1 auto;
@@ -30,9 +31,26 @@
 					flex: 1 1 auto;
 				}
 			}
+			> label:has(input[type="checkbox"]) {
+				display: flex;
+				flex-direction: row;
+				gap: 1em;
+				align-items: baseline;
+				justify-content: center;
+				> .stcdx--labelText:after {
+					content: ": ";
+				}
+			}
 			.stcdx--inputs {
 				display: flex;
 				align-items: baseline;
+			}
+
+			.stcdx--hoverSettings {
+				display: flex;
+				flex-direction: row;
+				gap: 0.5em;
+				justify-content: space-evenly;
 			}
 		}
 	}

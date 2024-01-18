@@ -26,25 +26,27 @@
 		<span class="stcdx--labelText">Keep zoomed <small>(don't close zoomed map on click)</small></span>
 		<input type="checkbox" class="text_pole" id="stcdx--zone-keepZoomed">
 	</label>
-	<div class="stcdx--overrideContainer">
-		<span class="stcdx--labelText">Override zoom (hover) [%]</span>
-		<div class="stcdx--inputs">
-			<input type="checkbox" id="stcdx--zone-overrideZoom">
-			<input type="number" class="text_pole" id="stcdx--zone-zoom" min="0">
+	<div class="stcdx--hoverSettings">
+		<div class="stcdx--overrideContainer">
+			<span class="stcdx--labelText">Override zoom (hover) [%]</span>
+			<div class="stcdx--inputs">
+				<input type="checkbox" id="stcdx--zone-overrideZoom" title="Enable override">
+				<input type="number" class="text_pole" id="stcdx--zone-zoom" min="0">
+			</div>
 		</div>
-	</div>
-	<div class="stcdx--overrideContainer">
-		<span class="stcdx--labelText">Override shadow strength (hover) [px]</span>
-		<div class="stcdx--inputs">
-			<input type="checkbox" id="stcdx--zone-overrideShadow">
-			<input type="number" class="text_pole" id="stcdx--zone-shadow" min="0">
+		<div class="stcdx--overrideContainer">
+			<span class="stcdx--labelText">Override shadow strength (hover) [px]</span>
+			<div class="stcdx--inputs">
+				<input type="checkbox" id="stcdx--zone-overrideShadow" title="Enable override">
+				<input type="number" class="text_pole" id="stcdx--zone-shadow" min="0">
+			</div>
 		</div>
-	</div>
-	<div class="stcdx--overrideContainer">
-		<span class="stcdx--labelText">Override shadow color (hover)</span>
-		<div class="stcdx--inputs">
-			<input type="checkbox" id="stcdx--zone-overrideShadowColor">
-			<toolcool-color-picker id="stcdx--zone-shadowColor"></toolcool-color-picker>
+		<div class="stcdx--overrideContainer">
+			<span class="stcdx--labelText">Override shadow color (hover)</span>
+			<div class="stcdx--inputs">
+				<input type="checkbox" id="stcdx--zone-overrideShadowColor" title="Enable override">
+				<toolcool-color-picker id="stcdx--zone-shadowColor"></toolcool-color-picker>
+			</div>
 		</div>
 	</div>
 	<label>
