@@ -1,9 +1,10 @@
-// eslint-disable-next-line no-unused-vars
 import { log } from '../../lib/log.js';
+// eslint-disable-next-line no-unused-vars
 import { CodexMap } from '../CodexMap.js';
 import { Line } from './Line.js';
 import { MapBase } from './MapBase.js';
 import { MapDetailsEditor } from './MapDetailsEditor.js';
+import { Painter } from './Painter/Painter.js';
 // eslint-disable-next-line no-unused-vars
 import { Point } from './Point.js';
 import { Zone } from './Zone.js';
@@ -15,7 +16,10 @@ import { ZoneEditor } from './ZoneEditor.js';
 export class MapEditor extends MapBase {
     /**@type {CodexMap}*/ codexMap;
 
+    /**@type {Painter}*/ painter;
+
     /**@type {HTMLElement}*/ editorDom;
+    /**@type {HTMLElement}*/ painterControls;
 
     /**@type {Function}*/ resolver;
 
@@ -42,7 +46,7 @@ export class MapEditor extends MapBase {
      * @param {CodexMap} codexMap
      */
     constructor(codexMap) {
-        super(codexMap.settings, codexMap.image, codexMap.zoneList);
+        super(codexMap.settings, codexMap.image, codexMap.zoneList, codexMap.paintList);
         this.codexMap = codexMap;
         this.handleKeyDownBound = this.handleKeyDown.bind(this);
         this.handleKeyUpBound = this.handleKeyUp.bind(this);
@@ -88,6 +92,11 @@ export class MapEditor extends MapBase {
                 root.classList.add('stcdx--mapEditor');
                 const menu = document.createElement('div'); {
                     menu.classList.add('stcdx--menu');
+                    const painterControls = document.createElement('div'); {
+                        this.painterControls = painterControls;
+                        painterControls.classList.add('stcdx--painterControls');
+                        menu.append(painterControls);
+                    }
                     const title = document.createElement('div'); {
                         title.classList.add('stcdx--title');
                         title.textContent = `${this.codexMap.entry.book}: ${this.codexMap.entry.title}`;
@@ -116,6 +125,18 @@ export class MapEditor extends MapBase {
                     }
                     const actions = document.createElement('div'); {
                         actions.classList.add('stcdx--actions');
+                        const paint = document.createElement('div'); {
+                            paint.classList.add('stcdx--painter');
+                            paint.classList.add('menu_button');
+                            paint.classList.add('menu_button_icon');
+                            paint.classList.add('fa-solid');
+                            paint.classList.add('fa-paintbrush');
+                            paint.title = 'Draw on the map';
+                            paint.addEventListener('click', ()=>{
+                                this.launchPainter();
+                            });
+                            actions.append(paint);
+                        }
                         const dets = document.createElement('div'); {
                             dets.classList.add('stcdx--details');
                             dets.classList.add('menu_button');
@@ -440,12 +461,14 @@ export class MapEditor extends MapBase {
         await editor.show();
         await this.refreshMap();
         await this.save();
+        this.updateHover();
     }
     async editDetails() {
         const editor = new MapDetailsEditor(this.codexMap);
         await editor.show();
         await this.refreshMap();
         await this.save();
+        this.updateHover();
     }
     async refreshMap() {
         this.image = await this.codexMap.fetchImage();
@@ -477,5 +500,30 @@ export class MapEditor extends MapBase {
             document.body.append(await this.render());
             await this.updateHover();
         });
+    }
+
+
+
+
+    async launchPainter() {
+        if (this.editorDom.classList.contains('stcdx--isPainting')) {
+            await this.refreshMap();
+            this.paintList = [];
+            this.codexMap.paintList = [];
+            for (const layer of this.painter.layerList) {
+                const data = layer.canvas.toDataURL();
+                this.paintList.push(data);
+                this.codexMap.paintList.push(data);
+            }
+            this.painter.unrender();
+            await this.rerenderPaint();
+            await this.save();
+            this.updateHover();
+        } else {
+            const painter = new Painter(this.dom, this.painterControls, this.mapCanvas.width, this.mapCanvas.height, this.paintList);
+            await painter.render();
+            this.painter = painter;
+        }
+        this.editorDom.classList.toggle('stcdx--isPainting');
     }
 }

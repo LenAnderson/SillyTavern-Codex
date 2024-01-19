@@ -22,6 +22,10 @@ export class Map extends MapBase {
     async render() {
         const hadDom = this.dom;
         await super.render();
+        for (const paintCanvas of this.paintCanvasList) {
+            this.mapContext.drawImage(paintCanvas, 0, 0);
+            paintCanvas.remove();
+        }
         if (!hadDom) {
             log('DID NOT HAVE DOM');
             for (const zone of this.zoneList) {
@@ -102,7 +106,7 @@ export class Map extends MapBase {
                 }
                 con.closePath();
                 con.clip();
-                con.drawImage(this.image, 0, 0);
+                con.drawImage(this.mapCanvas, 0, 0);
                 con.restore();
             }
             const cx = (zone.polygon.reduce((max,p)=>Math.max(max,p.x),0) - zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width)) / 2 + zone.polygon.reduce((min,p)=>Math.min(min,p.x),canvas.width);

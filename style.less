@@ -335,7 +335,7 @@
 				&:hover {
 					filter: drop-shadow(0 0 6px rgba(0 0 0 / 1));
 				}
-				> .stcdx--map, > .stcdx--hover {
+				> .stcdx--map, .stcdx--paint, > .stcdx--hover {
 					max-height: 50vh;
 				}
 			}
@@ -435,7 +435,7 @@
 		height: 100vh;
 		width: 100vw;
 		transition: calc(1ms * var(--stcdx--zoomTime));
-		> .stcdx--map, > .stcdx--hover {
+		> .stcdx--map, > .stcdx--paint, > .stcdx--hover {
 			position: absolute;
 			inset: 0;
 			max-height: 100%;
@@ -449,7 +449,12 @@
 .stcdx--mapContainer {
 	display: grid;
 	> .stcdx--map,
-	> .stcdx--hover {
+	> .stcdx--paint,
+	> .stcdx--hover,
+	> .stcdx--painter-canvas,
+	> .stcdx--painter-layer,
+	> .stcdx--painter-inputCanvas
+	{
 		grid-column: 1;
 		grid-row: 1;
 		max-width: 100%;
@@ -460,6 +465,12 @@
 		filter: saturate(calc(1 - var(--stcdx--mapDesaturate) / 100));
 
 		&.stcdx--map {}
+
+		&.stcdx--paint,
+		&.stcdx--painter-layer
+		{
+			pointer-events: none;
+		}
 
 		&.stcdx--hover {
 			pointer-events: none;
@@ -490,16 +501,163 @@
 	position: fixed;
 	inset: 0;
 	z-index: 9999;
+
+	&.stcdx--isPainting {
+		> .stcdx--menu {
+			> .stcdx--hintList {
+				display: none;
+			}
+			> .stcdx--actions {
+				> .stcdx--details,
+				> .stcdx--close
+				{
+					display: none;
+				}
+			}
+		}
+		.stcdx--mapContainer > .stcdx--paint { display: none; }
+	}
 	> .stcdx--menu {
 		display: flex;
 		flex-direction: row;
 		gap: 0.5em;
-		align-items: baseline;
+		align-items: center;
 		justify-content: end;
 		background-color: var(--greyCAIbg);
 		box-shadow: 0 0 6px rgba(0 0 0 / 0.5);
 		height: 2em;
 		position: relative;
+		z-index: 1;
+
+		> .stcdx--painterControls {
+			flex: 0 0 auto;
+			display: flex;
+			flex-direction: row;
+			gap: 1em;
+			margin-left: 1em;
+			> .stcdx--painter-group {
+				display: flex;
+				flex-direction: row;
+				gap: 0.25em;
+				> * {
+					height: 2em;
+					width: 2em;
+					background-position: center;
+					background-repeat: no-repeat;
+					border: 1px solid var(--SmartThemeBorderColor);
+					opacity: 0.5;
+					transition: 200ms;
+					&:hover {
+						opacity: 1;
+					}
+					&.stcdx--active {
+						background-color: whitesmoke;
+					}
+
+					&.stcdx--painter-layers { background-image: url(img/tools-layers-21.png); }
+					&.stcdx--painter-undo { background-image: url(img/tools-undo-21.png); }
+					&.stcdx--painter-redo { background-image: url(img/tools-redo-21.png); }
+					&.stcdx--painter-clear { background-image: url(img/tools-clear-21.png); }
+					&.stcdx--painter-pencil { background-image: url(img/tools-pencil-21.png); }
+					&.stcdx--painter-brush { background-image: url(img/tools-brush-21.png); }
+					&.stcdx--painter-rectangle { background-image: url(img/tools-rectangle-21.png); }
+					&.stcdx--painter-oval { background-image: url(img/tools-oval-21.png); }
+					&.stcdx--painter-line { background-image: url(img/tools-line-21.png); }
+					&.stcdx--painter-smoothing-radius { background-image: url(img/smoothing-radius-21.png); }
+					&.stcdx--painter-smoothing-catchup { background-image: url(img/smoothing-catchup-21.png); }
+
+					&.stcdx--painter-layers {
+						&.stcdx--active {
+							opacity: 1;
+							> .stcdx--painter-layerPanel {
+								display: block;
+							}
+						}
+						> .stcdx--painter-layerPanel {
+							background-color: var(--SmartThemeBotMesBlurTintColor);
+							border: 1px solid var(--SmartThemeBorderColor);
+							backdrop-filter: blur(var(--SmartThemeBlurStrength));
+							border-radius: 10px;
+							position: absolute;
+							top: 100%;
+							left: 0;
+							overflow: auto;
+							margin: 0;
+							padding: 0.5em;
+							max-height: 90vh;
+							list-style: none;
+							z-index: 10;
+							min-width: 100px;
+							display: none;
+
+							> .stcdx--painter-add {
+								font-weight: bold;
+								font-size: 2em;
+								line-height: 1;
+								opacity: 0.5;
+								transition: 200ms;
+								cursor: pointer;
+								text-align: center;
+								&:hover {
+									opacity: 1;
+								}
+							}
+
+							> .stcdx--painter-layerTrigger {
+								display: flex;
+								flex-direction: row;
+								gap: 1em;
+								padding: 0.5em;
+								&.stcdx--active {
+									background-color: var(--greyCAIbg);
+								}
+								> .stcdx--painter-title {
+									cursor: pointer;
+								}
+								> .stcdx--painter-actions {
+									display: flex;
+									flex-direction: row;
+									gap: 0.5em;
+									> .stcdx--painter-action {
+										width: 2em;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			> .stcdx--painter-colors {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+				grid-template-rows: 1fr 1fr;
+				> .stcdx--painter-swatch {
+					border: 1px solid var(--SmartThemeBorderColor);
+					height: 1em;
+					width: 1em;
+				}
+			}
+			> .stcdx--painter-width {
+				display: flex;
+				align-items: center;
+				height: 2em;
+				overflow: hidden;
+				> .stcdx--painter-widthDisplayContainer {
+					flex: 0 0 auto;
+					width: 100px;
+					height: 2em;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					> .stcdx--painter-widthDisplay {
+						border-radius: 50%;
+						height: calc(attr(data-stcdx--value) * 1px);
+						width: calc(attr(data-stcdx--value) * 1px);
+						background-color: var(--SmartThemeBodyColor);
+					}
+				}
+			}
+		}
 
 		> .stcdx--title {
 			flex: 1 1 auto;
@@ -545,13 +703,27 @@
 		height: 100%;
 		width: 100%;
 		> .stcdx--map,
-		> .stcdx--hover
+		> .stcdx--paint,
+		> .stcdx--hover,
+		> .stcdx--painter-canvas,
+		> .stcdx--painter-layer,
+		> .stcdx--painter-inputCanvas
 		{
 			max-height: 100%;
 			inset: 0;
 			position: absolute;
 			filter: none;
 			opacity: 1;
+
+			&.stcdx--hover {
+				z-index: 2;
+			}
+
+			&.stcdx--painter-layer {
+				&.stcdx--painter-isHidden {
+					display: none;
+				}
+			}
 		}
 	}
 }

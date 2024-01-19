@@ -13,6 +13,7 @@ import { Zone } from './map/Zone.js';
 
 export class CodexMap extends CodexBaseEntry {
     /**@type {String}*/ url;
+    /**@type {String[]}*/ paintList = [];
     /**@type {String}*/ description;
     /**@type {String}*/ command;
     /**@type {String}*/ qrSet;
@@ -37,6 +38,7 @@ export class CodexMap extends CodexBaseEntry {
         super(entry, settings, matcher, linker);
         const data = JSON.parse(entry.content || '{}');
         this.url = tryDecodeBase64(data.url);
+        this.paintList = data.paintList ?? [];
         this.description = tryDecodeBase64(data.description);
         this.command = tryDecodeBase64(data.command);
         this.qrSet = tryDecodeBase64(data.qrSet);
@@ -47,6 +49,7 @@ export class CodexMap extends CodexBaseEntry {
     async save() {
         this.entry.content = JSON.stringify({
             url: btoa(this.url ?? ''),
+            paintList: this.paintList,
             description: btoa(this.description ?? ''),
             command: btoa(this.command ?? ''),
             qrSet: btoa(this.qrSet ?? ''),
@@ -103,7 +106,7 @@ export class CodexMap extends CodexBaseEntry {
             this.dom.append(title);
         }
 
-        const map = new Map(this.settings, await this.fetchImage(), this.zoneList); {
+        const map = new Map(this.settings, await this.fetchImage(), this.zoneList, this.paintList); {
             //TODO map listeners (click, context, hover)
             map.onZoneClick = (zone, evt) => this.handleZoneClicked(zone, evt, false);
             map.onZoneHover = (zone, evt) => this.handleZoneHovered(zone, evt);
@@ -156,7 +159,7 @@ export class CodexMap extends CodexBaseEntry {
         const container = document.createElement('div'); {
             this.zoomedMapContainer = container;
             container.classList.add('stcdx--map-zoomed');
-            const map = new Map(this.settings, await this.fetchImage(), this.zoneList);
+            const map = new Map(this.settings, await this.fetchImage(), this.zoneList, this.paintList);
             //TODO map listeners (click, context, hover)
             map.onZoneClick = async(zone, evt) => {
                 if (!zone.keepZoomed) {

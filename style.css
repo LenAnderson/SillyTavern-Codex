@@ -333,6 +333,7 @@
   filter: drop-shadow(0 0 6px rgba(0 0 0 / 1));
 }
 .stcdx--root > .stcdx--content.stcdx--map > .stcdx--mapContainer > .stcdx--map,
+.stcdx--root > .stcdx--content.stcdx--map > .stcdx--mapContainer .stcdx--paint,
 .stcdx--root > .stcdx--content.stcdx--map > .stcdx--mapContainer > .stcdx--hover {
   max-height: 50vh;
 }
@@ -422,6 +423,7 @@
   transition: calc(1ms * var(--stcdx--zoomTime));
 }
 .stcdx--map-zoomed > .stcdx--mapContainer > .stcdx--map,
+.stcdx--map-zoomed > .stcdx--mapContainer > .stcdx--paint,
 .stcdx--map-zoomed > .stcdx--mapContainer > .stcdx--hover {
   position: absolute;
   inset: 0;
@@ -431,7 +433,11 @@
   display: grid;
 }
 .stcdx--mapContainer > .stcdx--map,
-.stcdx--mapContainer > .stcdx--hover {
+.stcdx--mapContainer > .stcdx--paint,
+.stcdx--mapContainer > .stcdx--hover,
+.stcdx--mapContainer > .stcdx--painter-canvas,
+.stcdx--mapContainer > .stcdx--painter-layer,
+.stcdx--mapContainer > .stcdx--painter-inputCanvas {
   grid-column: 1;
   grid-row: 1;
   max-width: 100%;
@@ -441,23 +447,53 @@
   z-index: 1;
   filter: saturate(calc(1 - var(--stcdx--mapDesaturate) / 100));
 }
+.stcdx--mapContainer > .stcdx--map.stcdx--paint,
+.stcdx--mapContainer > .stcdx--paint.stcdx--paint,
+.stcdx--mapContainer > .stcdx--hover.stcdx--paint,
+.stcdx--mapContainer > .stcdx--painter-canvas.stcdx--paint,
+.stcdx--mapContainer > .stcdx--painter-layer.stcdx--paint,
+.stcdx--mapContainer > .stcdx--painter-inputCanvas.stcdx--paint,
+.stcdx--mapContainer > .stcdx--map.stcdx--painter-layer,
+.stcdx--mapContainer > .stcdx--paint.stcdx--painter-layer,
+.stcdx--mapContainer > .stcdx--hover.stcdx--painter-layer,
+.stcdx--mapContainer > .stcdx--painter-canvas.stcdx--painter-layer,
+.stcdx--mapContainer > .stcdx--painter-layer.stcdx--painter-layer,
+.stcdx--mapContainer > .stcdx--painter-inputCanvas.stcdx--painter-layer {
+  pointer-events: none;
+}
 .stcdx--mapContainer > .stcdx--map.stcdx--hover,
-.stcdx--mapContainer > .stcdx--hover.stcdx--hover {
+.stcdx--mapContainer > .stcdx--paint.stcdx--hover,
+.stcdx--mapContainer > .stcdx--hover.stcdx--hover,
+.stcdx--mapContainer > .stcdx--painter-canvas.stcdx--hover,
+.stcdx--mapContainer > .stcdx--painter-layer.stcdx--hover,
+.stcdx--mapContainer > .stcdx--painter-inputCanvas.stcdx--hover {
   pointer-events: none;
   transition: opacity calc(1ms * var(--stcdx--mapZoneZoomTime)), transform calc(1ms * var(--stcdx--mapZoneZoomTime)), filter calc(1ms * var(--stcdx--mapZoneZoomTime));
 }
 .stcdx--mapContainer > .stcdx--map.stcdx--hover.stcdx--fade,
-.stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--fade {
+.stcdx--mapContainer > .stcdx--paint.stcdx--hover.stcdx--fade,
+.stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--fade,
+.stcdx--mapContainer > .stcdx--painter-canvas.stcdx--hover.stcdx--fade,
+.stcdx--mapContainer > .stcdx--painter-layer.stcdx--hover.stcdx--fade,
+.stcdx--mapContainer > .stcdx--painter-inputCanvas.stcdx--hover.stcdx--fade {
   opacity: 0;
 }
 .stcdx--mapContainer > .stcdx--map.stcdx--hover.stcdx--hovered,
-.stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--hovered {
+.stcdx--mapContainer > .stcdx--paint.stcdx--hover.stcdx--hovered,
+.stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--hovered,
+.stcdx--mapContainer > .stcdx--painter-canvas.stcdx--hover.stcdx--hovered,
+.stcdx--mapContainer > .stcdx--painter-layer.stcdx--hover.stcdx--hovered,
+.stcdx--mapContainer > .stcdx--painter-inputCanvas.stcdx--hover.stcdx--hovered {
   transform: scale(calc(1 + var(--stcdx--mapZoom) / 100));
   filter: saturate(1) drop-shadow(0 0 calc(1px * var(--stcdx--mapShadow)) var(--stcdx--mapShadowColor));
   z-index: 2;
 }
 .stcdx--mapContainer > .stcdx--map.stcdx--hover.stcdx--hovered.stcdx--fade,
-.stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--hovered.stcdx--fade {
+.stcdx--mapContainer > .stcdx--paint.stcdx--hover.stcdx--hovered.stcdx--fade,
+.stcdx--mapContainer > .stcdx--hover.stcdx--hover.stcdx--hovered.stcdx--fade,
+.stcdx--mapContainer > .stcdx--painter-canvas.stcdx--hover.stcdx--hovered.stcdx--fade,
+.stcdx--mapContainer > .stcdx--painter-layer.stcdx--hover.stcdx--hovered.stcdx--fade,
+.stcdx--mapContainer > .stcdx--painter-inputCanvas.stcdx--hover.stcdx--hovered.stcdx--fade {
   opacity: 1;
 }
 .stcdx--mapEditor {
@@ -468,16 +504,172 @@
   inset: 0;
   z-index: 9999;
 }
+.stcdx--mapEditor.stcdx--isPainting > .stcdx--menu > .stcdx--hintList {
+  display: none;
+}
+.stcdx--mapEditor.stcdx--isPainting > .stcdx--menu > .stcdx--actions > .stcdx--details,
+.stcdx--mapEditor.stcdx--isPainting > .stcdx--menu > .stcdx--actions > .stcdx--close {
+  display: none;
+}
+.stcdx--mapEditor.stcdx--isPainting .stcdx--mapContainer > .stcdx--paint {
+  display: none;
+}
 .stcdx--mapEditor > .stcdx--menu {
   display: flex;
   flex-direction: row;
   gap: 0.5em;
-  align-items: baseline;
+  align-items: center;
   justify-content: end;
   background-color: var(--greyCAIbg);
   box-shadow: 0 0 6px rgba(0 0 0 / 0.5);
   height: 2em;
   position: relative;
+  z-index: 1;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  margin-left: 1em;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25em;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > * {
+  height: 2em;
+  width: 2em;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 1px solid var(--SmartThemeBorderColor);
+  opacity: 0.5;
+  transition: 200ms;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *:hover {
+  opacity: 1;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--active {
+  background-color: whitesmoke;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers {
+  background-image: url(img/tools-layers-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-undo {
+  background-image: url(img/tools-undo-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-redo {
+  background-image: url(img/tools-redo-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-clear {
+  background-image: url(img/tools-clear-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-pencil {
+  background-image: url(img/tools-pencil-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-brush {
+  background-image: url(img/tools-brush-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-rectangle {
+  background-image: url(img/tools-rectangle-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-oval {
+  background-image: url(img/tools-oval-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-line {
+  background-image: url(img/tools-line-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-smoothing-radius {
+  background-image: url(img/smoothing-radius-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-smoothing-catchup {
+  background-image: url(img/smoothing-catchup-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers.stcdx--active {
+  opacity: 1;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers.stcdx--active > .stcdx--painter-layerPanel {
+  display: block;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel {
+  background-color: var(--SmartThemeBotMesBlurTintColor);
+  border: 1px solid var(--SmartThemeBorderColor);
+  backdrop-filter: blur(var(--SmartThemeBlurStrength));
+  border-radius: 10px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  overflow: auto;
+  margin: 0;
+  padding: 0.5em;
+  max-height: 90vh;
+  list-style: none;
+  z-index: 10;
+  min-width: 100px;
+  display: none;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-add {
+  font-weight: bold;
+  font-size: 2em;
+  line-height: 1;
+  opacity: 0.5;
+  transition: 200ms;
+  cursor: pointer;
+  text-align: center;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-add:hover {
+  opacity: 1;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  padding: 0.5em;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger.stcdx--active {
+  background-color: var(--greyCAIbg);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger > .stcdx--painter-title {
+  cursor: pointer;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger > .stcdx--painter-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger > .stcdx--painter-actions > .stcdx--painter-action {
+  width: 2em;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-colors {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-colors > .stcdx--painter-swatch {
+  border: 1px solid var(--SmartThemeBorderColor);
+  height: 1em;
+  width: 1em;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-width {
+  display: flex;
+  align-items: center;
+  height: 2em;
+  overflow: hidden;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-width > .stcdx--painter-widthDisplayContainer {
+  flex: 0 0 auto;
+  width: 100px;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-width > .stcdx--painter-widthDisplayContainer > .stcdx--painter-widthDisplay {
+  border-radius: 50%;
+  height: calc(attr(data-stcdx--value) * 1px);
+  width: calc(attr(data-stcdx--value) * 1px);
+  background-color: var(--SmartThemeBodyColor);
 }
 .stcdx--mapEditor > .stcdx--menu > .stcdx--title {
   flex: 1 1 auto;
@@ -522,12 +714,32 @@
   width: 100%;
 }
 .stcdx--mapEditor > .stcdx--mapContainer > .stcdx--map,
-.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--hover {
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--paint,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--hover,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-canvas,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-layer,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-inputCanvas {
   max-height: 100%;
   inset: 0;
   position: absolute;
   filter: none;
   opacity: 1;
+}
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--map.stcdx--hover,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--paint.stcdx--hover,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--hover.stcdx--hover,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-canvas.stcdx--hover,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-layer.stcdx--hover,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-inputCanvas.stcdx--hover {
+  z-index: 2;
+}
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--map.stcdx--painter-layer.stcdx--painter-isHidden,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--paint.stcdx--painter-layer.stcdx--painter-isHidden,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--hover.stcdx--painter-layer.stcdx--painter-isHidden,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-canvas.stcdx--painter-layer.stcdx--painter-isHidden,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-layer.stcdx--painter-layer.stcdx--painter-isHidden,
+.stcdx--mapEditor > .stcdx--mapContainer > .stcdx--painter-inputCanvas.stcdx--painter-layer.stcdx--painter-isHidden {
+  display: none;
 }
 .stcdx--tooltip {
   pointer-events: none;

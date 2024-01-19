@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import { Settings } from '../../Settings.js';
+import { warn } from '../../lib/log.js';
 import { Point } from './Point.js';
 // eslint-disable-next-line no-unused-vars
 import { Zone } from './Zone.js';
@@ -11,6 +12,7 @@ export class MapBase {
     /**@type {Settings}*/ settings;
     /**@type {HTMLImageElement}*/ image;
     /**@type {Zone[]}*/ zoneList;
+    /**@type {String[]}*/ paintList = [];
 
     /**@type {Zone}*/ zone;
 
@@ -18,16 +20,19 @@ export class MapBase {
 
     /**@type {HTMLCanvasElement}*/ mapCanvas;
     /**@type {HTMLCanvasElement}*/ hoverCanvas;
+    /**@type {HTMLCanvasElement[]}*/ paintCanvasList = [];
     /**@type {CanvasRenderingContext2D}*/ mapContext;
     /**@type {CanvasRenderingContext2D}*/ hoverContext;
+    /**@type {CanvasRenderingContext2D[]}*/ paintContextList = [];
 
 
 
 
-    constructor(settings, image, zoneList) {
+    constructor(settings, image, zoneList, paintList = []) {
         this.settings = settings;
         this.image = image;
         this.zoneList = zoneList;
+        this.paintList = paintList;
         zoneList.forEach(it=>it.init());
     }
 
@@ -117,34 +122,72 @@ export class MapBase {
 
 
     async render() {
-        const mapCont = document.createElement('div'); {
-            this.dom = mapCont;
-            mapCont.classList.add('stcdx--mapContainer');
-            const canvas = document.createElement('canvas'); {
-                this.mapCanvas = canvas;
-                canvas.classList.add('stcdx--map');
-                canvas.width = this.image.naturalWidth;
-                canvas.height = this.image.naturalHeight;
-                this.mapContext = canvas.getContext('2d');
-                this.mapContext.drawImage(this.image, 0, 0);
-                canvas.addEventListener('selectstart', (evt)=>evt.preventDefault());
-                canvas.addEventListener('pointermove', (evt)=>this.handleMove(evt));
-                canvas.addEventListener('pointerdown', (evt)=>this.handlePointerDown(evt));
-                canvas.addEventListener('pointerup', (evt)=>this.handlePointerUp(evt));
-                canvas.addEventListener('click', (evt)=>this.handleClick(evt));
-                canvas.addEventListener('contextmenu', (evt)=>this.handleContext(evt));
-                mapCont.append(canvas);
-            }
-            const hover = document.createElement('canvas'); {
-                this.hoverCanvas = hover;
-                hover.classList.add('stcdx--hover');
-                hover.width = this.image.naturalWidth;
-                hover.height = this.image.naturalHeight;
-                this.hoverContext = hover.getContext('2d');
-                mapCont.append(hover);
+        if (!this.dom) {
+            const mapCont = document.createElement('div'); {
+                this.dom = mapCont;
+                mapCont.classList.add('stcdx--mapContainer');
+                const canvas = document.createElement('canvas'); {
+                    this.mapCanvas = canvas;
+                    canvas.classList.add('stcdx--map');
+                    canvas.width = this.image.naturalWidth;
+                    canvas.height = this.image.naturalHeight;
+                    this.mapContext = canvas.getContext('2d');
+                    this.mapContext.drawImage(this.image, 0, 0);
+                    canvas.addEventListener('selectstart', (evt)=>evt.preventDefault());
+                    canvas.addEventListener('pointermove', (evt)=>this.handleMove(evt));
+                    canvas.addEventListener('pointerdown', (evt)=>this.handlePointerDown(evt));
+                    canvas.addEventListener('pointerup', (evt)=>this.handlePointerUp(evt));
+                    canvas.addEventListener('click', (evt)=>this.handleClick(evt));
+                    canvas.addEventListener('contextmenu', (evt)=>this.handleContext(evt));
+                    mapCont.append(canvas);
+                }
+                await this.renderPaint();
+                const hover = document.createElement('canvas'); {
+                    this.hoverCanvas = hover;
+                    hover.classList.add('stcdx--hover');
+                    hover.width = this.image.naturalWidth;
+                    hover.height = this.image.naturalHeight;
+                    this.hoverContext = hover.getContext('2d');
+                    mapCont.append(hover);
+                }
             }
         }
         return this.dom;
+    }
+
+    async rerenderPaint() {
+        while (this.paintCanvasList.length > 0) {
+            const pc = this.paintCanvasList.pop();
+            pc.remove();
+        }
+        await this.renderPaint();
+    }
+    async renderPaint() {
+        for (const p of this.paintList) {
+            const paint = document.createElement('canvas'); {
+                this.paintCanvasList.push(paint);
+                paint.classList.add('stcdx--paint');
+                paint.width = this.image.naturalWidth;
+                paint.height = this.image.naturalHeight;
+                const con = paint.getContext('2d');
+                this.paintContextList.push(con);
+                if (p) {
+                    try {
+                        const img = new Image();
+                        await new Promise(resolve=>{
+                            img.addEventListener('load', resolve);
+                            img.addEventListener('error', resolve);
+                            img.src = p;
+                            if (img.complete) resolve();
+                        });
+                        con.drawImage(img, 0, 0);
+                    } catch (ex) {
+                        warn('PAINT FAILED', ex);
+                    }
+                }
+                this.dom.append(paint);
+            }
+        }
     }
 
 
