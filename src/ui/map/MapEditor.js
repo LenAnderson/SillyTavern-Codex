@@ -29,6 +29,7 @@ export class MapEditor extends MapBase {
     /**@type {Point}*/ zoneDragPoint;
     /**@type {Point[]}*/ newPoly;
 
+    /**@type {Boolean}*/ isPainting = false;
     /**@type {Boolean}*/ isDrawing = false;
     /**@type {Boolean}*/ isRectangling = false;
     /**@type {Point}*/ rectangleStart;
@@ -185,6 +186,7 @@ export class MapEditor extends MapBase {
 
 
     async handleMove(evt) {
+        if (this.isPainting) return;
         if (this.isDrawing && this.isRectangling && this.rectangleStart) {
             const p = this.getPoint(evt);
             this.newPoly = [
@@ -260,6 +262,7 @@ export class MapEditor extends MapBase {
      * @param {PointerEvent} evt
      */
     async handlePointerDown(evt) {
+        if (this.isPainting) return;
         if (this.isDrawing && this.isRectangling) {
             this.rectangleStart = this.getPoint(evt);
             return;
@@ -293,10 +296,12 @@ export class MapEditor extends MapBase {
         }
     }
     async handlePointerUp(evt) {
+        if (this.isPainting) return;
         log('UP');
         if (this.isDrawing && this.isRectangling && this.rectangleStart) {
             this.isDrawing = false;
             this.isRectangling = false;
+            if (this.newPoly.length < 4) return;
             const zone = Zone.from({ polygon:this.newPoly });
             this.rectangleStart = null;
             this.newPoly = [];
@@ -328,6 +333,7 @@ export class MapEditor extends MapBase {
         }
     }
     async handleClick(evt) {
+        if (this.isPainting) return;
         log('CLICK');
         if (this.isDrawing) {
             const p = this.getPoint(evt);
@@ -361,6 +367,7 @@ export class MapEditor extends MapBase {
     async handleContext(evt) {}
 
     async handleKeyDown(evt) {
+        if (this.isPainting) return;
         if (!this.editorDom || this.isDragging) return;
         if (!this.isDrawing && evt.key == 'Control') {
             this.isDrawing = true;
@@ -371,6 +378,7 @@ export class MapEditor extends MapBase {
         }
     }
     async handleKeyUp(evt) {
+        if (this.isPainting) return;
         if (!this.dom || !this.isDrawing || this.isRectangling) return;
         if (evt.key == 'Control') {
             this.isDrawing = false;
@@ -519,7 +527,9 @@ export class MapEditor extends MapBase {
             await this.rerenderPaint();
             await this.save();
             this.updateHover();
+            this.isPainting = false;
         } else {
+            this.isPainting = true;
             const painter = new Painter(this.dom, this.painterControls, this.mapCanvas.width, this.mapCanvas.height, this.paintList);
             await painter.render();
             this.painter = painter;
