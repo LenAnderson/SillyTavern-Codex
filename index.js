@@ -6,6 +6,13 @@ import { log } from './src/lib/log.js';
 
 
 
+
+class TouchEventSubstitute {}
+if (window.TouchEvent === undefined) {
+    // @ts-ignore
+    window.TouchEvent = TouchEventSubstitute;
+}
+
 const init = ()=>{
     log('init');
     const codex = new CodexManager();

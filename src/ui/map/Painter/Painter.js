@@ -1,4 +1,4 @@
-import { warn } from '../../../lib/log.js';
+import { log, warn } from '../../../lib/log.js';
 import { Point } from '../Point.js';
 import { Layer } from './Layer.js';
 import { Brush } from './tool/Brush.js';
@@ -56,8 +56,11 @@ export class Painter {
             inputCanvas.width = this.width;
             inputCanvas.height = this.height;
             inputCanvas.addEventListener('pointerdown', (evt)=>this.handlePointerDown(evt));
+            inputCanvas.addEventListener('touchstart', (evt)=>this.handlePointerDown(evt));
             inputCanvas.addEventListener('pointerup', (evt)=>this.handlePointerUp(evt));
+            inputCanvas.addEventListener('touchend', (evt)=>this.handlePointerUp(evt));
             inputCanvas.addEventListener('pointermove', (evt)=>this.handlePointerMove(evt));
+            inputCanvas.addEventListener('touchmove', (evt)=>this.handlePointerMove(evt));
             this.inputContext = inputCanvas.getContext('2d');
             this.parent.append(inputCanvas);
         }
@@ -352,8 +355,16 @@ export class Painter {
     getPoint(evt) {
         const rect = this.inputCanvas.getBoundingClientRect();
         const scale = this.inputCanvas.width / rect.width;
-        const x = (evt.x - rect.left) * scale;
-        const y = (evt.y - rect.top) * scale;
+        let x;
+        let y;
+        if (evt instanceof TouchEvent) {
+            const touch = evt.touches[0] || evt.changedTouches[0];
+            x = (touch.clientX - rect.left) * scale;
+            y = (touch.clientY - rect.top) * scale;
+        } else {
+            x = (evt.x - rect.left) * scale;
+            y = (evt.y - rect.top) * scale;
+        }
         const p = new Point();
         p.x = x;
         p.y = y;
@@ -362,12 +373,16 @@ export class Painter {
 
 
     async handlePointerDown(evt) {
+        log('[PAINTER]', 'DOWN');
         if (this.isDrawing) return;
+        evt.preventDefault();
         this.isDrawing = true;
         this.tool.start(this.getPoint(evt));
     }
     async handlePointerUp(evt) {
+        log('[PAINTER]', 'UP');
         if (!this.isDrawing) return;
+        evt.preventDefault();
         this.isDrawing = false;
         this.tool.stop(this.getPoint(evt));
         const path = [...this.tool.path];
@@ -377,6 +392,7 @@ export class Painter {
     }
     async handlePointerMove(evt) {
         if (!this.isDrawing) return;
+        evt.preventDefault();
         this.tool.move(this.getPoint(evt));
     }
 }
