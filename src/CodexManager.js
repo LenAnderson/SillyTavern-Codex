@@ -13,6 +13,7 @@ import { Codex } from './ui/Codex.js';
 import { Book } from './st/wi/Book.js';
 import { Entry } from './st/wi/Entry.js';
 import { WorldInfoSettings } from './st/wi/Settings.js';
+import { Tooltip } from './ui/Tooltip.js';
 
 
 
@@ -139,6 +140,7 @@ export class CodexManager {
         this.codex = null;
         while (this.messageQueue.length > 0) this.messageQueue.pop();
         while (this.bookList.length > 0) this.bookList.pop();
+        while (Tooltip.list.length > 0) Tooltip.list.pop().remove();
 
         log('/STOP');
         this.isStopping = false;
