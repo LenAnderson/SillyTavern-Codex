@@ -196,13 +196,13 @@ export class Painter {
             const smoothing = document.createElement('div'); {
                 smoothing.classList.add('stcdx--painter-smoothing-radius');
                 smoothing.classList.add('stcdx--active');
-                smoothing.title = 'Line Smoothing\n-------------------\n(enabled, not configurable)\nWith line smoothing enabled, the drawn line will trail a bit behind your cursor to create smoother strokes';
+                smoothing.title = 'Line Smoothing\n-------------------\n(enabled, config not implemented)\nWith line smoothing enabled, the drawn line will trail a bit behind your cursor to create smoother strokes';
                 smooth.append(smoothing);
             }
             const catchUp = document.createElement('div'); {
                 catchUp.classList.add('stcdx--painter-smoothing-catchup');
                 catchUp.classList.add('stcdx--active');
-                catchUp.title = 'Catch up\n-------------------\n(enabled, not configurable)\nContinue the smoothed line to the cursor position when lifting the pen';
+                catchUp.title = 'Catch up\n-------------------\n(enabled, config not implemented)\nContinue the smoothed line to the cursor position when lifting the pen';
                 catchUp.textContent = '';
                 smooth.append(catchUp);
             }
