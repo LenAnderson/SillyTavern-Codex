@@ -334,6 +334,7 @@ export class Painter {
         layer.isZone = paint?.isZone ?? false;
         layer.zone = paint?.zone;
         layer.name = layer.zone?.label ?? layer.name;
+        layer.isLocked = paint?.isLocked;
         this.layerList.push(layer);
         const canvas = await layer.render(paint?.paint);
         this.parent.append(canvas);
