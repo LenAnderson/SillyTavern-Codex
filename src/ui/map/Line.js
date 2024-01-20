@@ -15,4 +15,9 @@ export class Line {
         this.a = a;
         this.b = b;
     }
+
+
+    toReversed() {
+        return new Line(this.b, this.a);
+    }
 }

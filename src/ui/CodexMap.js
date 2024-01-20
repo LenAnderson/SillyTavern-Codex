@@ -6,6 +6,7 @@ import { waitForFrame } from '../lib/wait.js';
 import { CodexBaseEntry } from './CodexBaseEntry.js';
 import { Map } from './map/Map.js';
 import { MapEditor } from './map/MapEditor.js';
+import { PaintLayer } from './map/PaintLayer.js';
 import { Zone } from './map/Zone.js';
 
 
@@ -13,7 +14,7 @@ import { Zone } from './map/Zone.js';
 
 export class CodexMap extends CodexBaseEntry {
     /**@type {String}*/ url;
-    /**@type {String[]}*/ paintList = [];
+    /**@type {PaintLayer[]}*/ paintList = [];
     /**@type {String}*/ description;
     /**@type {String}*/ command;
     /**@type {String}*/ qrSet;
@@ -38,7 +39,10 @@ export class CodexMap extends CodexBaseEntry {
         super(entry, settings, matcher, linker);
         const data = JSON.parse(entry.content || '{}');
         this.url = tryDecodeBase64(data.url);
-        this.paintList = data.paintList ?? [];
+        this.paintList = (data.paintList ?? []).map(it=>{
+            if (typeof it == 'string') return PaintLayer.from({ paint:it });
+            return PaintLayer.from(it);
+        });
         this.description = tryDecodeBase64(data.description);
         this.command = tryDecodeBase64(data.command);
         this.qrSet = tryDecodeBase64(data.qrSet);
@@ -251,7 +255,7 @@ export class CodexMap extends CodexBaseEntry {
 
     async handleZoneHovered(zone, evt) {
         Array.from(this.dom.querySelectorAll('.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
-        if (!zone) return;
+        if (!zone || !zone.dom) return;
         zone.dom.classList.add('stcdx--active');
         if (zone.dom.scrollIntoViewIfNeeded) {
             zone.dom.scrollIntoViewIfNeeded();

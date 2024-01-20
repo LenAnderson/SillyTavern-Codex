@@ -1,7 +1,10 @@
+import { callPopup } from '../../../../../../../../script.js';
 import { log, warn } from '../../../lib/log.js';
+import { PaintLayer } from '../PaintLayer.js';
 import { Point } from '../Point.js';
 import { Layer } from './Layer.js';
 import { Brush } from './tool/Brush.js';
+import { Eraser } from './tool/Eraser.js';
 import { Line } from './tool/Line.js';
 import { Pencil } from './tool/Pencil.js';
 import { Rectangle } from './tool/Rectangle.js';
@@ -16,7 +19,7 @@ export class Painter {
     /**@type {HTMLElement}*/ controlsContainer;
     /**@type {Number}*/ width;
     /**@type {Number}*/ height;
-    /**@type {String[]}*/ paintList = [];
+    /**@type {PaintLayer[]}*/ paintList = [];
 
     /**@type {Tool}*/ tool;
     /**@type {Layer[]}*/ layerList = [];
@@ -46,7 +49,7 @@ export class Painter {
     async render() {
         this.renderControls();
 
-        for (const paint of this.paintList ?? ['']) {
+        for (const paint of this.paintList ?? [new PaintLayer()]) {
             await this.addLayer(paint);
         }
 
@@ -66,6 +69,7 @@ export class Painter {
         }
 
         this.tool.context = this.inputContext;
+        this.updateCursor();
     }
 
     renderControls() {
@@ -120,6 +124,22 @@ export class Painter {
                     this.layer.memorize();
                 });
                 basics.append(clear);
+            }
+            const eraser = document.createElement('div'); {
+                eraser.classList.add('stcdx--painter-eraser');
+                eraser.classList.add('stcdx--tool');
+                eraser.title = 'Eraser';
+                eraser.addEventListener('click', ()=>{
+                    const t = new Eraser();
+                    t.width = this.tool.width;
+                    t.color = this.tool.color;
+                    t.context = this.inputContext;
+                    t.targetCanvas = this.layer.canvas;
+                    this.tool = t;
+                    Array.from(tools.querySelectorAll('.stcdx--tool.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
+                    eraser.classList.add('stcdx--active');
+                });
+                basics.append(eraser);
             }
             dom.append(basics);
         }
@@ -257,9 +277,11 @@ export class Painter {
                     dc.append(disp);
                 }
                 inp.addEventListener('input', ()=>{
-                    disp.style.width = `${inp.value}px`;
-                    disp.style.height = `${inp.value}px`;
-                    this.tool.width = Number(inp.value);
+                    const value = Number(inp.value);
+                    disp.style.width = `${value}px`;
+                    disp.style.height = `${value}px`;
+                    this.tool.width = value;
+                    this.updateCursor();
                 });
                 width.append(dc);
             }
@@ -275,44 +297,118 @@ export class Painter {
         this.controlsContainer.innerHTML = '';
     }
 
+    updateCursor() {
+        const value = this.tool.width;
+        const cc = document.createElement('canvas'); {
+            const rect = this.inputCanvas.getBoundingClientRect();
+            const scale = rect.width / this.width;
+            const sv = value * scale;
+            cc.width = sv + 2;
+            cc.height = sv + 2;
+            const con = cc.getContext('2d');
+            con.strokeStyle = 'white';
+            con.lineWidth = 3;
+            con.beginPath();
+            con.ellipse(sv / 2 + 1, sv / 2 + 1, sv / 2, sv / 2, 0, 0, 2 * Math.PI);
+            con.closePath();
+            con.stroke();
+            con.strokeStyle = 'silver';
+            con.lineWidth = 1;
+            con.beginPath();
+            con.ellipse(sv / 2 + 1, sv / 2 + 1, sv / 2, sv / 2, 0, 0, 2 * Math.PI);
+            con.closePath();
+            con.stroke();
+            this.inputCanvas.style.cursor = `url(${cc.toDataURL()}) ${sv/2 + 1} ${sv/2 + 1}, auto`;
+        }
+    }
 
 
 
+
+    /**
+     *
+     * @param {PaintLayer} paint
+     */
     async addLayer(paint = null) {
         const layer = new Layer(this.width, this.height, this.layerList.length == 0 ? 1 : (Math.max(...this.layerList.map(it=>it.index)) + 1));
+        layer.isZone = paint?.isZone ?? false;
+        layer.zone = paint?.zone;
+        layer.name = layer.zone?.label ?? layer.name;
         this.layerList.push(layer);
-        const canvas = await layer.render(paint);
+        const canvas = await layer.render(paint?.paint);
         this.parent.append(canvas);
         this.layerIndex = this.layerList.length - 1;
         const el = document.createElement('div'); {
             el.classList.add('stcdx--painter-layerTrigger');
             el.title = '';
-            const title = document.createElement('div'); {
-                title.classList.add('stcdx--painter-title');
-                title.classList.add('menu_button');
-                title.textContent = `Layer ${layer.index}`;
-                title.title = 'Switch to layer';
-                title.addEventListener('click', (evt)=>{
+            const thumb = document.createElement('canvas'); {
+                thumb.classList.add('stcdx--painter-thumb');
+                thumb.height = 50;
+                thumb.width = 50 / this.height * this.width;
+                thumb.title = 'Switch to layer';
+                thumb.addEventListener('click', (evt)=>{
                     evt.stopPropagation();
                     this.layerIndex = this.layerList.indexOf(layer);
                     Array.from(this.layerPanel.querySelectorAll('.stcdx--painter-layerTrigger.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
                     el.classList.add('stcdx--active');
+                });
+                layer.thumbContext = thumb.getContext('2d');
+                layer.updateThumb();
+                el.append(thumb);
+            }
+            const title = document.createElement('div'); {
+                title.classList.add('stcdx--painter-title');
+                title.classList.add('menu_button');
+                title.textContent = layer.name;
+                title.title = 'Rename layer';
+                title.addEventListener('click', async(evt)=>{
+                    evt.stopPropagation();
+                    const newTitle = await callPopup('Layer name', 'input', title.textContent);
+                    if (newTitle) {
+                        title.textContent = newTitle;
+                        layer.name = newTitle;
+                    }
                 });
                 el.append(title);
             }
             const zone = document.createElement('label'); {
                 zone.classList.add('stcdx--painter-zoneWrap');
                 zone.title = 'Use layer as zone';
+                zone.addEventListener('click', (evt)=>evt.stopPropagation());
                 zone.append('Zone');
                 const cb = document.createElement('input'); {
                     cb.type = 'checkbox';
-                    cb.checked = false;
+                    cb.checked = layer.isZone;
+                    cb.addEventListener('click', (evt)=>{
+                        evt.stopPropagation();
+                        layer.isZone = cb.checked;
+                    });
                     zone.append(cb);
                 }
                 el.append(zone);
             }
             const actions = document.createElement('div'); {
                 actions.classList.add('stcdx--painter-actions');
+                const zoneLock = document.createElement('div'); {
+                    zoneLock.classList.add('stcdx--painter-action');
+                    zoneLock.classList.add('stcdx--painter-zoneLock');
+                    zoneLock.classList.add('menu_button');
+                    zoneLock.classList.add('menu_button_icon');
+                    zoneLock.classList.add('fa-solid');
+                    if (layer.isLocked) {
+                        zoneLock.classList.add('fa-lock');
+                    } else {
+                        zoneLock.classList.add('fa-lock-open');
+                    }
+                    zoneLock.title = 'Lock / unlock zone\n-------------------\nDo not automatically regenerate zone';
+                    zoneLock.addEventListener('click', (evt)=>{
+                        evt.stopPropagation();
+                        layer.isLocked = !layer.isLocked;
+                        zoneLock.classList.toggle('fa-lock-open');
+                        zoneLock.classList.toggle('fa-lock');
+                    });
+                    actions.append(zoneLock);
+                }
                 const hide = document.createElement('div'); {
                     hide.classList.add('stcdx--painter-action');
                     hide.classList.add('stcdx--painter-hide');
@@ -388,6 +484,9 @@ export class Painter {
         if (this.isDrawing) return;
         evt.preventDefault();
         this.isDrawing = true;
+        if (this.tool instanceof Eraser) {
+            this.tool.targetCanvas = this.layer.canvas;
+        }
         this.tool.start(this.getPoint(evt));
     }
     async handlePointerUp(evt) {

@@ -28,7 +28,7 @@ export class Map extends MapBase {
         }
         if (!hadDom) {
             log('DID NOT HAVE DOM');
-            for (const zone of this.zoneList) {
+            for (const zone of this.combinedZoneList) {
                 const hc = new HoverCanvas(zone, this.hoverCanvas.cloneNode(true));
                 this.hoverCanvas.insertAdjacentElement('afterend', hc.canvas);
                 this.hoverList.push(hc);
@@ -42,7 +42,7 @@ export class Map extends MapBase {
     async handleMove(evt) {
         const p = this.getPoint(evt);
         let newZone;
-        for (const zone of this.zoneList) {
+        for (const zone of this.combinedZoneList) {
             if (this.pip(zone.polygon, p)) {
                 newZone = zone;
                 break;

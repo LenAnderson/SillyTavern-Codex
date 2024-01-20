@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Settings } from '../../Settings.js';
 import { warn } from '../../lib/log.js';
+import { PaintLayer } from './PaintLayer.js';
 import { Point } from './Point.js';
 // eslint-disable-next-line no-unused-vars
 import { Zone } from './Zone.js';
@@ -12,7 +13,7 @@ export class MapBase {
     /**@type {Settings}*/ settings;
     /**@type {HTMLImageElement}*/ image;
     /**@type {Zone[]}*/ zoneList;
-    /**@type {String[]}*/ paintList = [];
+    /**@type {PaintLayer[]}*/ paintList = [];
 
     /**@type {Zone}*/ zone;
 
@@ -24,6 +25,10 @@ export class MapBase {
     /**@type {CanvasRenderingContext2D}*/ mapContext;
     /**@type {CanvasRenderingContext2D}*/ hoverContext;
     /**@type {CanvasRenderingContext2D[]}*/ paintContextList = [];
+
+    get combinedZoneList() {
+        return [...this.zoneList, ...this.paintList.filter(it=>it.isZone).map(it=>it.zone)];
+    }
 
 
 
@@ -72,7 +77,7 @@ export class MapBase {
      */
     getZone(evt) {
         const p  = this.getPoint(evt);
-        for (const zone of this.zoneList) {
+        for (const zone of this.combinedZoneList) {
             if (this.pip(zone.polygon, p)) {
                 return zone;
             }
@@ -171,19 +176,17 @@ export class MapBase {
                 paint.height = this.image.naturalHeight;
                 const con = paint.getContext('2d');
                 this.paintContextList.push(con);
-                if (p) {
-                    try {
-                        const img = new Image();
-                        await new Promise(resolve=>{
-                            img.addEventListener('load', resolve);
-                            img.addEventListener('error', resolve);
-                            img.src = p;
-                            if (img.complete) resolve();
-                        });
-                        con.drawImage(img, 0, 0);
-                    } catch (ex) {
-                        warn('PAINT FAILED', ex);
-                    }
+                try {
+                    const img = new Image();
+                    await new Promise(resolve=>{
+                        img.addEventListener('load', resolve);
+                        img.addEventListener('error', resolve);
+                        img.src = p.paint;
+                        if (img.complete) resolve();
+                    });
+                    con.drawImage(img, 0, 0);
+                } catch (ex) {
+                    warn('PAINT FAILED', ex);
                 }
                 this.dom.append(paint);
             }

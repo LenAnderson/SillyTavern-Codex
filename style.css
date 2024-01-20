@@ -10,13 +10,16 @@
   --stcdx--mapZoneZoomTime: 400;
 }
 #shadow_popup:has(#stcdx--zoneEditor),
-#shadow_popup:has(#stcdx--mapEditor) {
+#shadow_popup:has(#stcdx--mapEditor),
+body:has(.stcdx--mapEditor) #shadow_popup {
   z-index: 10000;
 }
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor,
-#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor {
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -25,38 +28,52 @@
 }
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(#stcdx--map-description),
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(#stcdx--map-description),
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor > label:has(#stcdx--map-description),
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(#stcdx--map-description),
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--map-description),
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor > label:has(#stcdx--map-description),
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(#stcdx--zone-description),
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(#stcdx--zone-description),
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor > label:has(#stcdx--zone-description),
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description),
-#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description) {
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description),
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor > label:has(#stcdx--zone-description) {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
 }
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(#stcdx--map-description) #stcdx--map-description,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(#stcdx--map-description) #stcdx--map-description,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor > label:has(#stcdx--map-description) #stcdx--map-description,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(#stcdx--map-description) #stcdx--map-description,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--map-description) #stcdx--map-description,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor > label:has(#stcdx--map-description) #stcdx--map-description,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(#stcdx--zone-description) #stcdx--map-description,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(#stcdx--zone-description) #stcdx--map-description,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor > label:has(#stcdx--zone-description) #stcdx--map-description,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--map-description,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--map-description,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--map-description,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(#stcdx--map-description) #stcdx--zone-description,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(#stcdx--map-description) #stcdx--zone-description,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor > label:has(#stcdx--map-description) #stcdx--zone-description,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(#stcdx--map-description) #stcdx--zone-description,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--map-description) #stcdx--zone-description,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor > label:has(#stcdx--map-description) #stcdx--zone-description,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(#stcdx--zone-description) #stcdx--zone-description,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(#stcdx--zone-description) #stcdx--zone-description,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor > label:has(#stcdx--zone-description) #stcdx--zone-description,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--zone-description,
-#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--zone-description {
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--zone-description,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor > label:has(#stcdx--zone-description) #stcdx--zone-description {
   flex: 1 1 auto;
 }
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(input[type="checkbox"]),
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(input[type="checkbox"]),
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor > label:has(input[type="checkbox"]),
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]),
-#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]) {
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]),
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor > label:has(input[type="checkbox"]) {
   display: flex;
   flex-direction: row;
   gap: 1em;
@@ -65,21 +82,27 @@
 }
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after,
-#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after {
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor > label:has(input[type="checkbox"]) > .stcdx--labelText:after {
   content: ": ";
 }
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor .stcdx--inputs,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor .stcdx--inputs,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor .stcdx--inputs,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor .stcdx--inputs,
-#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor .stcdx--inputs {
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor .stcdx--inputs,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--inputs {
   display: flex;
   align-items: baseline;
 }
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--mapEditor .stcdx--hoverSettings,
 #shadow_popup:has(#stcdx--mapEditor) #stcdx--mapEditor .stcdx--hoverSettings,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--mapEditor .stcdx--hoverSettings,
 #shadow_popup:has(#stcdx--zoneEditor) #stcdx--zoneEditor .stcdx--hoverSettings,
-#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor .stcdx--hoverSettings {
+#shadow_popup:has(#stcdx--mapEditor) #stcdx--zoneEditor .stcdx--hoverSettings,
+body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--hoverSettings {
   display: flex;
   flex-direction: row;
   gap: 0.5em;
@@ -133,7 +156,7 @@
   transition: calc(1ms * var(--stcdx--transitionTime));
 }
 .stcdx--codex.stcdx--maximized {
-  width: calc(100vw - var(--nav-bar-width));
+  width: calc(100vw - var(--nav-bar-width, 0));
   z-index: 1000;
 }
 .stcdx--codex.stcdx--isEditing > .stcdx--header > .stcdx--action,
@@ -575,6 +598,9 @@
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-clear {
   background-image: url(img/tools-clear-21.png);
 }
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-eraser {
+  background-image: url(img/tools-eraser-21.png);
+}
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-pencil {
   background-image: url(img/tools-pencil-21.png);
 }
@@ -635,13 +661,31 @@
   display: flex;
   flex-direction: row;
   gap: 1em;
+  align-items: center;
   padding: 0.5em;
 }
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger.stcdx--active {
   background-color: var(--greyCAIbg);
 }
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger > .stcdx--painter-thumb {
+  cursor: pointer;
+  border: 2px solid var(--SmartThemeBorderColor);
+  background: var(--SmartThemeBlurTintColor);
+  transition: 200ms;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger > .stcdx--painter-thumb:hover {
+  border-color: var(--SmartThemeShadowColor);
+}
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger > .stcdx--painter-title {
   cursor: pointer;
+  flex: 1 1 auto;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger > .stcdx--painter-zoneWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25em;
 }
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-layers > .stcdx--painter-layerPanel > .stcdx--painter-layerTrigger > .stcdx--painter-actions {
   display: flex;

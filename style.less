@@ -14,7 +14,8 @@
 
 #shadow_popup {
 	&:has(#stcdx--zoneEditor),
-	&:has(#stcdx--mapEditor)
+	&:has(#stcdx--mapEditor),
+	body:has(.stcdx--mapEditor) &
 	{
 		z-index: 10000;
 		#stcdx--mapEditor, #stcdx--zoneEditor {
@@ -119,7 +120,7 @@
 	transition: calc(1ms * var(--stcdx--transitionTime));
 
 	&.stcdx--maximized {
-		width: calc(100vw - var(--nav-bar-width));
+		width: calc(100vw - var(--nav-bar-width, 0));
 		z-index: 1000;
 	}
 
@@ -569,6 +570,7 @@
 					&.stcdx--painter-undo { background-image: url(img/tools-undo-21.png); }
 					&.stcdx--painter-redo { background-image: url(img/tools-redo-21.png); }
 					&.stcdx--painter-clear { background-image: url(img/tools-clear-21.png); }
+					&.stcdx--painter-eraser { background-image: url(img/tools-eraser-21.png); }
 					&.stcdx--painter-pencil { background-image: url(img/tools-pencil-21.png); }
 					&.stcdx--painter-brush { background-image: url(img/tools-brush-21.png); }
 					&.stcdx--painter-rectangle { background-image: url(img/tools-rectangle-21.png); }
@@ -618,12 +620,30 @@
 								display: flex;
 								flex-direction: row;
 								gap: 1em;
+								align-items: center;
 								padding: 0.5em;
 								&.stcdx--active {
 									background-color: var(--greyCAIbg);
 								}
+								> .stcdx--painter-thumb {
+									cursor: pointer;
+									border: 2px solid var(--SmartThemeBorderColor);
+									background: var(--SmartThemeBlurTintColor);
+									transition: 200ms;
+									&:hover {
+										border-color: var(--SmartThemeShadowColor);
+									}
+								}
 								> .stcdx--painter-title {
 									cursor: pointer;
+									flex: 1 1 auto;
+								}
+								> .stcdx--painter-zoneWrap {
+									display: flex;
+									flex-direction: column;
+									justify-content: center;
+									align-items: center;
+									gap: 0.25em;
 								}
 								> .stcdx--painter-actions {
 									display: flex;

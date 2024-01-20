@@ -59,7 +59,7 @@ export class MapEditor extends MapBase {
     getLine(evt) {
         const p = this.getPoint(evt);
         let line;
-        for (const zone of this.zoneList) {
+        for (const zone of this.combinedZoneList) {
             let prev = zone.polygon.slice(-1)[0];
             for (const zp of zone.polygon) {
                 const a = Math.sqrt(Math.pow(p.x - zp.x,2) + Math.pow(p.y - zp.y,2));
@@ -228,14 +228,14 @@ export class MapEditor extends MapBase {
         let needsUpdate = false;
         const p = this.getPoint(evt);
         let zone;
-        const hp = this.zoneList.map(z=>z.polygon.find(it=>it.checkHover(p))).find(it=>it);
+        const hp = this.combinedZoneList.map(z=>z.polygon.find(it=>it.checkHover(p))).find(it=>it);
         let hl;
         if (this.hoverPoint != hp) {
             this.hoverPoint = hp;
             needsUpdate = true;
         }
         if (this.hoverPoint) {
-            zone = this.zoneList.find(it=>it.polygon.includes(hp));
+            zone = this.combinedZoneList.find(it=>it.polygon.includes(hp));
         } else {
             hl = this.getLine(evt);
         }
@@ -244,7 +244,7 @@ export class MapEditor extends MapBase {
             needsUpdate = true;
         }
         if (this.hoverLine) {
-            zone = this.zoneList.find(it=>it.polygon.includes(hl.a));
+            zone = this.combinedZoneList.find(it=>it.polygon.includes(hl.a));
         }
         if (!zone) {
             zone = this.getZone(evt);
@@ -355,7 +355,15 @@ export class MapEditor extends MapBase {
         }
         if (this.zone) {
             if (evt.altKey) {
-                this.zoneList.splice(this.zoneList.indexOf(this.zone), 1);
+                if (this.zoneList.includes(this.zone)) {
+                    this.zoneList.splice(this.zoneList.indexOf(this.zone), 1);
+                } else {
+                    const paint = this.paintList.find(it=>it.zone == this.zone);
+                    if (paint) {
+                        paint.isZone = false;
+                        paint.zone = null;
+                    }
+                }
                 this.updateHover();
                 this.save();
                 return;
@@ -406,7 +414,7 @@ export class MapEditor extends MapBase {
         const pointSize = 10;
         con.clearRect(0, 0, canvas.width, canvas.height);
 
-        for (const zone of this.zoneList) {
+        for (const zone of this.combinedZoneList) {
             let fs;
             if (zone == this.zone) {
                 con.fillStyle = 'rgba(255 0 0 / 1)';
@@ -444,8 +452,14 @@ export class MapEditor extends MapBase {
     drawPolygon(polygon, fillStyle = null) {
         const con = this.hoverContext;
         const pointSize = 10;
+        let i = 0;
         for (const p of polygon) {
             con.fillRect(p.x - pointSize / 2, p.y - pointSize / 2, pointSize, pointSize);
+            const fs = con.fillStyle;
+            con.fillStyle = 'black';
+            con.font = '20px monospace';
+            con.fillText(i++, p.x, p.y);
+            con.fillStyle = fs;
         }
         con.beginPath();
         con.lineWidth = 5;
@@ -519,7 +533,7 @@ export class MapEditor extends MapBase {
             this.paintList = [];
             this.codexMap.paintList = [];
             for (const layer of this.painter.layerList) {
-                const data = layer.canvas.toDataURL();
+                const data = layer.toPaintLayer();
                 this.paintList.push(data);
                 this.codexMap.paintList.push(data);
             }
