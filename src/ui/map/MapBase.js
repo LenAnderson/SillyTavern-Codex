@@ -169,6 +169,7 @@ export class MapBase {
     }
     async renderPaint() {
         for (const p of this.paintList) {
+            if (p.isZone) continue;
             const paint = document.createElement('canvas'); {
                 this.paintCanvasList.push(paint);
                 paint.classList.add('stcdx--paint');
