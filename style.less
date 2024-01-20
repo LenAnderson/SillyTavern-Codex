@@ -96,7 +96,18 @@
 
 
 
-
+@media screen and (max-width: 1000px) {
+	html > body {
+		.stcdx--codex {
+			top: var(--topBarBlockSize);
+			width: calc(100vw - var(--nav-bar-width, 0));
+			z-index: 1000;
+		}
+		.stcdx--tooltip.stcdx--root.stcdx--active {
+			display: none;
+		}
+	}
+}
 .stcdx--codex {
 	position: absolute;
 	bottom: 0;
