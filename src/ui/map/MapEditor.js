@@ -1,6 +1,7 @@
 import { log } from '../../lib/log.js';
 // eslint-disable-next-line no-unused-vars
 import { CodexMap } from '../CodexMap.js';
+import { HoverCanvas } from './HoverCanvas.js';
 import { Line } from './Line.js';
 import { MapBase } from './MapBase.js';
 import { MapDetailsEditor } from './MapDetailsEditor.js';
@@ -173,6 +174,14 @@ export class MapEditor extends MapBase {
                 const mc = await super.render(); {
                     root.append(mc);
                 }
+            }
+
+            for (const p of this.paintList) {
+                if (!p.zone) continue;
+                const zone = p.zone;
+                const hc = new HoverCanvas(zone, this.hoverCanvas.cloneNode(true));
+                await hc.applyPaint(p.paint);
+                this.mapContext.drawImage(hc.canvas, 0, 0);
             }
         }
         return this.editorDom;
@@ -500,6 +509,14 @@ export class MapEditor extends MapBase {
         this.hoverCanvas.height = this.image.naturalHeight;
         this.mapContext.clearRect(0, 0, this.mapCanvas.width, this.mapCanvas.height);
         this.mapContext.drawImage(this.image, 0, 0);
+
+        for (const p of this.paintList) {
+            if (!p.zone) continue;
+            const zone = p.zone;
+            const hc = new HoverCanvas(zone, this.hoverCanvas.cloneNode(true));
+            await hc.applyPaint(p.paint);
+            this.mapContext.drawImage(hc.canvas, 0, 0);
+        }
     }
     async save() {
         await this.codexMap.save();
