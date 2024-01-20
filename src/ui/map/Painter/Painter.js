@@ -32,12 +32,12 @@ export class Painter {
 
 
 
-    constructor(parent, controlsContainer, width, height, paint) {
+    constructor(parent, controlsContainer, width, height, paintList) {
         this.parent = parent;
         this.controlsContainer = controlsContainer;
         this.width = width;
         this.height = height;
-        this.paintList = [paint];
+        this.paintList = paintList;
         this.tool = new Pencil();
         this.tool.width = 10;
         this.tool.color = 'rgba(0, 0, 0, 1)';
@@ -299,6 +299,17 @@ export class Painter {
                     el.classList.add('stcdx--active');
                 });
                 el.append(title);
+            }
+            const zone = document.createElement('label'); {
+                zone.classList.add('stcdx--painter-zoneWrap');
+                zone.title = 'Use layer as zone';
+                zone.append('Zone');
+                const cb = document.createElement('input'); {
+                    cb.type = 'checkbox';
+                    cb.checked = false;
+                    zone.append(cb);
+                }
+                el.append(zone);
             }
             const actions = document.createElement('div'); {
                 actions.classList.add('stcdx--painter-actions');
