@@ -342,6 +342,7 @@ export class Painter {
         const el = document.createElement('div'); {
             el.classList.add('stcdx--painter-layerTrigger');
             el.title = '';
+            el.addEventListener('click', (evt)=>evt.stopPropagation());
             const thumb = document.createElement('canvas'); {
                 thumb.classList.add('stcdx--painter-thumb');
                 thumb.height = 50;
