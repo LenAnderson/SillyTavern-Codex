@@ -125,7 +125,7 @@ export class CodexMap extends CodexBaseEntry {
         const zoneCont = document.createElement('div'); {
             this.zoneListDom = zoneCont;
             zoneCont.classList.add('stcdx--zoneContainer');
-            for (const zone of this.zoneList?.toSorted((a,b)=>(a.label ?? '').localeCompare(b.label ?? '')) ?? []) {
+            for (const zone of this.map.combinedZoneList?.toSorted((a,b)=>(a.label ?? '').localeCompare(b.label ?? '')) ?? []) {
                 let entry;
                 if (zone.key) {
                     entry = this.matcher.findMatches(zone.key)[0]?.entry;
