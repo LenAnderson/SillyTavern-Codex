@@ -20,9 +20,11 @@ export class Painter {
     /**@type {HTMLElement}*/ controlsContainer;
     /**@type {Number}*/ width;
     /**@type {Number}*/ height;
+    /**@type {Number}*/ scale = 1;
     /**@type {PaintLayer[]}*/ paintList = [];
 
     /**@type {HTMLElement}*/ colorPicker;
+    /**@type {HTMLElement}*/ widthDisplay;
     /**@type {Tool}*/ tool;
     /**@type {Layer[]}*/ layerList = [];
     /**@type {Number}*/ layerIndex = -1;
@@ -46,6 +48,7 @@ export class Painter {
         this.tool = new Pencil();
         this.tool.width = 10;
         this.tool.color = 'rgba(0, 0, 0, 1)';
+
     }
 
     async render() {
@@ -342,21 +345,21 @@ export class Painter {
                 inp.type = 'range';
                 inp.min = '1';
                 inp.max = '100';
-                inp.value = '10';
+                inp.value = `${this.tool.width}`;
                 width.append(inp);
             }
             const dc = document.createElement('div'); {
                 dc.classList.add('stcdx--painter-widthDisplayContainer');
                 const disp = document.createElement('div'); {
+                    this.widthDisplay = disp;
                     disp.classList.add('stcdx--painter-widthDisplay');
-                    disp.style.width = '10px';
-                    disp.style.height = '10px';
+                    this.updateWidthDisplay();
                     dc.append(disp);
                 }
                 inp.addEventListener('input', ()=>{
                     const value = Number(inp.value);
-                    disp.style.width = `${value}px`;
-                    disp.style.height = `${value}px`;
+                    disp.style.width = `${value * this.scale}px`;
+                    disp.style.height = `${value * this.scale}px`;
                     this.tool.width = value;
                     this.updateCursor();
                 });
@@ -374,11 +377,18 @@ export class Painter {
         this.controlsContainer.innerHTML = '';
     }
 
+    updateScale() {
+        const rect = this.inputCanvas?.getBoundingClientRect() ?? { width: this.width };
+        this.scale = rect.width / this.width;
+    }
+
     updateCursor() {
         const value = this.tool.width;
         const cc = document.createElement('canvas'); {
             const rect = this.inputCanvas.getBoundingClientRect();
             const scale = rect.width / this.width;
+            this.scale = scale;
+            this.updateWidthDisplay();
             const sv = value * scale;
             cc.width = sv + 2;
             cc.height = sv + 2;
@@ -397,6 +407,13 @@ export class Painter {
             con.stroke();
             this.inputCanvas.style.cursor = `url(${cc.toDataURL()}) ${sv/2 + 1} ${sv/2 + 1}, auto`;
         }
+    }
+
+    updateWidthDisplay() {
+        const disp = this.widthDisplay;
+        const value = this.tool.width;
+        disp.style.width = `${value * this.scale}px`;
+        disp.style.height = `${value * this.scale}px`;
     }
 
 
