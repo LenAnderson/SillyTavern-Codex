@@ -181,7 +181,8 @@ export class MapEditor extends MapBase {
                 const zone = p.zone;
                 const hc = new HoverCanvas(zone, this.hoverCanvas.cloneNode(true));
                 await hc.applyPaint(p.paint);
-                this.mapContext.drawImage(hc.canvas, 0, 0);
+                this.dom.append(hc.canvas);
+                // this.mapContext.drawImage(hc.canvas, 0, 0);
             }
         }
         return this.editorDom;

@@ -28,6 +28,7 @@ export class HoverCanvas {
 
     async applyPaint(paint) {
         if (paint) {
+            this.canvas.classList.add('stcdx--paint');
             try {
                 const img = new Image();
                 await new Promise(resolve=>{
