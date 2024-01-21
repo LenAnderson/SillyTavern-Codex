@@ -701,9 +701,12 @@ body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--hoverSettin
   grid-template-rows: 1fr 1fr;
 }
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-colors > .stcdx--painter-swatch {
-  border: 1px solid var(--SmartThemeBorderColor);
+  border: 1px solid var(--grey30);
   height: 1em;
   width: 1em;
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-colors > .stcdx--painter-swatch:hover {
+  scale: 1.25;
 }
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-width {
   display: flex;

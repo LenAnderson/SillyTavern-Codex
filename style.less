@@ -663,9 +663,12 @@
 				grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 				grid-template-rows: 1fr 1fr;
 				> .stcdx--painter-swatch {
-					border: 1px solid var(--SmartThemeBorderColor);
+					border: 1px solid var(--grey30);
 					height: 1em;
 					width: 1em;
+					&:hover {
+						scale: 1.25;
+					}
 				}
 			}
 			> .stcdx--painter-width {

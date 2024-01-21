@@ -1,4 +1,5 @@
 import { callPopup } from '../../../../../../../../script.js';
+import { delay } from '../../../../../../../utils.js';
 import { log, warn } from '../../../lib/log.js';
 import { PaintLayer } from '../PaintLayer.js';
 import { Point } from '../Point.js';
@@ -21,6 +22,7 @@ export class Painter {
     /**@type {Number}*/ height;
     /**@type {PaintLayer[]}*/ paintList = [];
 
+    /**@type {HTMLElement}*/ colorPicker;
     /**@type {Tool}*/ tool;
     /**@type {Layer[]}*/ layerList = [];
     /**@type {Number}*/ layerIndex = -1;
@@ -252,11 +254,86 @@ export class Painter {
                     swatch.style.backgroundColor = c;
                     swatch.addEventListener('click', ()=>{
                         this.tool.color = c;
+                        this.colorPicker.color = c;
                     });
                     color.append(swatch);
                 }
             });
             dom.append(color);
+        }
+        const cols = (JSON.parse(localStorage.getItem('stcdx--recentColors') ?? 'null') ?? [
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+            'rgba(0, 0, 0, 0)',
+        ]);
+        const recentColors = document.createElement('div'); {
+            recentColors.classList.add('stcdx--painter-colors');
+            cols.forEach(c=>{
+                const swatch = document.createElement('div'); {
+                    swatch.classList.add('stcdx--painter-swatch');
+                    swatch.style.backgroundColor = c;
+                    swatch.addEventListener('click', ()=>{
+                        this.tool.color = c;
+                        this.colorPicker.color = c;
+                    });
+                    recentColors.append(swatch);
+                }
+            });
+            dom.append(recentColors);
+        }
+        const colorDisp = document.createElement('div'); {
+            colorDisp.classList.add('stcdx--painter-colorDisp');
+            const picker = document.createElement('toolcool-color-picker'); {
+                this.colorPicker = picker;
+                picker.classList.add('stcdx--painter-colorPicker');
+                picker.addEventListener('change', (evt)=>{
+                    this.tool.color = evt.detail.rgba;
+                });
+                (async()=>{
+                    let isOpen = picker.opened;
+                    let col = JSON.stringify(picker.color.toRgb());
+                    let isStarting = true;
+                    while (true && (isStarting || picker.closest('body'))) {
+                        if (isStarting && picker.closest('body')) {
+                            isStarting = false;
+                        }
+                        if (!isStarting && isOpen != picker.opened) {
+                            isOpen = picker.opened;
+                            const ncol = JSON.stringify(picker.color.toRgb());
+                            if (!isOpen && col != ncol) {
+                                col = ncol;
+                                const co = picker.color.toRgb();
+                                const c = `rgba(${co.r}, ${co.g}, ${co.b}, ${co.a})`;
+                                const swatch = document.createElement('div'); {
+                                    swatch.classList.add('stcdx--painter-swatch');
+                                    swatch.style.backgroundColor = c;
+                                    swatch.addEventListener('click', ()=>{
+                                        this.tool.color = c;
+                                        this.colorPicker.color = c;
+                                    });
+                                    if (!cols.includes(c)) {
+                                        cols.unshift(c);
+                                        while (cols.length > 10) cols.pop();
+                                        localStorage.setItem('stcdx--recentColors', JSON.stringify(cols));
+                                        recentColors.children[0].insertAdjacentElement('beforebegin', swatch);
+                                        recentColors.lastElementChild.remove();
+                                    }
+                                }
+                            }
+                        }
+                        await delay(200);
+                    }
+                })();
+                colorDisp.append(picker);
+            }
+            dom.append(colorDisp);
         }
         const width = document.createElement('div'); {
             width.classList.add('stcdx--painter-width');
