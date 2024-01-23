@@ -57,6 +57,15 @@ export class SlashCommandHandler {
             true,
         );
 
+        registerSlashCommand(
+            'codex-match',
+            (args, value)=>this.handleCodexMatch(args, value),
+            [],
+            '<span class="monospace">(text / keys)</span> – get an array of matching entries (basic entries only, no maps or character lists)',
+            true,
+            true,
+        );
+
 
         registerSlashCommand(
             'codex?',
@@ -150,6 +159,12 @@ export class SlashCommandHandler {
             while (!c.editor.editorDom) await delay(100);
             await c.editor.launchPainter();
         }
+    }
+
+
+    async handleCodexMatch(args, value) {
+        const matches = this.matcher.findMatches(value).filter(it=>!it.entry.isMap && !it.entry.isCharList);
+        return JSON.stringify(matches.map(it=>it.entry.content));
     }
 
 
