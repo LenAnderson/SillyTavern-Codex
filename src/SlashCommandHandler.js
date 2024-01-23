@@ -1,5 +1,5 @@
 import { sendSystemMessage } from '../../../../../script.js';
-import { registerSlashCommand } from '../../../../slash-commands.js';
+import { getSlashCommandsHelp, registerSlashCommand } from '../../../../slash-commands.js';
 import { delay, isTrueBoolean } from '../../../../utils.js';
 // eslint-disable-next-line no-unused-vars
 import { CodexManager } from './CodexManager.js';
@@ -62,7 +62,7 @@ export class SlashCommandHandler {
             'codex?',
             ()=>this.showHelp(),
             [],
-            ' – get help on how to use the Codex extension',
+            '<span></span><span></span> – get help on how to use the Codex extension',
             true,
             true,
         );
@@ -158,8 +158,46 @@ export class SlashCommandHandler {
         if (!response.ok) {
             return warn('failed to fetch template: help.html');
         }
+        const helpText = (await response.text());
+        window.x = helpText;
         const now = new Date().getTime();
-        sendSystemMessage('generic', (await response.text()).replaceAll('%%TIMESTAMP%%', `${now}`));
+        const toc = Array.from(helpText.matchAll(/<h2[^>]+id="stcdx--help--([^"]+)"[^>]*>.*?<a[^>]*>.*?<\/a>(.*?)<\/h2>/igs))
+            .map((match)=>`<li><a data-stcdx--href="${match[1]}">${match[2]}</a></li>`)
+            .join('\n')
+        ;
+        const slashHelp = document.createRange().createContextualFragment(getSlashCommandsHelp());
+        const slashList = Array.from(slashHelp.querySelector('ol').querySelectorAll(':scope > li'))
+            .filter(it=>it.querySelector('span').textContent.startsWith('/codex'))
+            .map(it=>{
+                const li = document.createElement('li'); {
+                    const code = document.createElement('code'); {
+                        const cmd = it.querySelector('span');
+                        cmd.remove();
+                        code.append(cmd.textContent);
+                        code.append(' ');
+                        const q = document.createElement('q'); {
+                            const args = it.querySelector('span');
+                            args.remove();
+                            q.append(args.textContent);
+                            code.append(q);
+                        }
+                        li.append(code);
+                    }
+                    const p = document.createElement('p'); {
+                        p.innerHTML = it.innerHTML;
+                        li.append(p);
+                    }
+                }
+                return li.outerHTML;
+            })
+            .join('\n')
+        ;
+        const message = helpText
+            .replaceAll('%%TIMESTAMP%%', `${now}`)
+            .replaceAll('%%TOC%%', toc)
+            .replaceAll('%%COMMANDS%%', slashList)
+        ;
+        sendSystemMessage('generic', message);
         await waitForFrame();
         document.querySelector(`#stcdx--help--${now}`)?.scrollIntoView();
     }
