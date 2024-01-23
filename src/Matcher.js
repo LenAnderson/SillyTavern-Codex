@@ -167,6 +167,6 @@ export class Matcher {
             }
         }
         log('/MATCHER.findMatches', matches);
-        return matches;
+        return matches.toSorted((a,b)=>a.start - b.start);
     }
 }
