@@ -33,6 +33,8 @@ export class Settings {
     /**@type {String}*/ mapShadowColor = 'rgba(0, 0, 0, 1)';
     /**@type {Number}*/ mapDesaturate = 50;
 
+    /**@type {Number}*/ headerFontSize = 2;
+
     /**@type {Number}*/ transitionTime = 400;
     /**@type {Number}*/ zoomTime = 400;
     /**@type {Number}*/ mapZoneZoomTime = 200;
@@ -84,6 +86,8 @@ export class Settings {
             mapShadow: this.mapShadow,
             mapShadowColor: this.mapShadowColor,
             mapDesaturate: this.mapDesaturate,
+
+            headerFontSize: this.headerFontSize,
 
             transitionTime: this.transitionTime,
             zoomTime: this.zoomTime,
@@ -192,6 +196,16 @@ export class Settings {
             try {
                 this.cycleDelay = parseInt(cycleDelay.value);
                 document.body.style.setProperty('--stcdx--cycleDelay', `${this.cycleDelay}`);
+                this.save();
+            } catch { /* empty */ }
+        });
+        /**@type {HTMLInputElement} */
+        const headerFontSize = dom.querySelector('#stcdx--headerFontSize');
+        headerFontSize.value = `${this.headerFontSize}`;
+        headerFontSize.addEventListener('input', () => {
+            try {
+                this.headerFontSize = parseFloat(headerFontSize.value);
+                document.body.style.setProperty('--stcdx--headerFontSize', `${this.headerFontSize}`);
                 this.save();
             } catch { /* empty */ }
         });

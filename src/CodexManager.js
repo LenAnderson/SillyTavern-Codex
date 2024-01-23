@@ -114,6 +114,8 @@ export class CodexManager {
         document.body.style.setProperty('--stcdx--mapShadowColor', this.settings.mapShadowColor);
         document.body.style.setProperty('--stcdx--mapZoom', `${this.settings.mapZoom}`);
 
+        document.body.style.setProperty('--stcdx--headerFontSize', `${this.settings.headerFontSize}`);
+
         document.body.style.setProperty('--stcdx--transitionTime', `${this.settings.transitionTime}`);
         document.body.style.setProperty('--stcdx--zoomTime', `${this.settings.zoomTime}`);
         document.body.style.setProperty('--stcdx--mapZoneZoomTime', `${this.settings.mapZoneZoomTime}`);

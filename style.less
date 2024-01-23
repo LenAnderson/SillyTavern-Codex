@@ -1,10 +1,13 @@
 :root {
 	--stcdx--color: rgb(0, 255, 255);
 	--stcdx--icon: "🧾";
+
 	--stcdx--mapZoom: 10;
 	--stcdx--mapShadow: 3;
 	--stcdx--mapShadowColor: rgba(0 0 0 / 1);
 	--stcdx--mapDesaturate: 50;
+
+	--stcdx--headerFontSize: 2;
 
 	--stcdx--transitionTime: 400;
 	--stcdx--zoomTime: 400;
@@ -145,14 +148,14 @@
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		gap: 1em;
+		gap: calc(1em * var(--stcdx--headerFontSize) / 2);
 
 		position: relative;
 		height: 2em;
 
 		> .stcdx--action {
 			cursor: pointer;
-			font-size: 2em;
+			font-size: calc(1em * var(--stcdx--headerFontSize));
 			padding: 0.2em;
 			opacity: 0.5;
 			transition: 200ms;
@@ -174,7 +177,7 @@
 					border: 1px solid var(--SmartThemeBorderColor);
 					backdrop-filter: blur(var(--SmartThemeBlurStrength));
 					border-radius: 10px;
-					font-size: 0.5em;
+					font-size: calc(1em / var(--stcdx--headerFontSize));
 					position: absolute;
 					top: 100%;
 					left: 0;

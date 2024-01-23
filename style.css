@@ -5,6 +5,7 @@
   --stcdx--mapShadow: 3;
   --stcdx--mapShadowColor: rgba(0 0 0 / 1);
   --stcdx--mapDesaturate: 50;
+  --stcdx--headerFontSize: 2;
   --stcdx--transitionTime: 400;
   --stcdx--zoomTime: 400;
   --stcdx--mapZoneZoomTime: 400;
@@ -180,13 +181,13 @@ body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--hoverSettin
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 1em;
+  gap: calc(1em * var(--stcdx--headerFontSize) / 2);
   position: relative;
   height: 2em;
 }
 .stcdx--codex > .stcdx--header > .stcdx--action {
   cursor: pointer;
-  font-size: 2em;
+  font-size: calc(1em * var(--stcdx--headerFontSize));
   padding: 0.2em;
   opacity: 0.5;
   transition: 200ms;
@@ -207,7 +208,7 @@ body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--hoverSettin
   border: 1px solid var(--SmartThemeBorderColor);
   backdrop-filter: blur(var(--SmartThemeBlurStrength));
   border-radius: 10px;
-  font-size: 0.5em;
+  font-size: calc(1em / var(--stcdx--headerFontSize));
   position: absolute;
   top: 100%;
   left: 0;
