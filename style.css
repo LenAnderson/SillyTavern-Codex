@@ -622,6 +622,9 @@ body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--hoverSettin
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-line {
   background-image: url(img/tools-line-21.png);
 }
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-line.stcdx--painter-filled {
+  background-image: url(img/tools-lineFilled-21.png);
+}
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-smoothing-radius {
   background-image: url(img/smoothing-radius-21.png);
 }

@@ -33,6 +33,7 @@ export class Tool {
     /**
      *
      * @param {Point} point
+     * @returns {Boolean}
      */
     stop(point) {
         throw new Error(`${this.constructor.name}.stop is not implemented!`);

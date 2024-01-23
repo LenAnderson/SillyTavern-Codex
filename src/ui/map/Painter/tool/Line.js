@@ -10,16 +10,6 @@ export class Line extends Shape {
     actualEnd;
     bendPoint;
     bending = false;
-    _fill = false;
-
-
-    get fill() { return this._fill; }
-    set fill(value) {
-        this._fill = value;
-        if (!value) {
-            this.bending = false;
-        }
-    }
 
 
 

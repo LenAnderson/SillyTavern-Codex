@@ -225,11 +225,16 @@ export class Painter {
             const line = document.createElement('div'); {
                 line.classList.add('stcdx--painter-line');
                 line.classList.add('stcdx--tool');
-                line.title = 'Line\n-------------------\n[CTRL] expand from center\n[SHIFT] draw at 45° angles';
+                line.title = 'Line\n-------------------\nClick again to toggle between straight lines and curved lines\n[CTRL] expand from center\n[SHIFT] draw at 45° angles';
                 line.addEventListener('click', ()=>{
+                    if (this.tool instanceof Line) {
+                        this.tool.fill = line.classList.toggle('stcdx--painter-filled');
+                        return;
+                    }
                     const t = new Line();
                     t.width = this.tool.width;
                     t.color = this.tool.color;
+                    t.fill = line.classList.contains('stcdx--painter-filled');
                     t.context = this.inputContext;
                     this.tool = t;
                     Array.from(tools.querySelectorAll('.stcdx--tool.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
@@ -610,11 +615,12 @@ export class Painter {
         if (!this.isDrawing) return;
         evt.preventDefault();
         this.isDrawing = false;
-        this.tool.stop(this.getPoint(evt));
-        const path = [...this.tool.path];
-        this.tool.drawPath(path, this.layer.context);
-        this.layer.memorize();
-        this.inputContext.clearRect(0, 0, this.width, this.height);
+        if (this.tool.stop(this.getPoint(evt))) {
+            const path = [...this.tool.path];
+            this.tool.drawPath(path, this.layer.context);
+            this.layer.memorize();
+            this.inputContext.clearRect(0, 0, this.width, this.height);
+        }
     }
     async handlePointerMove(evt) {
         if (!this.isDrawing) return;
