@@ -610,8 +610,14 @@ body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--hoverSettin
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-rectangle {
   background-image: url(img/tools-rectangle-21.png);
 }
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-rectangle.stcdx--painter-filled {
+  background-image: url(img/tools-rectangleFilled-21.png);
+}
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-oval {
   background-image: url(img/tools-oval-21.png);
+}
+.stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-oval.stcdx--painter-filled {
+  background-image: url(img/tools-ovalFilled-21.png);
 }
 .stcdx--mapEditor > .stcdx--menu > .stcdx--painterControls > .stcdx--painter-group > *.stcdx--painter-line {
   background-image: url(img/tools-line-21.png);

@@ -7,6 +7,7 @@ import { Layer } from './Layer.js';
 import { Brush } from './tool/Brush.js';
 import { Eraser } from './tool/Eraser.js';
 import { Line } from './tool/Line.js';
+import { Oval } from './tool/Oval.js';
 import { Pencil } from './tool/Pencil.js';
 import { Rectangle } from './tool/Rectangle.js';
 // eslint-disable-next-line no-unused-vars
@@ -184,11 +185,16 @@ export class Painter {
             const rect = document.createElement('div'); {
                 rect.classList.add('stcdx--painter-rectangle');
                 rect.classList.add('stcdx--tool');
-                rect.title = 'Rectangle\n-------------------\n[CTRL] expand from center\n[SHIFT] draw square\n[SPACE] draw at an angle';
+                rect.title = 'Rectangle\n-------------------\nClick again to toggle between outline and filled shape\n[CTRL] expand from center\n[SHIFT] draw square\n[SPACE] draw at an angle';
                 rect.addEventListener('click', ()=>{
+                    if (this.tool instanceof Rectangle) {
+                        this.tool.fill = rect.classList.toggle('stcdx--painter-filled');
+                        return;
+                    }
                     const t = new Rectangle();
                     t.width = this.tool.width;
                     t.color = this.tool.color;
+                    t.fill = rect.classList.contains('stcdx--painter-filled');
                     t.context = this.inputContext;
                     this.tool = t;
                     Array.from(tools.querySelectorAll('.stcdx--tool.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
@@ -199,7 +205,21 @@ export class Painter {
             const oval = document.createElement('div'); {
                 oval.classList.add('stcdx--painter-oval');
                 oval.classList.add('stcdx--tool');
-                oval.title = 'Oval (not implemented)';
+                oval.title = 'Oval\n-------------------\nClick again to toggle between outline and filled shape\n[CTRL] expand from center\n[SHIFT] draw circle';
+                oval.addEventListener('click', ()=>{
+                    if (this.tool instanceof Oval) {
+                        this.tool.fill = oval.classList.toggle('stcdx--painter-filled');
+                        return;
+                    }
+                    const t = new Oval();
+                    t.width = this.tool.width;
+                    t.color = this.tool.color;
+                    t.fill = oval.classList.contains('stcdx--painter-filled');
+                    t.context = this.inputContext;
+                    this.tool = t;
+                    Array.from(tools.querySelectorAll('.stcdx--tool.stcdx--active')).forEach(it=>it.classList.remove('stcdx--active'));
+                    oval.classList.add('stcdx--active');
+                });
                 tools.append(oval);
             }
             const line = document.createElement('div'); {
