@@ -34,7 +34,25 @@ export class SlashCommandHandler {
             'codex-map',
             (args, value)=>this.handleCodexMap(args, value),
             [],
-            '',
+            '<span class="monospace">(text / keys)</span> – open a map in full screen',
+            true,
+            true,
+        );
+
+        registerSlashCommand(
+            'codex-edit',
+            (args, value)=>this.handleCodexEdit(args, value),
+            [],
+            '<span class="monospace">(text / keys)</span> – open an entry editor',
+            true,
+            true,
+        );
+
+        registerSlashCommand(
+            'codex-paint',
+            (args, value)=>this.handleCodexPaint(args, value),
+            [],
+            '<span class="monospace">(text / keys)</span> – open a map editor painter',
             true,
             true,
         );
@@ -105,11 +123,32 @@ export class SlashCommandHandler {
 
 
     async handleCodexMap(args, value) {
-        const matches = this.matcher.findMatches(value);
+        const matches = this.matcher.findMatches(value).filter(it=>it.entry.isMap);
         if (matches.length > 0) {
             const map = new CodexMap(matches[0].entry, this.manager.settings, this.matcher, this.manager.linker);
             await map.render();
             await map.renderZoom();
+        }
+    }
+
+
+    async handleCodexEdit(args, value) {
+        const matches = this.matcher.findMatches(value);
+        if (matches.length > 0) {
+            await this.manager.showCodex(matches[0]);
+            this.manager.codex.content.toggleEditor();
+        }
+    }
+
+    async handleCodexPaint(args, value) {
+        const matches = this.matcher.findMatches(value).filter(it=>it.entry.isMap);
+        if (matches.length > 0) {
+            await this.manager.showCodex(matches[0]);
+            /**@type {CodexMap} */
+            const c = this.manager.codex.content;
+            c.toggleEditor();
+            while (!c.editor.editorDom) await delay(100);
+            await c.editor.launchPainter();
         }
     }
 
