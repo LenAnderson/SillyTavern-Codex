@@ -14,6 +14,7 @@ import { Book } from '../st/wi/Book.js';
 import { CodexBaseEntry } from './CodexBaseEntry.js';
 import { CodexCharList } from './CodexCharList.js';
 import { CodexEntry } from './CodexEntry.js';
+import { CodexEntryFactory } from './CodexEntryFactory.js';
 import { CodexMap } from './CodexMap.js';
 
 export class Codex {
@@ -317,14 +318,7 @@ export class Codex {
         this.render().classList.add('stcdx--active');
         if (match) {
             /**@type {CodexBaseEntry}*/
-            let content;
-            if (match.entry.isMap) {
-                content = new CodexMap(match.entry, this.settings, this.matcher, this.linker);
-            } else if (match.entry.isCharList) {
-                content = new CodexCharList(match.entry, this.settings, this.matcher, this.linker);
-            } else {
-                content = new CodexEntry(match.entry, this.settings, this.matcher, this.linker);
-            }
+            let content = CodexEntryFactory.create(match.entry, this.settings, this.matcher, this.linker);
             this.newContent = content;
             this.dom.append(await content.render());
             await Promise.all([

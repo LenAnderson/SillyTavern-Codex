@@ -10,6 +10,7 @@ import { Entry } from '../st/wi/Entry.js';
 import { CodexBaseEntry } from './CodexBaseEntry.js';
 import { CodexCharList } from './CodexCharList.js';
 import { CodexEntry } from './CodexEntry.js';
+import { CodexEntryFactory } from './CodexEntryFactory.js';
 import { CodexMap } from './CodexMap.js';
 
 
@@ -122,14 +123,7 @@ export class Tooltip {
      */
     async show(evt) {
         if (!this.content) {
-            let content;
-            if (this.entry.isMap) {
-                content = new CodexMap(this.entry, this.settings, this.matcher, this.linker);
-            } else if (this.entry.isCharList) {
-                content = new CodexCharList(this.entry, this.settings, this.matcher, this.linker);
-            } else {
-                content = new CodexEntry(this.entry, this.settings, this.matcher, this.linker);
-            }
+            let content = CodexEntryFactory.create(this.entry, this.settings, this.matcher, this.linker);
             this.dom.append(await content.render());
             this.content = content;
             content.dom.classList.add('stcdx--preactive');
