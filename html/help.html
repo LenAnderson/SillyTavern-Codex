@@ -144,7 +144,34 @@
 		Character Lists
 	</h2>
 	<p>
-		Add the key <code>codex-chars:</code> to the WI entry.<br>
+		Add the key <code>codex-chars:<q>qrSetName</q></code> to the WI entry.<br>
 		Put a list of names in the WI entry's content. Separate the names either with a comma or write one name per line.
 	</p>
+	<h3>Actions</h3>
+	<p>
+		The named Quick Reply set should have a single Quick Reply. That QR will be executed when clicking on a character.
+		The QR's context menu will be shown when right-clicking on a character.
+	</p>
+	<h4>Macros</h4>
+	<p>
+		The following macros can be used in the QR and its context menu's QRs.
+	</p>
+	<ul>
+		<li>
+			<code>{{arg::avatar}}</code>
+			<p>The character's avatar.</p>
+		</li>
+		<li>
+			<code>{{arg::name}}</code>
+			<p>The character's name.</p>
+		</li>
+		<li>
+			<code>{{arg::description}}</code>
+			<p>The character's description.</p>
+		</li>
+		<li>
+			<code>{{arg::personality}}</code>
+			<p>The character's personality.</p>
+		</li>
+	</ul>
 </div>

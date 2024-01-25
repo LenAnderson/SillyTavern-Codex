@@ -1,19 +1,28 @@
 import { characters } from '../../../../../../script.js';
+import { quickReplyApi } from '../../../../quick-reply/index.js';
+import { QuickReplySet } from '../../../../quick-reply/src/QuickReplySet.js';
+import { log, warn } from '../lib/log.js';
 import { Character } from '../st/Character.js';
-import { Entry } from '../st/wi/Entry.js';
 import { CodexBaseEntry } from './CodexBaseEntry.js';
+import { CharListContextMenu } from './contextmenu/CharListContextMenu.js';
 
 
 
 
 export class CodexCharList extends CodexBaseEntry {
     /**@type {Character[]}*/ charList = [];
+    /**@type {QuickReplySet}*/ quickReplySet;
 
 
 
 
     constructor(entry, settings, matcher, linker) {
         super(entry, settings, matcher, linker);
+
+        const qrsName = entry.keyList.find(it=>it.startsWith('codex-chars:')).substring(12);
+        if (qrsName.length > 0) {
+            this.quickReplySet = quickReplyApi.getSetByName(qrsName);
+        }
 
         let names;
         if (entry.content.search('\n') == -1) {
@@ -36,33 +45,6 @@ export class CodexCharList extends CodexBaseEntry {
     }
 
 
-    renderCharTemplate(c) {
-        let template = `
-            ![](/characters/{{char::name}}/joy.png)
-
-        `;
-        let messageText = this.subParams(entry.content);
-        messageText = template
-            .replace(/{{comment}}/g, entry.comment)
-            .replace(/{{comment::url}}/g, encodeURIComponent(entry.comment))
-            .replace(/{{content}}/g, entry.content)
-            .replace(/{{content::url}}/g, encodeURIComponent(entry.content))
-            .replace(/{{key\[(\d+)\]}}/g, (_,idx)=>entry.keyList[idx])
-            .replace(/{{key\[(\d+)\]::url}}/g, (_,idx)=>encodeURIComponent(entry.keyList[idx]))
-            .replace(/{{title}}/g, entry.title)
-            .replace(/{{title::url}}/g, encodeURIComponent(entry.title))
-        ;
-        messageText = messageFormatting(
-            messageText,
-            'Codex',
-            false,
-            false,
-        );
-        const dom = document.createElement('div');
-        dom.innerHTML = messageText;
-        this.linker.addCodexLinks(dom, [this.entry]);
-        return Array.from(dom.children);
-    }
     async render() {
         if (!this.dom) {
             const root = document.createElement('div'); {
@@ -79,6 +61,9 @@ export class CodexCharList extends CodexBaseEntry {
                     for (const c of this.charList) {
                         const char = document.createElement('div'); {
                             char.classList.add('stcdx--char');
+                            char.title = `${c.name}\n${(this.quickReplySet.qrList[0]?.title || this.quickReplySet.qrList[0]?.message) ?? ''}`;
+                            char.addEventListener('click', (evt)=>this.handleClick(evt, c));
+                            char.addEventListener('contextmenu', (evt)=>this.handleContextMenu(evt, c));
                             const ava = document.createElement('div'); {
                                 ava.classList.add('stcdx--image');
                                 ava.style.backgroundImage = `url("/characters/${encodeURIComponent(c.name)}/joy.png")`;
@@ -97,5 +82,33 @@ export class CodexCharList extends CodexBaseEntry {
             }
         }
         return this.dom;
+    }
+
+
+    /**
+     *
+     * @param {MouseEvent} evt
+     * @param {Character} character
+     */
+    async handleClick(evt, character) {
+        if (this.quickReplySet && this.quickReplySet.qrList.length > 0) {
+            const qr = this.quickReplySet.qrList[0];
+            await qr.execute({ ...character });
+        }
+    }
+
+    /**
+     *
+     * @param {MouseEvent} evt
+     * @param {Character} character
+     */
+    async handleContextMenu(evt, character) {
+        if (this.quickReplySet && this.quickReplySet.qrList.length > 0 && this.quickReplySet.qrList[0].contextList.length > 0) {
+            evt.preventDefault();
+            const qr = this.quickReplySet.qrList[0];
+            const ctx = new CharListContextMenu(qr, character);
+            ctx.show(evt);
+            log(ctx, ctx.itemList);
+        }
     }
 }
