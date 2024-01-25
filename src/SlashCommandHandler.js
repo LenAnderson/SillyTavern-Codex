@@ -174,7 +174,6 @@ export class SlashCommandHandler {
             return warn('failed to fetch template: help.html');
         }
         const helpText = (await response.text());
-        window.x = helpText;
         const now = new Date().getTime();
         const toc = Array.from(helpText.matchAll(/<h2[^>]+id="stcdx--help--([^"]+)"[^>]*>.*?<a[^>]*>.*?<\/a>(.*?)<\/h2>/igs))
             .map((match)=>`<li><a data-stcdx--href="${match[1]}">${match[2]}</a></li>`)
