@@ -8,10 +8,7 @@ import { Settings } from '../Settings.js';
 import { Entry } from '../st/wi/Entry.js';
 // eslint-disable-next-line no-unused-vars
 import { CodexBaseEntry } from './CodexBaseEntry.js';
-import { CodexCharList } from './CodexCharList.js';
-import { CodexEntry } from './CodexEntry.js';
 import { CodexEntryFactory } from './CodexEntryFactory.js';
-import { CodexMap } from './CodexMap.js';
 
 
 
@@ -38,6 +35,7 @@ export class Tooltip {
     /**@type {Linker}*/ linker;
 
     /**@type {Boolean}*/ isFrozen = false;
+    /**@type {Boolean}*/ isHidden = true;
 
     /**@type {Function}*/ boundMove;
     /**@type {Function}*/ boundScroll;
@@ -122,9 +120,11 @@ export class Tooltip {
      * @param {PointerEvent} evt
      */
     async show(evt) {
+        this.isHidden = false;
         if (!this.content) {
             let content = CodexEntryFactory.create(this.entry, this.settings, this.matcher, this.linker);
             this.dom.append(await content.render());
+            if (this.isHidden) return;
             this.content = content;
             content.dom.classList.add('stcdx--preactive');
             content.dom.classList.add('stcdx--active');
@@ -141,6 +141,7 @@ export class Tooltip {
 
     hide(isForced = false) {
         if (this.isFrozen && !isForced) return;
+        this.isHidden = true;
         this.isFrozen = false;
         this.dom?.remove();
         // @ts-ignore
