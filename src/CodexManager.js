@@ -182,7 +182,9 @@ export class CodexManager {
         while (this.messageQueue.length > 0) {
             const idx = this.messageQueue.shift();
             if (done.includes(idx)) continue;
-            await this.updateMessageIdx(idx);
+            if (!this.settings.disableLinks) {
+                await this.updateMessageIdx(idx);
+            }
             done.push(idx);
         }
         log('/PROCESS QUEUE');

@@ -21,6 +21,8 @@ export class Settings {
 
     /**@type {Boolean}*/ requirePrefix = false;
 
+    /**@type {Boolean}*/ disableLinks = false;
+
     /**@type {String}*/ template = '## {{title}}\n\n{{content}}';
     /**@type {String}*/ mapTemplate = '## {{title}}\n\n{{map}}\n\n{{desription}}\n\n{{zones}}y';
     /**@type {Template[]}*/ templateList = [];
@@ -76,6 +78,8 @@ export class Settings {
 
             requirePrefix: this.requirePrefix,
 
+            disableLinks: this.disableLinks,
+
             template: this.template,
             templateList: this.templateList,
 
@@ -127,6 +131,14 @@ export class Settings {
         isEnabled.checked = this.isEnabled;
         isEnabled.addEventListener('click', () => {
             this.isEnabled = isEnabled.checked;
+            this.save();
+            this.restartDebounced();
+        });
+        /**@type {HTMLInputElement} */
+        const disableLinks = dom.querySelector('#stcdx--disableLinks');
+        disableLinks.checked = this.disableLinks;
+        disableLinks.addEventListener('click', () => {
+            this.disableLinks = disableLinks.checked;
             this.save();
             this.restartDebounced();
         });
