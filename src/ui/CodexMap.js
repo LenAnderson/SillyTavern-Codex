@@ -1,5 +1,7 @@
 import { executeSlashCommands } from '../../../../../slash-commands.js';
 import { delay } from '../../../../../utils.js';
+import { Match } from '../Match.js';
+import { ResultNode } from '../ResultNode.js';
 import { tryDecodeBase64 } from '../lib/base64.js';
 import { log } from '../lib/log.js';
 import { waitForFrame } from '../lib/wait.js';
@@ -136,6 +138,10 @@ export class CodexMap extends CodexBaseEntry {
                     const label = document.createElement('div'); {
                         label.classList.add('stcdx--title');
                         label.textContent = zone.label ?? entry?.title ?? '???';
+                        if (entry) {
+                            label.classList.add('stcdx--link');
+                            this.linker.updateNodes([new ResultNode(label.firstChild, [new Match(entry.book, entry, 0, label.textContent.length)])]);
+                        }
                         z.append(label);
                     }
                     const content = document.createElement('div'); {
@@ -145,7 +151,7 @@ export class CodexMap extends CodexBaseEntry {
                             const p = document.createElement('p');
                             p.textContent = zone.description;
                             content.append(p);
-                        } else if (entry) {
+                        } else if (entry && !entry.isMap && !entry.isCharList) {
                             content.append(...this.renderTemplate(entry));
                             Array.from(content.querySelectorAll('img, h1, h2, h3, h4')).forEach(it=>it.remove());
                         }
