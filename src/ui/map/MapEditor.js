@@ -539,6 +539,9 @@ export class MapEditor extends MapBase {
             window.addEventListener('keyup', this.handleKeyUpBound);
             document.body.append(await this.render());
             await this.updateHover();
+            if (!this.codexMap.url) {
+                this.editDetails();
+            }
         });
     }
 
