@@ -84,11 +84,11 @@ export class Matcher {
                         }
                     } else {
                         plain = searchKey;
-                        if (!this.wiSettings.isCaseSensitive) {
+                        if (!(entry.isCaseSensitive ?? this.wiSettings.isCaseSensitive)) {
                             plain = plain.toLowerCase();
                             searchText = searchText.toLowerCase();
                         }
-                        if (this.wiSettings.isMatchingWholeWords) {
+                        if (entry.isMatchingWholeWords ?? this.wiSettings.isMatchingWholeWords) {
                             re = new RegExp(`\\b${escapeRegex(plain)}\\b`);
                         }
                     }

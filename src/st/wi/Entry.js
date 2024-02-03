@@ -13,6 +13,8 @@ export class Entry {
             comment:props.comment,
             content: props.content,
             isDisabled: props.disable,
+            isCaseSensitive: props.caseSensitive,
+            isMatchingWholeWords: props.matchWholeWords,
         });
         return instance;
     }
@@ -27,6 +29,8 @@ export class Entry {
     /**@type {String}*/ comment;
     /**@type {String}*/ content;
     /**@type {Boolean}*/ isDisabled;
+    /**@type {Boolean}*/ isCaseSensitive;
+    /**@type {Boolean}*/ isMatchingWholeWords;
 
     /**@type {Function}*/ saveDebounced;
 
@@ -66,6 +70,8 @@ export class Entry {
             comment: this.comment,
             content: this.content,
             disable: this.isDisabled,
+            caseSensitive: this.isCaseSensitive,
+            matchWholeWords: this.isMatchingWholeWords,
         };
     }
 
