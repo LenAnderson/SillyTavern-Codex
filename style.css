@@ -146,6 +146,42 @@ body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--hoverSettin
     display: none;
   }
 }
+.stcdx--parchment .stcdx--codex {
+  background-image: url(img/parchment.png);
+  background-size: 100% 100%;
+  color: black;
+  background-color: transparent;
+  border: none;
+  backdrop-filter: none;
+  grid-template-rows: 6.5% 1fr;
+}
+.stcdx--parchment .stcdx--codex > .stcdx--header {
+  padding-left: 0%;
+  margin-bottom: 0%;
+  width: 81%;
+  position: relative;
+  left: 13%;
+  height: 100%;
+}
+.stcdx--parchment .stcdx--codex > .stcdx--header > .stcdx--action.stcdx--menu > .stcdx--books,
+.stcdx--parchment .stcdx--codex > .stcdx--header > .stcdx--search > .stcdx--results {
+  color: var(--SmartThemeBodyColor);
+}
+.stcdx--parchment .stcdx--codex > .stcdx--content,
+.stcdx--parchment .stcdx--codex .stcdx--content.stcdx--map {
+  position: relative;
+  left: 11%;
+  width: 79%;
+  height: 98.5%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  clip-path: polygon(0% 3%, 12.5% 1.75%, 25% 1.1%, 50% 1.1%, 75% 1.6%, 87.5% 2.2%, 100% 3%, 100% 93.2%, 50% 97.25%, 37% 99.5%, 25% 99.3%, 0% 97.3%);
+}
+.stcdx--parchment .stcdx--codex > .stcdx--content *,
+.stcdx--parchment .stcdx--codex .stcdx--content.stcdx--map * {
+  text-shadow: none !important;
+}
 .stcdx--codex {
   position: absolute;
   bottom: 0;

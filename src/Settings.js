@@ -43,6 +43,8 @@ export class Settings {
 
     /**@type {Number}*/ historyLength = 10;
 
+    /**@type {Boolean}*/ isParchment = false;
+
     /**@type {Function}*/ restartDebounced;
     /**@type {Function}*/ rerenderDebounced;
 
@@ -98,6 +100,8 @@ export class Settings {
             mapZoneZoomTime: this.mapZoneZoomTime,
 
             historyLength: this.historyLength,
+
+            isParchment: this.isParchment,
         };
     }
 
@@ -171,6 +175,14 @@ export class Settings {
         fixedTooltips.checked = this.fixedTooltips;
         fixedTooltips.addEventListener('click', () => {
             this.fixedTooltips = fixedTooltips.checked;
+            this.save();
+            this.restartDebounced();
+        });
+        /**@type {HTMLInputElement} */
+        const isParchment = dom.querySelector('#stcdx--isParchment');
+        isParchment.checked = this.isParchment;
+        isParchment.addEventListener('click', () => {
+            this.isParchment = isParchment.checked;
             this.save();
             this.restartDebounced();
         });

@@ -120,6 +120,8 @@ export class CodexManager {
         document.body.style.setProperty('--stcdx--zoomTime', `${this.settings.zoomTime}`);
         document.body.style.setProperty('--stcdx--mapZoneZoomTime', `${this.settings.mapZoneZoomTime}`);
 
+        document.body.classList[this.settings.isParchment ? 'add' : 'remove']('stcdx--parchment');
+
         this.isActive = true;
         await this.updateChat();
 
