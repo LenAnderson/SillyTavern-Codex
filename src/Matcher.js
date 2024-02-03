@@ -1,3 +1,4 @@
+import { escapeRegex } from '../../../../utils.js';
 import { Match } from './Match.js';
 import { ResultNode } from './ResultNode.js';
 // eslint-disable-next-line no-unused-vars
@@ -86,6 +87,9 @@ export class Matcher {
                         if (!this.wiSettings.isCaseSensitive) {
                             plain = plain.toLowerCase();
                             searchText = searchText.toLowerCase();
+                        }
+                        if (this.wiSettings.isMatchingWholeWords) {
+                            re = new RegExp(`\\b${escapeRegex(plain)}\\b`);
                         }
                     }
                     let offset = 0;

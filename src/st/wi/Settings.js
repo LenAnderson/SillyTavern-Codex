@@ -48,7 +48,7 @@ export class WorldInfoSettings {
             this.isCaseSensitive = world_info_case_sensitive;
             isChanged = true;
         }
-        if (this.isMatchingWholeWords == world_info_match_whole_words) {
+        if (this.isMatchingWholeWords != world_info_match_whole_words) {
             this.isMatchingWholeWords = world_info_match_whole_words;
             isChanged = true;
         }
