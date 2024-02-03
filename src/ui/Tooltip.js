@@ -4,6 +4,7 @@ import { Linker } from '../Linker.js';
 import { Matcher } from '../Matcher.js';
 // eslint-disable-next-line no-unused-vars
 import { Settings } from '../Settings.js';
+import { waitForFrame } from '../lib/wait.js';
 // eslint-disable-next-line no-unused-vars
 import { Entry } from '../st/wi/Entry.js';
 // eslint-disable-next-line no-unused-vars
@@ -131,12 +132,13 @@ export class Tooltip {
         }
         this.dom.classList.add('stcdx--active');
         this.dom.classList[this.settings.fixedTooltips ? 'add' : 'remove']('stcdx--fixed');
-        this.updatePosition(evt.x, evt.y);
         // @ts-ignore
         window.addEventListener('pointermove', this.boundMove);
         // @ts-ignore
         evt.target.addEventListener('wheel', this.boundScroll);
         document.body.append(this.dom);
+        await waitForFrame();
+        this.updatePosition(evt.x, evt.y);
     }
 
     hide(isForced = false) {
