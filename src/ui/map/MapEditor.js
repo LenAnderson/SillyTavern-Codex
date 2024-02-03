@@ -468,7 +468,8 @@ export class MapEditor extends MapBase {
             const fs = con.fillStyle;
             con.fillStyle = 'black';
             con.font = '20px monospace';
-            con.fillText(i++, p.x, p.y);
+            // con.fillText(i, p.x, p.y);
+            i++;
             con.fillStyle = fs;
         }
         con.beginPath();
