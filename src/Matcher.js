@@ -92,57 +92,57 @@ export class Matcher {
                             re = new RegExp(`\\b${escapeRegex(plain)}\\b`);
                         }
                     }
+                    // secondary keys
+                    if (entry.secondaryKeyList.length > 0) {
+                        let any = false;
+                        let all = true;
+                        for (const key of entry.secondaryKeyList) {
+                            const searchKey = key.replace(/^codex:/, '');
+                            /**@type {RegExp}*/
+                            let re;
+                            /**@type {String}*/
+                            let plain;
+                            if (searchKey.match(/^\/.+\/[a-z]*$/)) {
+                                try {
+                                    re = new RegExp(searchKey.replace(/^\/(.+)\/([a-z]*)$/, '$1'), searchKey.replace(/^\/(.+)\/([a-z]*)$/, '$2'));
+                                } catch (ex) {
+                                    warn(ex.message, ex);
+                                }
+                            } else {
+                                plain = searchKey;
+                                if (!this.wiSettings.isCaseSensitive) {
+                                    plain = plain.toLowerCase();
+                                }
+                            }
+                            if (searchText.search(re ?? plain) != -1) {
+                                any = true;
+                            } else {
+                                all = false;
+                            }
+                        }
+                        switch (entry.secondaryKeyLogic) {
+                            case worldInfoLogic.AND_ANY: {
+                                if (!any) continue;
+                                break;
+                            }
+                            case worldInfoLogic.NOT_ALL: {
+                                if (all) continue;
+                                break;
+                            }
+                            case worldInfoLogic.NOT_ANY: {
+                                if (any) continue;
+                                break;
+                            }
+                            case worldInfoLogic.AND_ALL: {
+                                if (!all) continue;
+                                break;
+                            }
+                        }
+                    }
+                    // /secondary keys
                     let offset = 0;
                     while (searchText.substring(offset).search(re ?? plain) != -1) {
                         if (this.settings.onlyFirst && found.find(it=>it == entry)) break;
-                        // secondary keys
-                        if (entry.secondaryKeyList.length > 0) {
-                            let any = false;
-                            let all = true;
-                            for (const key of entry.secondaryKeyList) {
-                                const searchKey = key.replace(/^codex:/, '');
-                                /**@type {RegExp}*/
-                                let re;
-                                /**@type {String}*/
-                                let plain;
-                                if (searchKey.match(/^\/.+\/[a-z]*$/)) {
-                                    try {
-                                        re = new RegExp(searchKey.replace(/^\/(.+)\/([a-z]*)$/, '$1'), searchKey.replace(/^\/(.+)\/([a-z]*)$/, '$2'));
-                                    } catch (ex) {
-                                        warn(ex.message, ex);
-                                    }
-                                } else {
-                                    plain = searchKey;
-                                    if (!this.wiSettings.isCaseSensitive) {
-                                        plain = plain.toLowerCase();
-                                    }
-                                }
-                                if (searchText.search(re ?? plain) != -1) {
-                                    any = true;
-                                } else {
-                                    all = false;
-                                }
-                            }
-                            switch (entry.secondaryKeyLogic) {
-                                case worldInfoLogic.AND_ANY: {
-                                    if (!any) continue;
-                                    break;
-                                }
-                                case worldInfoLogic.NOT_ALL: {
-                                    if (all) continue;
-                                    break;
-                                }
-                                case worldInfoLogic.NOT_ANY: {
-                                    if (any) continue;
-                                    break;
-                                }
-                                case worldInfoLogic.AND_ALL: {
-                                    if (!all) continue;
-                                    break;
-                                }
-                            }
-                        }
-                        // /secondary keys
                         let start;
                         let end;
                         if (re) {
