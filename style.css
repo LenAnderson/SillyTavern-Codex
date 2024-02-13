@@ -121,6 +121,12 @@ body:has(.stcdx--mapEditor) #shadow_popup #stcdx--zoneEditor .stcdx--hoverSettin
   display: flex;
   gap: 0.5em;
 }
+body:has(#stcdx--codex.stcdx--active) #WorldInfo {
+  max-width: calc(100vw - (100vw - var(--sheldWidth)) / 2 - var(--nav-bar-width, 0));
+}
+#WorldInfo .stcdx--wiButton {
+  white-space: nowrap;
+}
 .stcdx--link {
   cursor: help;
   color: var(--stcdx--color);

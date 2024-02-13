@@ -28,6 +28,8 @@ export class CodexManager {
 
     /**@type {Codex}*/ codex;
 
+    /**@type {HTMLElement}*/ wiButton;
+
     /**@type {Boolean}*/ isActive = false;
     /**@type {Boolean}*/ isRestarting = false;
     /**@type {Boolean}*/ isStarting = false;
@@ -106,6 +108,16 @@ export class CodexManager {
             this.bookList,
         );
 
+        this.wiButton = document.createElement('div'); {
+            this.wiButton.classList.add('stcdx--wiButton');
+            this.wiButton.classList.add('menu_button');
+            this.wiButton.textContent = 'Toggle Codex';
+            this.wiButton.addEventListener('click', ()=>{
+                this.toggleCodex();
+            });
+            document.querySelector('#WI_panel_pin_div').append(this.wiButton);
+        }
+
         document.body.style.setProperty('--stcdx--color', this.settings.color);
         document.body.style.setProperty('--stcdx--icon', `"${this.settings.icon}"`);
 
@@ -142,6 +154,8 @@ export class CodexManager {
         this.linker = null;
         this.codex?.unrender();
         this.codex = null;
+        this.wiButton.remove();
+        this.wiButton = null;
         while (this.messageQueue.length > 0) this.messageQueue.pop();
         while (this.bookList.length > 0) this.bookList.pop();
         while (Tooltip.list.length > 0) Tooltip.list.pop().remove();
