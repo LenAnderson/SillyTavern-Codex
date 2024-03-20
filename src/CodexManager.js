@@ -101,12 +101,16 @@ export class CodexManager {
             this.matcher,
             (match)=>this.toggleCodex(match),
         );
-        this.codex = new Codex(
-            this.settings,
-            this.matcher,
-            this.linker,
-            this.bookList,
-        );
+        if (this.codex) {
+            this.codex.stopReload(this.bookList);
+        } else {
+            this.codex = new Codex(
+                this.settings,
+                this.matcher,
+                this.linker,
+                this.bookList,
+            );
+        }
 
         this.wiButton = document.createElement('div'); {
             this.wiButton.classList.add('stcdx--wiButton');
@@ -152,8 +156,12 @@ export class CodexManager {
         Array.from(document.querySelectorAll('#chat > .mes .mes_text')).forEach(it=>this.linker.restoreChatMessage(it));
         this.matcher = null;
         this.linker = null;
-        this.codex?.unrender();
-        this.codex = null;
+        if (!getContext().chatId) {
+            this.codex?.unrender();
+            this.codex = null;
+        } else {
+            this.codex?.startReload();
+        }
         this.wiButton.remove();
         this.wiButton = null;
         while (this.messageQueue.length > 0) this.messageQueue.pop();

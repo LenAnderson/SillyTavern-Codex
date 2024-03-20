@@ -31,6 +31,9 @@ export class Codex {
     /**@type {HTMLElement}*/ historyBack;
     /**@type {HTMLElement}*/ historyForward;
 
+    /**@type {HTMLElement}*/ menuTrigger;
+    /**@type {HTMLElement}*/ menu;
+
     /**@type {HTMLElement}*/ searchWrap;
     /**@type {HTMLElement}*/ searchResults;
 
@@ -53,6 +56,38 @@ export class Codex {
         this.matcher = matcher;
         this.linker = linker;
         this.bookList = bookList;
+    }
+
+    startReload() {
+        this.dom?.classList?.add('stcdx--isReloading');
+    }
+    stopReload(books) {
+        this.bookList = books;
+        const currentMatch = this.history[this.historyIdx];
+        this.history = this.history
+            .map(match=>this.bookList.find(book=>book.name == match.book)?.entryList?.find(entry=>entry.uid == match.entry.uid))
+            .filter(it=>it)
+            .map(entry=>new Match(entry.book, entry))
+        ;
+        this.history = this.history.filter(it=>it);
+        if (this.dom) {
+            if (this.dom.classList.contains('stcdx--active')) {
+                if (this.history.length == 0) {
+                    this.content?.unrender();
+                } else {
+                    const currentIndex = this.history.findIndex(match=>match.book == currentMatch.book && match.entry.uid == currentMatch.entry.uid);
+                    if (currentIndex == -1) {
+                        this.historyIdx = this.history.length - 1;
+                    } else {
+                        this.historyIdx = currentIndex;
+                    }
+                    this.show(this.history[this.historyIdx], true);
+                }
+            }
+            this.updateHistoryButtons();
+            this.renderMenu();
+            this.dom.classList?.remove('stcdx--isReloading');
+        }
     }
 
 
@@ -145,6 +180,45 @@ export class Codex {
 
 
 
+    renderMenu() {
+        this.menu?.remove();
+        const menu = document.createElement('ul'); {
+            this.menu = menu;
+            menu.classList.add('stcdx--books');
+            this.bookList.forEach(book=>{
+                const entries = book.entryList
+                    .filter(e=>e.keyList.find(k=>!this.settings.requirePrefix || k.startsWith('codex:')))
+                    .filter(e=>!e.keyList.includes('codex-skip:'))
+                    .toSorted((a,b)=>a.title.localeCompare(b.title))
+                ;
+                if (entries.length == 0) return;
+                const li = document.createElement('li'); {
+                    li.classList.add('stcdx--book');
+                    const name = document.createElement('div'); {
+                        name.classList.add('stcdx--name');
+                        name.textContent = book.name;
+                        li.append(name);
+                    }
+                    const entryList = document.createElement('ul'); {
+                        entryList.classList.add('stcdx--entries');
+                        entries.forEach(entry=>{
+                            const link = document.createElement('li'); {
+                                link.classList.add('stcdx--entry');
+                                link.textContent = entry.title;
+                                link.addEventListener('click', (evt)=>{
+                                    this.show(new Match(book.name, entry));
+                                });
+                                entryList.append(link);
+                            }
+                        });
+                        li.append(entryList);
+                    }
+                    menu.append(li);
+                }
+            });
+            this.menuTrigger.append(menu);
+        }
+    }
     rerender() {
         if (!this.content) return;
         this.show(new Match(this.content.entry.book, this.content.entry), false, true);
@@ -160,48 +234,15 @@ export class Codex {
                 const head = document.createElement('div'); {
                     head.classList.add('stcdx--header');
                     const menuTrigger = document.createElement('div'); {
+                        this.menuTrigger = menuTrigger;
                         menuTrigger.classList.add('stcdx--action');
                         menuTrigger.classList.add('stcdx--menu');
                         menuTrigger.textContent = '≡';
                         menuTrigger.title = 'Entries';
                         menuTrigger.addEventListener('click', ()=>{
-                            menu.classList.toggle('stcdx--active');
+                            this.menu.classList.toggle('stcdx--active');
                         });
-                        const menu = document.createElement('ul'); {
-                            menu.classList.add('stcdx--books');
-                            this.bookList.forEach(book=>{
-                                const entries = book.entryList
-                                    .filter(e=>e.keyList.find(k=>!this.settings.requirePrefix || k.startsWith('codex:')))
-                                    .filter(e=>!e.keyList.includes('codex-skip:'))
-                                    .toSorted((a,b)=>a.title.localeCompare(b.title))
-                                ;
-                                if (entries.length == 0) return;
-                                const li = document.createElement('li'); {
-                                    li.classList.add('stcdx--book');
-                                    const name = document.createElement('div'); {
-                                        name.classList.add('stcdx--name');
-                                        name.textContent = book.name;
-                                        li.append(name);
-                                    }
-                                    const entryList = document.createElement('ul'); {
-                                        entryList.classList.add('stcdx--entries');
-                                        entries.forEach(entry=>{
-                                            const link = document.createElement('li'); {
-                                                link.classList.add('stcdx--entry');
-                                                link.textContent = entry.title;
-                                                link.addEventListener('click', (evt)=>{
-                                                    this.show(new Match(book.name, entry));
-                                                });
-                                                entryList.append(link);
-                                            }
-                                        });
-                                        li.append(entryList);
-                                    }
-                                    menu.append(li);
-                                }
-                            });
-                            menuTrigger.append(menu);
-                        }
+                        this.renderMenu();
                         head.append(menuTrigger);
                     }
                     const back = document.createElement('div'); {

@@ -183,6 +183,13 @@ body:has(#stcdx--codex.stcdx--active) #WorldInfo {
 	width: calc((100vw - var(--sheldWidth)) / 2);
 	transition: calc(1ms * var(--stcdx--transitionTime));
 
+	&.stcdx--isReloading {
+		opacity: 0.5;
+		> .stcdx--content {
+			display: none;
+		}
+	}
+
 	&.stcdx--maximized {
 		width: calc(100vw - var(--nav-bar-width, 0));
 		z-index: 1000;
