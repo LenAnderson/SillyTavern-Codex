@@ -10,11 +10,14 @@ export class Entry {
             keyList: props.key,
             secondaryKeyList: props.keysecondary,
             secondaryKeyLogic: props.selectiveLogic,
-            comment:props.comment,
+            comment: props.comment,
             content: props.content,
             isDisabled: props.disable,
             isCaseSensitive: props.caseSensitive,
             isMatchingWholeWords: props.matchWholeWords,
+            originalKeyList: props.key.join(', '),
+            originalComment: props.comment,
+            originalContent: props.content,
         });
         return instance;
     }
@@ -31,6 +34,10 @@ export class Entry {
     /**@type {Boolean}*/ isDisabled;
     /**@type {Boolean}*/ isCaseSensitive;
     /**@type {Boolean}*/ isMatchingWholeWords;
+
+    /**@type {String}*/ originalKeyList;
+    /**@type {String}*/ originalComment;
+    /**@type {String}*/ originalContent;
 
     /**@type {Function}*/ saveDebounced;
 
@@ -78,9 +85,19 @@ export class Entry {
 
 
 
+    getChanges() {
+        const changes = [];
+        if (this.originalComment != this.comment) changes.push('comment');
+        if (this.originalContent != this.content) changes.push('content');
+        if (this.originalKeyList != this.keyList.join(', ')) changes.push('key');
+        return changes;
+    }
     async save() {
         if (this.onSave) {
-            await this.onSave(this);
+            const changes = this.getChanges();
+            if (changes.length > 0) {
+                await this.onSave(this, changes);
+            }
         }
     }
 }

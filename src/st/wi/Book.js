@@ -34,7 +34,7 @@ export class Book {
             const data = await result.json();
             for (const uid of Object.keys(data.entries)) {
                 const entry = Entry.from(this.name, data.entries[uid]);
-                entry.onSave = ()=>this.save(entry);
+                entry.onSave = (_, changes)=>this.save(entry, changes);
                 this.entryList.push(entry);
             }
         } else {
@@ -44,7 +44,12 @@ export class Book {
         log('/BOOK.load', this);
     }
 
-    async save(entry) {
-        await executeSlashCommands(`/setentryfield file="${this.name}" uid=${entry.uid} field=content ${entry.content.replace(/([{}|])/g, '\\$1')}`);
+    async save(entry, changes) {
+        const commands = [
+            !changes.includes('content') ? null : `/setentryfield file="${this.name}" uid=${entry.uid} field=content ${entry.content.replace(/([{}|])/g, '\\$1')}`,
+            !changes.includes('key') ? null : `/setentryfield file="${this.name}" uid=${entry.uid} field=key ${entry.keyList.map(it=>it.replace(/([{}|])/g, '\\$1')).join(', ')}`,
+            !changes.includes('comment') ? null : `/setentryfield file="${this.name}" uid=${entry.uid} field=comment ${entry.comment.replace(/([{}|])/g, '\\$1')}`,
+        ];
+        await executeSlashCommands(commands.filter(it=>it).join(' | '));
     }
 }

@@ -465,6 +465,16 @@ body:has(#stcdx--codex.stcdx--active) #WorldInfo {
 .stcdx--root > .stcdx--content.stcdx--charList > .stcdx--chars > .stcdx--char > .stcdx--name {
   text-align: center;
 }
+.stcdx--root > .stcdx--editor {
+  display: flex;
+  flex-direction: column;
+}
+.stcdx--root > .stcdx--editor.stcdx--preactive {
+  display: flex;
+}
+.stcdx--root > .stcdx--editor > .stcdx--editor-content {
+  flex: 1 1 auto;
+}
 .stcdx--blocker {
   position: fixed;
   inset: 0;

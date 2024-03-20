@@ -1,7 +1,9 @@
 import { characters } from '../../../../../../script.js';
+import { delay } from '../../../../../utils.js';
 import { quickReplyApi } from '../../../../quick-reply/index.js';
 import { QuickReplySet } from '../../../../quick-reply/src/QuickReplySet.js';
 import { log, warn } from '../lib/log.js';
+import { waitForFrame } from '../lib/wait.js';
 import { Character } from '../st/Character.js';
 import { CodexBaseEntry } from './CodexBaseEntry.js';
 import { CharListContextMenu } from './contextmenu/CharListContextMenu.js';
@@ -24,11 +26,16 @@ export class CodexCharList extends CodexBaseEntry {
             this.quickReplySet = quickReplyApi.getSetByName(qrsName);
         }
 
+        this.fetchChars();
+    }
+
+    fetchChars() {
+        while (this.charList.length > 0) this.charList.pop();
         let names;
-        if (entry.content.search('\n') == -1) {
-            names = entry.content.split(/\s*,\s*/).map(it=>it.trim());
+        if (this.entry.content.search('\n') == -1) {
+            names = this.entry.content.split(/\s*,\s*/).map(it=>it.trim());
         } else {
-            names = entry.content.split(/\n+/).map(it=>it.trim());
+            names = this.entry.content.split(/\n+/).map(it=>it.trim());
         }
         for (const name of names) {
             const c = characters.find(it=>it.name == name);
@@ -45,8 +52,10 @@ export class CodexCharList extends CodexBaseEntry {
     }
 
 
-    async render() {
-        if (!this.dom) {
+    async render(isUpdate = false) {
+        let oldDom;
+        if (isUpdate || !this.dom) {
+            oldDom = this.dom;
             const root = document.createElement('div'); {
                 this.dom = root;
                 root.classList.add('stcdx--content');
@@ -81,6 +90,9 @@ export class CodexCharList extends CodexBaseEntry {
                 }
             }
         }
+        if (isUpdate && oldDom) {
+            oldDom.replaceWith(this.dom);
+        }
         return this.dom;
     }
 
@@ -110,5 +122,81 @@ export class CodexCharList extends CodexBaseEntry {
             ctx.show(evt);
             log(ctx, ctx.itemList);
         }
+    }
+
+    async toggleEditor() {
+        log('CodexCharList.toggleEditor');
+        if (this.isTogglingEditor) return;
+        this.isTogglingEditor = true;
+        if (this.isEditing) {
+            this.fetchChars();
+            await this.entry.saveDebounced();
+            await this.render(true);
+            this.dom.classList.add('stcdx--preactive');
+            await waitForFrame();
+            this.dom.classList.add('stcdx--active');
+            this.editor.classList.remove('stcdx--active');
+            await delay(this.settings.transitionTime + 10);
+            this.editor.classList.remove('stcdx--preactive');
+            this.editor.remove();
+            this.editor = null;
+            this.isEditing = false;
+        } else {
+            this.isEditing = true;
+            let editor;
+            const wrapper = document.createElement('div'); {
+                this.editor = wrapper;
+                wrapper.classList.add('stcdx--editor');
+                const title = document.createElement('input'); {
+                    title.classList.add('text_pole');
+                    title.classList.add('stcdx--editor-title');
+                    title.placeholder = 'Title / Memo';
+                    title.title = 'Title / Memo';
+                    title.value = this.entry.comment;
+                    title.addEventListener('input', async()=>{
+                        if (!this.isEditing || this.isTogglingEditor) return;
+                        this.entry.comment = title.value;
+                        this.entry.saveDebounced();
+                    });
+                    wrapper.append(title);
+                }
+                const keywords = document.createElement('input'); {
+                    keywords.classList.add('text_pole');
+                    keywords.classList.add('stcdx--editor-tags');
+                    keywords.placeholder = 'Primary Keywords';
+                    keywords.title = 'Primary Keywords';
+                    keywords.value = this.entry.keyList.join(', ');
+                    keywords.addEventListener('input', async()=>{
+                        if (!this.isEditing || this.isTogglingEditor) return;
+                        this.entry.keyList = keywords.value.split(/\s*,\s*/);
+                        this.entry.saveDebounced();
+                    });
+                    wrapper.append(keywords);
+                }
+                editor = document.createElement('textarea'); {
+                    editor.classList.add('text_pole');
+                    editor.classList.add('stcdx--editor-content');
+                    editor.value = this.entry.content;
+                    editor.addEventListener('input', async()=>{
+                        if (!this.isEditing || this.isTogglingEditor) return;
+                        this.entry.content = editor.value;
+                        this.entry.saveDebounced();
+                    });
+                    wrapper.append(editor);
+                }
+                this.dom.insertAdjacentElement('afterend', wrapper);
+            }
+            wrapper.classList.add('stcdx--preactive');
+            await waitForFrame();
+            this.dom.classList.remove('stcdx--active');
+            wrapper.classList.add('stcdx--active');
+            await delay(this.settings.transitionTime + 10);
+            this.dom.classList.remove('stcdx--preactive');
+            editor.selectionStart = 0;
+            editor.selectionEnd = 0;
+            editor.focus();
+        }
+        this.isTogglingEditor = false;
+        log('/CodexCharList.toggleEditor');
     }
 }

@@ -21,13 +21,25 @@ export class MapDetailsEditor {
     async show() {
         const response = await fetch('/scripts/extensions/third-party/SillyTavern-Codex/html/mapDetailsEditor.html');
         if (!response.ok) {
-            return warn('failed to fetch template: zoneEditor.html');
+            return warn('failed to fetch template: mapDetailsEditor.html');
         }
         const template = document.createRange().createContextualFragment(await response.text()).querySelector('#stcdx--mapEditor');
         /**@type {HTMLElement} */
         // @ts-ignore
         const dom = template.cloneNode(true);
         const popProm = callPopup(dom, 'text', undefined, { okButton: 'OK', wide: true, large: true, rows: 1 });
+        /**@type {HTMLInputElement}*/
+        const comment = dom.querySelector('#stcdx--map-comment');
+        comment.value = this.codexMap.entry.comment ?? '';
+        comment.addEventListener('input', ()=>{
+            this.codexMap.entry.comment = comment.value.trim();
+        });
+        /**@type {HTMLInputElement}*/
+        const keys = dom.querySelector('#stcdx--map-keys');
+        keys.value = this.codexMap.entry.keyList?.join(', ') ?? '';
+        keys.addEventListener('input', ()=>{
+            this.codexMap.entry.keyList = keys.value.trim().split(/\s*,\s*/);
+        });
         /**@type {HTMLInputElement}*/
         const url = dom.querySelector('#stcdx--map-url');
         url.value = this.codexMap.url ?? '';

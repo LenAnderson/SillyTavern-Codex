@@ -7,7 +7,7 @@ import { CodexBaseEntry } from './CodexBaseEntry.js';
 
 
 export class CodexEntry extends CodexBaseEntry {
-    /**@type {HTMLTextAreaElement}*/ editor;
+    /**@type {HTMLDivElement}*/ editor;
 
 
 
@@ -94,22 +94,53 @@ export class CodexEntry extends CodexBaseEntry {
             this.isEditing = false;
         } else {
             this.isEditing = true;
-            const editor = document.createElement('textarea'); {
-                this.editor = editor;
-                editor.classList.add('stcdx--editor');
-                editor.classList.add('text_pole');
-                editor.value = this.entry.content;
-                editor.addEventListener('input', async()=>{
-                    if (!this.isEditing || this.isTogglingEditor) return;
-                    this.entry.content = editor.value;
-                    this.entry.saveDebounced();
-                });
-                this.dom.insertAdjacentElement('afterend', editor);
+            let editor;
+            const wrapper = document.createElement('div'); {
+                this.editor = wrapper;
+                wrapper.classList.add('stcdx--editor');
+                const title = document.createElement('input'); {
+                    title.classList.add('text_pole');
+                    title.classList.add('stcdx--editor-title');
+                    title.placeholder = 'Title / Memo';
+                    title.title = 'Title / Memo';
+                    title.value = this.entry.comment;
+                    title.addEventListener('input', async()=>{
+                        if (!this.isEditing || this.isTogglingEditor) return;
+                        this.entry.comment = title.value;
+                        this.entry.saveDebounced();
+                    });
+                    wrapper.append(title);
+                }
+                const keywords = document.createElement('input'); {
+                    keywords.classList.add('text_pole');
+                    keywords.classList.add('stcdx--editor-tags');
+                    keywords.placeholder = 'Primary Keywords';
+                    keywords.title = 'Primary Keywords';
+                    keywords.value = this.entry.keyList.join(', ');
+                    keywords.addEventListener('input', async()=>{
+                        if (!this.isEditing || this.isTogglingEditor) return;
+                        this.entry.keyList = keywords.value.split(/\s*,\s*/);
+                        this.entry.saveDebounced();
+                    });
+                    wrapper.append(keywords);
+                }
+                editor = document.createElement('textarea'); {
+                    editor.classList.add('text_pole');
+                    editor.classList.add('stcdx--editor-content');
+                    editor.value = this.entry.content;
+                    editor.addEventListener('input', async()=>{
+                        if (!this.isEditing || this.isTogglingEditor) return;
+                        this.entry.content = editor.value;
+                        this.entry.saveDebounced();
+                    });
+                    wrapper.append(editor);
+                }
+                this.dom.insertAdjacentElement('afterend', wrapper);
             }
-            editor.classList.add('stcdx--preactive');
+            wrapper.classList.add('stcdx--preactive');
             await waitForFrame();
             this.dom.classList.remove('stcdx--active');
-            editor.classList.add('stcdx--active');
+            wrapper.classList.add('stcdx--active');
             await delay(this.settings.transitionTime + 10);
             this.dom.classList.remove('stcdx--preactive');
             editor.selectionStart = 0;

@@ -1,5 +1,7 @@
 import { dragElement } from '../../../../../RossAscends-mods.js';
+import { executeSlashCommands } from '../../../../../slash-commands.js';
 import { delay } from '../../../../../utils.js';
+import { quickReplyApi } from '../../../../quick-reply/index.js';
 
 // eslint-disable-next-line no-unused-vars
 import { Linker } from '../Linker.js';
@@ -10,6 +12,8 @@ import { Matcher } from '../Matcher.js';
 import { Settings } from '../Settings.js';
 // eslint-disable-next-line no-unused-vars
 import { Book } from '../st/wi/Book.js';
+import { Entry } from '../st/wi/Entry.js';
+import { worldInfoLogic } from '../st/wi/Logic.js';
 // eslint-disable-next-line no-unused-vars
 import { CodexBaseEntry } from './CodexBaseEntry.js';
 import { CodexCharList } from './CodexCharList.js';
@@ -196,7 +200,27 @@ export class Codex {
                     li.classList.add('stcdx--book');
                     const name = document.createElement('div'); {
                         name.classList.add('stcdx--name');
-                        name.textContent = book.name;
+                        name.textContent = `${book.name} +`;
+                        name.title = `Create entry in ${book.name}`;
+                        name.addEventListener('click', async(evt)=>{
+                            const type = (await executeSlashCommands('/buttons labels=["Basic Text", "Map", "Character List"] Codex Entry Type'))?.pipe;
+                            const key = (await executeSlashCommands('/input Key'))?.pipe;
+                            let qrs;
+                            if (type == 'Character List') {
+                                qrs = (await executeSlashCommands(`/buttons labels=${JSON.stringify(quickReplyApi.listSets())} Quick Reply Set`))?.pipe;
+                            }
+                            const typeKey = {
+                                'Map': ', codex-map:',
+                                'Character List': `, codex-chars:${qrs ?? ''}`,
+                            };
+                            const typeContent = {
+                                'Map': '{}',
+                                'Character List': 'Alice\nBob',
+                                'Basic Text': 'YOUR CONTENT HERE',
+                            };
+                            const uid = (await executeSlashCommands(`/createentry file="${book.name}" key="${key}${typeKey[type]}" ${typeContent[type]}`))?.pipe;
+                            this.show(new Match(book.name, Object.assign(new Entry(book.name), { uid, keyList:[], secondaryKeyList:[], secondaryKeyLogic:worldInfoLogic.AND_ANY, comment:'', content:'', isDisabled:false })));
+                        });
                         li.append(name);
                     }
                     const entryList = document.createElement('ul'); {
@@ -205,6 +229,7 @@ export class Codex {
                             const link = document.createElement('li'); {
                                 link.classList.add('stcdx--entry');
                                 link.textContent = entry.title;
+                                link.title = entry.title;
                                 link.addEventListener('click', (evt)=>{
                                     this.show(new Match(book.name, entry));
                                 });
@@ -300,6 +325,7 @@ export class Codex {
                             await this.content?.toggleEditor();
                             if (!this.isEditing) {
                                 root.classList.remove('stcdx--isEditing');
+                                this.renderMenu();
                             }
                         });
                         head.append(edit);
