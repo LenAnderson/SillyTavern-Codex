@@ -81,6 +81,7 @@ export class CodexBaseEntry {
             'Codex',
             false,
             false,
+            null,
         );
         const dom = document.createElement('div');
         dom.innerHTML = messageText;
