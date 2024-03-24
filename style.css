@@ -477,6 +477,15 @@ body:has(#stcdx--codex.stcdx--active) #WorldInfo {
 .stcdx--root > .stcdx--editor.stcdx--preactive {
   display: flex;
 }
+.stcdx--root > .stcdx--editor > .stcdx--editor-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: flex-end;
+}
+.stcdx--root > .stcdx--editor > .stcdx--editor-actions > .menu_button {
+  white-space: nowrap;
+}
 .stcdx--root > .stcdx--editor > .stcdx--editor-content {
   flex: 1 1 auto;
 }

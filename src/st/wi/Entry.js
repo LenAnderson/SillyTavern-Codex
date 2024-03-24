@@ -1,3 +1,5 @@
+import { eventSource, event_types } from '../../../../../../../script.js';
+import { delay } from '../../../../../../utils.js';
 import { debounceAsync } from '../../lib/debounce.js';
 
 
@@ -80,6 +82,36 @@ export class Entry {
             caseSensitive: this.isCaseSensitive,
             matchWholeWords: this.isMatchingWholeWords,
         };
+    }
+
+
+
+
+    async showInWorldInfo() {
+        const drawer = document.querySelector('#WorldInfo');
+        if (!drawer.classList.contains('openDrawer')) {
+            document.querySelector('#WI-SP-button > .drawer-toggle').click();
+        }
+        const sel = document.querySelector('#world_editor_select');
+        const bookIndex = Array.from(sel.children).find(it=>it.textContent.trim() == this.book)?.value;
+        const afterBookLoaded = async()=>{
+            const container = document.querySelector('#world_popup_entries_list');
+            const entry = container.querySelector(`.world_entry[uid="${this.uid}"]`);
+            if (entry.querySelector('.inline-drawer-toggle .inline-drawer-icon.down')) {
+                entry.querySelector('.inline-drawer-toggle').click();
+            }
+            entry.scrollIntoView();
+            entry.classList.add('stcdx--flash');
+            await delay(510);
+            entry.classList.remove('stcdx--flash');
+        };
+        if (sel.value != bookIndex) {
+            eventSource.once(event_types.WORLDINFO_UPDATED, async()=>afterBookLoaded());
+            sel.value = bookIndex;
+            sel.dispatchEvent(new Event('change'));
+        } else {
+            afterBookLoaded();
+        }
     }
 
 

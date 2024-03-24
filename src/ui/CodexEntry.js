@@ -12,6 +12,9 @@ export class CodexEntry extends CodexBaseEntry {
 
 
 
+    async unrender() {
+        super.unrender();
+    }
     async render(isUpdate = false) {
         let oldDom;
         if (isUpdate || !this.dom) {
@@ -124,6 +127,26 @@ export class CodexEntry extends CodexBaseEntry {
                     });
                     wrapper.append(keywords);
                 }
+                const actions = document.createElement('div'); {
+                    actions.classList.add('stcdx--editor-actions');
+                    const wi = document.createElement('div'); {
+                        wi.classList.add('menu_button');
+                        wi.textContent = 'Open in WI Panel';
+                        wi.addEventListener('click', ()=>{
+                            this.toggleEditor();
+                            this.entry.showInWorldInfo();
+                        });
+                        actions.append(wi);
+                    }
+                    const del = document.createElement('div'); {
+                        del.classList.add('menu_button');
+                        del.classList.add('redWarningBG');
+                        del.textContent = 'Delete';
+                        //TODO no exported function or slash command to delete WI entries
+                        // actions.append(del);
+                    }
+                    wrapper.append(actions);
+                }
                 editor = document.createElement('textarea'); {
                     editor.classList.add('text_pole');
                     editor.classList.add('stcdx--editor-content');
@@ -149,5 +172,6 @@ export class CodexEntry extends CodexBaseEntry {
         }
         this.isTogglingEditor = false;
         log('/CodexEntry.toggleEditor');
+        while (this.isEditing) await delay(100);
     }
 }

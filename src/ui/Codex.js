@@ -316,16 +316,12 @@ export class Codex {
                         edit.classList.add('stcdx--edit');
                         edit.classList.add('stcdx--disabled');
                         edit.textContent = '✎';
-                        edit.title = 'Edit entry';
-                        edit.addEventListener('click', async()=>{
-                            if (!this.isEditing) {
-                                editHeader.textContent = `${this.content?.entry?.book}: (${this.content?.entry?.uid}) ${this.content?.entry?.comment ?? this.content?.entry?.keyList?.join(' / ')}`;
-                                root.classList.add('stcdx--isEditing');
-                            }
-                            await this.content?.toggleEditor();
-                            if (!this.isEditing) {
-                                root.classList.remove('stcdx--isEditing');
-                                this.renderMenu();
+                        edit.title = 'Edit entry\n——————————\n[Ctrl]+[Click] to open in World Info editor';
+                        edit.addEventListener('click', async(evt)=>{
+                            if (evt.ctrlKey) {
+                                this.content.entry.showInWorldInfo();
+                            } else {
+                                this.toggleEditor();
                             }
                         });
                         head.append(edit);
@@ -382,6 +378,7 @@ export class Codex {
      * @param {Match} match
      */
     async show(match = null, isHistory = false, isForced = false) {
+        if (this.isEditing) await this.toggleEditor();
         this.render().classList.add('stcdx--active');
         if (match) {
             /**@type {CodexBaseEntry}*/
@@ -437,5 +434,17 @@ export class Codex {
     zoom(idx) {
         // @ts-ignore
         Array.from(this.content?.dom?.querySelectorAll('img, canvas') ?? [])[idx]?.click();
+    }
+
+    async toggleEditor() {
+        if (!this.isEditing) {
+            this.editHeader.textContent = `${this.content?.entry?.book}: (${this.content?.entry?.uid}) ${this.content?.entry?.title}`;
+            this.dom.classList.add('stcdx--isEditing');
+        }
+        await this.content?.toggleEditor();
+        if (!this.isEditing) {
+            this.dom.classList.remove('stcdx--isEditing');
+            this.renderMenu();
+        }
     }
 }
