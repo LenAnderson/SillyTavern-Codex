@@ -18,9 +18,10 @@ import { CodexEntry } from './ui/CodexEntry.js';
 import { CodexBaseEntry } from './ui/CodexBaseEntry.js';
 import { CodexMap } from './ui/CodexMap.js';
 import { CodexCharList } from './ui/CodexCharList.js';
+import { createHash } from './lib/hash.js';
 
 
-
+const MAX_HASHES = 2000; // Maximum number of hashes to store
 
 export class CodexManager {
     /**@type {Settings}*/ settings;
@@ -46,6 +47,7 @@ export class CodexManager {
 
     /**@type {(isForced?:boolean)=>Promise}*/ restartDebounced;
     /**@type {Function}*/ processQueueDebounced;
+    /**@type {Object.<string, string>}*/ messageHashes = {};
 
 
 
@@ -258,8 +260,28 @@ export class CodexManager {
     }
 
     async updateMessageIdx(idx) {
-        await this.updateMessage(document.querySelector(`#chat > .mes[mesid="${idx}"] .mes_text`));
+        const message = chat[idx];
+        const newHash = createHash(message.mes);
+
+        if (this.messageHashes[idx] !== newHash) {
+            this.messageHashes[idx] = newHash;
+            await this.updateMessage(document.querySelector(`#chat > .mes[mesid="${idx}"] .mes_text`));
+        }
+        else {
+                const msg_obj = document.querySelector(`#chat > .mes[mesid="${idx}"] .mes_text`);
+                this.linker.restoreChatMessage(msg_obj);
+                this.linker.addCodexLinks(msg_obj);
+                log('Message hash ' + newHash + ' is the same, skipping processing.')
+        }
+
+        // Check if the number of stored hashes exceeds the maximum limit
+        if (Object.keys(this.messageHashes).length > MAX_HASHES) {
+            const oldestIdx = Object.keys(this.messageHashes)[0]; // Get the first key (oldest entry)
+            delete this.messageHashes[oldestIdx]; // Remove the oldest hash
+            log(`Removed oldest hash for message id: ${oldestIdx}`);
+        }
     }
+
     async updateMessage(msg) {
         log('UPDATE MESSAGE', msg);
         const mes = msg.closest('.mes');
