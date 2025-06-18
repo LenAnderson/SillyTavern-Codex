@@ -780,6 +780,43 @@ body .stcdx--root {
 			}
 		}
 	}
+    > .stcdx--content {  
+        img, video {
+          max-width: 100%;
+          height: auto;
+        }
+    }
+    @media screen and (max-width: 768px) {
+        width: 100%;
+        left: 0;
+        right: 0;
+        font-size: 14px;
+        line-height: 1.4;
+
+        .stcdx--codex {
+          left: 0;
+          right: 0;
+          width: 100%;
+          top: var(--topBarBlockSize, 0);
+          bottom: var(--bottomBarBlockSize, 0);
+        }
+
+        > .stcdx--content {
+          padding: 0.5em;
+
+          &.stcdx--entry section {
+            padding: 0.5em;
+          }
+
+          h1, h2, h3 {
+            font-size: 1.2em;
+          }
+
+          p {
+            font-size: 0.9em;
+          }
+        }
+    }
 }
 
 

@@ -782,6 +782,41 @@ body .stcdx--root > .stcdx--editor .stcdx--editor-tabUi .stcdx--tabs .stcdx--tab
   left: 0;
   opacity: 1;
 }
+body .stcdx--root > .stcdx--content img,
+body .stcdx--root > .stcdx--content video {
+  max-width: 100%;
+  height: auto;
+}
+@media screen and (max-width: 768px) {
+  body .stcdx--root {
+    width: 100%;
+    left: 0;
+    right: 0;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  body .stcdx--root .stcdx--codex {
+    left: 0;
+    right: 0;
+    width: 100%;
+    top: var(--topBarBlockSize, 0);
+    bottom: var(--bottomBarBlockSize, 0);
+  }
+  body .stcdx--root > .stcdx--content {
+    padding: 0.5em;
+  }
+  body .stcdx--root > .stcdx--content.stcdx--entry section {
+    padding: 0.5em;
+  }
+  body .stcdx--root > .stcdx--content h1,
+  body .stcdx--root > .stcdx--content h2,
+  body .stcdx--root > .stcdx--content h3 {
+    font-size: 1.2em;
+  }
+  body .stcdx--root > .stcdx--content p {
+    font-size: 0.9em;
+  }
+}
 .stcdx--blocker {
   position: fixed;
   inset: 0;
